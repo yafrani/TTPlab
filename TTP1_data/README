@@ -1,0 +1,18 @@
+Sample Instances
+
+We provide a range of sample instances that are representative for the instances that your algorithms will have to solve. In brackets, we list some decent objective values.
+
+280 cities
+1 item per city, lowest knapsack capacity, strongly correlated item weights/profits (16099)
+5 items per city, medium knapsack capacity, uncorrelated but similar item weights/profits (104366)
+10 items per city, highest knapsack capacity, uncorrelated item weights/profits (411715)
+
+4461 cities
+1 item per city, lowest knapsack capacity, strongly correlated item weights/profits (235856)
+5 items per city, medium knapsack capacity, uncorrelated but similar item weights/profits (1478962)
+10 items per city, highest knapsack capacity, uncorrelated item weights/profits (6256200)
+
+33810 cities
+1 item per city, lowest knapsack capacity, strongly correlated item weights/profits (1639008)
+5 items per city, medium knapsack capacity, uncorrelated but similar item weights/profits (0)
+10 items per city, highest knapsack capacity, uncorrelated item weights/profits (580948)
