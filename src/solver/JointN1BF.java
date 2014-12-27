@@ -116,9 +116,9 @@ public class JointN1BF extends LocalSearch {
            * velocity-TSP
            * TSP constrained with knapsack weight
            */
-          // tour index where change happened (from which the item is added/leaved)
+          // tour index where change happened (from which the item is added/left)
           int refBF;
-          for (refBF=0; refBF<nbCities; refBF++) {
+          for (refBF=0; refBF<nbCities; refBF++) { // necessary ?
             if (A[k]==tour[refBF]) break;
           }
           
@@ -139,8 +139,11 @@ public class JointN1BF extends LocalSearch {
             }
             
             ft2 += dist[tour[r]-1][tour[(r+1)%nbCities]-1] / (maxSpeed-wc*C);
-            //P.echo(r+": ("+(c1+1)+","+(c2+1)+") wc "+wc+
-            //    " ft "+String.format("%.2f", ft2));
+            
+            // debugging...
+            int c1 = tour[r], c2 = tour[(r+1)%nbCities];
+            Deb.echo(r+": ("+String.format("%2d", c1)+","+String.format("%2d", c2)+") | wc "+wc+" vs "+sol.weightAcc[r]+
+                " ft "+String.format("%.2f", ft2));
           }
           
           ob2 = fp2 - ft2*R;
@@ -192,7 +195,7 @@ public class JointN1BF extends LocalSearch {
         
         ttp.objective(sol);
         
-        sBest = sol;
+        sBest = sol.clone();
         
         // debug print
         if (this.debug) {
@@ -203,6 +206,7 @@ public class JointN1BF extends LocalSearch {
           Deb.echo("---");
         }
       }
+      improv=false;
     } while(improv);
     
     

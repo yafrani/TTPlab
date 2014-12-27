@@ -133,6 +133,7 @@ public class Joint2optBF extends LocalSearch {
             // recalculate velocities from start
             for (int r=start; r<nbCities; r++) {
               
+              /** @Todo: replace weightRecord with weightAcc ? */
               wc += TwoOptHelper.get2opt(r, sol.weightRecord, i, j);
               
               // add delta stating from refBF
@@ -183,7 +184,7 @@ public class Joint2optBF extends LocalSearch {
         pickingPlan[kBest] = pickingPlan[kBest]!=0 ? 0 : A[kBest];
         
         ttp.objective(sol);
-        sBest = sol;
+        sBest = sol.clone();
         
         // debug print
         if (this.debug) {

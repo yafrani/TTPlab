@@ -57,12 +57,16 @@ public class Constructive extends TTPHeuristic {
         x = greedyTour();
       break;
       
+      case 'l':
+        x = linkernTour();
+      break;
+      
       case 'o':
         x = optimalTour();
       break;
       
       default:
-        x = simpleTour();
+        x = linkernTour();
       break;
     }
     
@@ -82,7 +86,7 @@ public class Constructive extends TTPHeuristic {
       break;
       
       default:
-        z = zerosPickingPlan();
+        z = randomPickingPlan();
       break;
     }
     
@@ -174,15 +178,6 @@ public class Constructive extends TTPHeuristic {
   }
   
   
-  
-  // testing ...
-  public static void main(String[] args) {
-    Constructive x = new Constructive(new TTP1Instance(    "./TTP1_data/eil51-ttp/eil51_n50_bounded-strongly-corr_01.ttp"));
-    int[] t = x.optimalTour();
-    Deb.echo(t);
-  }
-  
-  
   /**
    * use optimal TSP tour
    * 
@@ -214,6 +209,48 @@ public class Constructive extends TTPHeuristic {
       int i = 0;
       while ((line = br.readLine()) != null && i<nbCities) {
         tour[i++] = Integer.parseInt(line);
+      } // end while
+      
+      br.close();
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+    
+    return tour;
+  }
+  
+  
+  /**
+   * use Lin-Kernighan TSP tour
+   * 
+   * @return
+   */
+  public int[] linkernTour() {
+    int nbCities = ttp.getNbCities();
+    int[] tour = new int[nbCities];
+    
+    String fileName = ttp.getName().replaceAll("-.+", "");
+    String dirName = "./TTP1_data/"+fileName+"-ttp";
+    fileName += ".linkern.tour";
+    //Deb.echo(dirName + "/" + fileName);
+    
+    File file = new File(dirName + "/" + fileName);
+    BufferedReader br = null;
+    
+    try {
+      br = new BufferedReader(new FileReader(file));
+      String line;
+      
+      // scan tour
+      while ((line = br.readLine()) != null) {
+        
+        if (line.startsWith("TOUR_SECTION")) {
+          
+          for (int j=0; j<nbCities; j++) {
+            line = br.readLine();
+            tour[j] = Integer.parseInt(line);
+          }
+        }
       } // end while
       
       br.close();
@@ -353,6 +390,7 @@ public class Constructive extends TTPHeuristic {
   }
   
   
+  
   /**
    * basic heuristic no 1
    * based on the constructive heuristic SH
@@ -382,8 +420,10 @@ public class Constructive extends TTPHeuristic {
      * the tour
      * generated using greedy algorithm
      */
-    x = greedyTour();
-    
+    x = optimalTour();
+    z = zerosPickingPlan();
+    Deb.echo(x);
+    Deb.echo(z);
     
     /*
      * the picking plan
@@ -460,4 +500,10 @@ public class Constructive extends TTPHeuristic {
   
   
   
+  //testing ...
+  public static void main(String[] args) {
+    Constructive x = new Constructive(new TTP1Instance("./TTP1_data/eil51-ttp/eil51_n50_bounded-strongly-corr_01.ttp"));
+    int[] t = x.linkernTour();
+    Deb.echo(t);
+  }
 }

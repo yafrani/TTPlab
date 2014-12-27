@@ -31,13 +31,20 @@ public class TestAll {
   
   
   /**
+   * number of repetitions for random init algos
+   */
+  static final int nbRep = 5;
+  
+  
+  /**
    * initial tour generation
+   * l: Lin-Kernighan
    * o: optimal
    * r: random
    * g: greedy
    * s: simple
    */
-  static final char tourAlgo = 'o';
+  static final char tourAlgo = 'l';
   
   
   /**
@@ -46,13 +53,13 @@ public class TestAll {
    * r: random
    * g: greedy
    */
-  static final char ppAlgo = 'g';
+  static final char ppAlgo = 'r';
   
   
   /**
    * instances folder
    */
-  static final String instFolder = "eil51-ttp";
+  static final String instFolder = "bier127-ttp";
   
   
   /**
@@ -61,16 +68,7 @@ public class TestAll {
   static final String instFiles[] = {
     "eil51-ttp/eil51_n50_bounded-strongly-corr_01.ttp",
     "eil51-ttp/eil51_n50_bounded-strongly-corr_02.ttp",
-    "eil51-ttp/eil51_n50_bounded-strongly-corr_03.ttp",
-//      "a280-ttp/a280_n279_bounded-strongly-corr_01.ttp"
-//      "a280_n1395_uncorr-similar-weights_05.ttp",
-//      "a280_n2790_uncorr_10.ttp",
-//      "fnl4461_n4460_bounded-strongly-corr_01.ttp",
-//      "fnl4461_n22300_uncorr-similar-weights_05.ttp",
-//      "fnl4461_n44600_uncorr_10.ttp",
-//      "pla33810_n33809_bounded-strongly-corr_01.ttp",
-//      "pla33810_n169045_uncorr-similar-weights_05.ttp",
-//      "pla33810_n338090_uncorr_10.ttp"
+    "eil51-ttp/eil51_n50_bounded-strongly-corr_03.ttp"
   };
   
   
@@ -113,7 +111,8 @@ public class TestAll {
     final PrintWriter out = new PrintWriter(filename);
     
     // number of repetitions for random-based algos
-    final int nbIt = 1;
+    final int nbIt = ppAlgo == 'r' ? nbRep : 1;
+    
     int cmp = 1;
     do {
       
@@ -138,8 +137,8 @@ public class TestAll {
          *---------------------------------*/
         ExecutorService executor = Executors.newFixedThreadPool(4);
         Future<?> future = executor.submit(new Runnable() {
-          public void run() {
             
+          public void run() {
             /* execute */
             long startTime = System.currentTimeMillis();
             TTPSolution sx = algo.solve();

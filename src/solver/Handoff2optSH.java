@@ -48,6 +48,7 @@ public class Handoff2optSH extends LocalSearch {
     // initial solution data
     int[] tour = sol.getTour();
     int[] pickingPlan = sol.getPickingPlan();
+    ttp.objective(sol);
     
     int fp2 = sol.fp;
     double ft2, ob2 = .0;

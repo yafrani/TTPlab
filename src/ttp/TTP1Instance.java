@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import utils.CityCoordinates;
+import utils.Deb;
 
 /**
  * TTP1 instance
@@ -49,7 +50,7 @@ public class TTP1Instance extends TTPInstance {
    * @param file
    */
   public TTP1Instance(File file) {
-	  
+    
     this.ttpFile = file;
     BufferedReader br = null;
     
@@ -216,6 +217,7 @@ public class TTP1Instance extends TTPInstance {
       
       // record important data for future use
       s.timeAcc[i] = ft;
+      s.timeRec[i] = D[x[i]-1][x[h]-1] / velocity;
       s.weightAcc[i] = wc;
       s.weightRecord[i] = acc;
     }

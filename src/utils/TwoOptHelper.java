@@ -9,7 +9,7 @@ public class TwoOptHelper {
    * @param tour TSP tour
    * @param i beginning
    * @param j end
-   * @return the kth element
+   * @return the k'th element
    */
   public static int get2opt(int k, int[] tour, int i, int j) {
     

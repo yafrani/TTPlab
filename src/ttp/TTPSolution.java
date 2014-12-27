@@ -25,7 +25,7 @@ public class TTPSolution {
    * time accumulator
    */
   public double[] timeAcc;
-  
+  public double[] timeRec;
   /**
    * weight accumulator
    */
@@ -48,6 +48,7 @@ public class TTPSolution {
     
     // records
     timeAcc = new double[tour.length];
+    timeRec = new double[tour.length];
     weightAcc = new int[tour.length];
     weightRecord = new int[tour.length];
   }
@@ -59,6 +60,7 @@ public class TTPSolution {
     
     // records
     timeAcc = new double[tour.length];
+    timeRec = new double[tour.length];
     weightAcc = new int[tour.length];
     weightRecord = new int[tour.length];
   }
@@ -73,6 +75,7 @@ public class TTPSolution {
     this.wend = s2.wend;
     
     this.timeAcc= Arrays.copyOf(s2.timeAcc,s2.timeAcc.length);
+    this.timeRec= Arrays.copyOf(s2.timeRec,s2.timeRec.length);
     this.weightAcc = Arrays.copyOf(s2.weightAcc,s2.weightAcc.length);
     this.weightRecord = Arrays.copyOf(s2.weightRecord,s2.weightRecord.length);
   }
