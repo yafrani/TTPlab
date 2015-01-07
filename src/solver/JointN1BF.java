@@ -3,6 +3,7 @@ package solver;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
+import utils.SwapHelper;
 
 /**
  * local search algorithms 
@@ -33,12 +34,12 @@ public class JointN1BF extends LocalSearch {
     ttp.objective(s0);
     
     // copy initial solution into improved solution
-    TTPSolution sol = s0.clone(), sBest = s0.clone();
+    TTPSolution sol = s0.clone();//, sBest = s0.clone();
     
     // TTP data
     int nbCities = ttp.getNbCities();
     int nbItems = ttp.getNbItems();
-    long[][] dist = ttp.getDist();
+    long[][] D = ttp.getDist();
     int[] A = ttp.getAvailability();
     double maxSpeed = ttp.getMaxSpeed();
     double minSpeed = ttp.getMinSpeed();
@@ -46,61 +47,110 @@ public class JointN1BF extends LocalSearch {
     double C = (maxSpeed - minSpeed) / capacity;
     double R = ttp.getRent();
     
-    // initial solution data
+    // solution data
     int[] tour = sol.getTour();
     int[] pickingPlan = sol.getPickingPlan();
+    int[] mapCI = new int[nbCities];          // city/index store
+    
+    // iterations indicators
+    boolean improv;
+    int nbIter = 0;
     
     // delta parameters
-    int deltaP, deltaW,
-        tmp,
-        oldWR_i;
+    int deltaP, deltaW;
+    double deltaT;
     
-    // improvement indicator
-    boolean improv;
+    // swapped cities
+    int c1, c2, c3, c4;
     
-    // best solution
+    // changed velocities
+    double v1, v2, v3, v2i;
+    
+    // best solution params
     int iBest=0, kBest=0;
-    double obBest = sol.ob;
+    double GBest = sol.ob;
     
-    // neighbor solution
-    int fp2;
-    double ft2, ob2;
-    int nbIter = 0;
-    int wc, start;
+    // neighbor solution data
+    int fp = sol.fp;
+    double ft = sol.ft, G = sol.ob;
+    int wc,       // current weight
+        newWA,
+        oldWA;    // saved WA at swap index
+    int refBF;    // one-bit-flip index
+    double[] tacc = new double[nbCities];  // tmp time acc
     
     do {
+      
+      /* map indices to their associated cities */
+      for (int q=0; q<nbCities; q++) { // @todo move this to solution coding?
+        mapCI[tour[q]-1] = q;
+      }
+      
+      // improvement checker and iterator
       improv = false;
       nbIter++;
-      // find all neighbors
-      for (int i=1; i<nbCities-1; i++) { // TSP swap
+      
+      /* ****************************** */
+      /* swap two adjacent cities       */
+      /* ****************************** */
+      for (int i=1;i<nbCities-1; i++) {
         
-        // swap city i with i+1
-        tmp = tour[i];
-        tour[i] = tour[i+1];
-        tour[i+1] = tmp;
-        oldWR_i = sol.weightAcc[i];
+        oldWA = sol.weightAcc[i];
+        newWA = sol.weightAcc[i-1] + sol.weightAcc[i+1] - sol.weightAcc[i];
         
-        sol.weightAcc[i] = sol.weightAcc[i-1]+sol.weightAcc[i+1]-sol.weightAcc[i];
+        /* compute time using delta technique */
+        // affected cities
+        c1 = tour[i-1]-1;
+        c2 = tour[i]-1;
+        c3 = tour[i+1]-1;
+        c4 = tour[(i+2)%nbCities]-1;
+    
+        // partial velocities
+        v1 = maxSpeed - sol.weightAcc[i-1]*C;
+        v2 = maxSpeed - sol.weightAcc[i]  *C;
+        v3 = maxSpeed - sol.weightAcc[i+1]*C;
+        v2i= maxSpeed - newWA*C;
         
-        for (int k=0; k<nbItems; k++) {  // KP bit-flip
+        // compute objective
+        deltaT = - D[c1][c2]/v1 - D[c2][c3]/v2  - D[c3][c4]/v3
+                 + D[c1][c3]/v1 + D[c3][c2]/v2i + D[c2][c4]/v3;
+        ft = sol.ft + deltaT;
+        
+        /* fix time accumulator */
+//        for (int q=0; q<i+1; q++) {
+//          tacc[q] = sol.timeAcc[q];
+//        }
+        if (i-2>-1) tacc[i-2] = sol.timeAcc[i-2]; // @todo sufficient ?
+        tacc[i-1] = sol.timeAcc[i-1] - D[c1][c2]/v1 + D[c1][c3]/v1;
+        tacc[i] = tacc[i-1] + D[c2][c3]/v2i;
+        for (int r=i+1; r<nbCities; r++) {
+          tacc[r] = sol.timeAcc[r] + deltaT;
+        }
+        
+        /* apply a swap between node i and node i+1 */
+        SwapHelper.doSwap(tour, i);
+        sol.weightAcc[i] = newWA;
+        SwapHelper.doSwap(mapCI, tour[i]-1, tour[i+1]-1);
+        
+        
+        /* ****************************** */
+        /* on bit flip                    */
+        /* ****************************** */
+        for (int k=0; k<nbItems; k++) {
           
-          /*
-           * cleanup and stop execution
-           */
+          /* cleanup and stop execution if interrupted */
           if (Thread.currentThread().isInterrupted()) {
-            return sBest;
+            return sol;
           }
           
-          
-          // check if new weight doesn't exceed knapsack capacity
+          /* check if new weight doesn't exceed knapsack capacity */
           if (pickingPlan[k]==0 && ttp.weightOf(k)>sol.wend) {
             continue;
           }
           
-          /**
-           * KP
+          /*
+           * sub-KP: calculate delta, calculate total profit
            */
-          // calculate delta-profit and delta-weight
           if (pickingPlan[k]==0) {
             deltaP = ttp.profitOf(k);
             deltaW = ttp.weightOf(k);
@@ -109,93 +159,65 @@ public class JointN1BF extends LocalSearch {
             deltaP = -ttp.profitOf(k);
             deltaW = -ttp.weightOf(k);
           }
+          fp = sol.fp + deltaP;
           
-          fp2 = sol.fp + deltaP;
           
-          /**
+          /*
            * velocity-TSP
            * TSP constrained with knapsack weight
            */
-          // tour index where change happened (from which the item is added/left)
-          int refBF;
-          for (refBF=0; refBF<nbCities; refBF++) { // necessary ?
-            if (A[k]==tour[refBF]) break;
-          }
+          // index where Bit-Flip happened
+          refBF = mapCI[ A[k]-1 ];
           
-          // tour index from which start recalculation
-          start = refBF<i-1 ? refBF : i-1;
-          
-          // time to start with
-          ft2 = start==0 ? .0 : sol.timeAcc[start-1];
+          // starting time
+          ft = refBF==0 ? .0 : tacc[refBF-1];
           
           // recalculate velocities from start
-          for (int r=start; r<nbCities; r++) {
-            
-            wc = sol.weightAcc[r];
+          for (int r=refBF; r<nbCities; r++) {
             
             // add delta stating from refBF
-            if (r>=refBF) {
-              wc += deltaW;
-            }
-            
-            ft2 += dist[tour[r]-1][tour[(r+1)%nbCities]-1] / (maxSpeed-wc*C);
-            
-            // debugging...
-            int c1 = tour[r], c2 = tour[(r+1)%nbCities];
-            Deb.echo(r+": ("+String.format("%2d", c1)+","+String.format("%2d", c2)+") | wc "+wc+" vs "+sol.weightAcc[r]+
-                " ft "+String.format("%.2f", ft2));
+            wc = sol.weightAcc[r] + deltaW;
+            ft += D[tour[r]-1][tour[(r+1)%nbCities]-1] / (maxSpeed-wc*C);
           }
           
-          ob2 = fp2 - ft2*R;
+          /* compute objective value */
+          G = fp - ft*R;
           
-          //pickingPlan[k] = pickingPlan[k]!=0 ? 0 : A[k];
-          //TTPSolution cl = sol.clone();
-          //P.echo((i+1)+"x"+(i+2)+":"+(k+1)+"\n"+sol);
-          //pickingPlan[k] = pickingPlan[k]!=0 ? 0 : A[k];
-          
-          //P.echo2(i+"~"+(i+1)+"/"+k+"  "); P.echo2("ob2: "+ob2);
-          //ttp.objective(cl);
-          //P.echo(" :: "+cl.ob);
-          
-          
-          if (ob2 > obBest) {
+          if (G > GBest) {
             iBest = i;
             kBest = k;
-            obBest = ob2;
+            GBest = G;
             improv = true;
             
-            // echos
-            //pickingPlan[jBest] = pickingPlan[jBest]!=0 ? 0 : A[jBest];
-            //P.echo(sol+"\n");
-            //pickingPlan[jBest] = pickingPlan[jBest]!=0 ? 0 : A[jBest];
             if (firstfit) break;
           }
           
         } // END FOR k
         
-        // retrieve initial solution
-        tmp = tour[i];
-        tour[i] = tour[i+1];
-        tour[i+1] = tmp;
-        sol.weightAcc[i] = oldWR_i;
+        // swap back to retrieve initial solution
+        SwapHelper.doSwap(tour, i);
+        sol.weightAcc[i] = oldWA;
+        SwapHelper.doSwap(mapCI, tour[i]-1, tour[i+1]-1);
         
         if (firstfit && improv) break;
       } // END FOR i
       
-      
       if (improv) {
         
         // swap
-        tmp = tour[iBest];
-        tour[iBest] = tour[iBest+1];
-        tour[iBest+1] = tmp;
+        SwapHelper.doSwap(tour, iBest);
         
         // bit-flip
         pickingPlan[kBest] = pickingPlan[kBest]!=0 ? 0 : A[kBest];
         
         ttp.objective(sol);
         
-        sBest = sol.clone();
+        // for more accuracy in unit testing
+        sol.ob = GBest;
+        if (firstfit) {
+          sol.ft = ft;
+          sol.fp = fp;
+        }
         
         // debug print
         if (this.debug) {
@@ -206,11 +228,11 @@ public class JointN1BF extends LocalSearch {
           Deb.echo("---");
         }
       }
-      improv=false;
+      
+//      improv=false;
     } while(improv);
     
-    
-    return sBest;
+    return sol;
   }
   
 }

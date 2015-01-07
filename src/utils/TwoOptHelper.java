@@ -1,5 +1,11 @@
 package utils;
 
+/**
+ * 2-OPT operations
+ * 
+ * @author kyu
+ *
+ */
 public class TwoOptHelper {
 
   /**
@@ -11,10 +17,9 @@ public class TwoOptHelper {
    * @param j end
    * @return the k'th element
    */
-  public static int get2opt(int k, int[] tour, int i, int j) {
+  public static int get2optValue(int k, int[] tour, int i, int j) {
     
     if (k>=i && k<=j) {
-      //P.echo(">>"+k);
       return tour[j-k+i];
     }
     return tour[k];
@@ -22,13 +27,13 @@ public class TwoOptHelper {
   
   
   /**
-   * get tour index using 2opt technique
+   * get tour index after 2opt is applied
    * 
    * @param k element index
    * @param tour TSP tour
    * @param i beginning
    * @param j end
-   * @return the kth element
+   * @return the k'th element index
    */
   public static int get2optIndex(int k, int[] tour, int i, int j) {
     

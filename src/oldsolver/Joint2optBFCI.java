@@ -1,4 +1,4 @@
-package solver;
+package oldsolver;
 
 import solver.LocalSearch;
 import ttp.TTP1Instance;
@@ -14,18 +14,18 @@ import utils.TwoOptHelper;
  * @author kyu
  *
  */
-public class Joint2optBF extends LocalSearch {
+public class Joint2optBFCI extends LocalSearch {
   
   
-  public Joint2optBF() {
+  public Joint2optBFCI() {
     super();
   }
   
-  public Joint2optBF(TTP1Instance ttp) {
+  public Joint2optBFCI(TTP1Instance ttp) {
     super(ttp);
   }
   
-  public Joint2optBF(TTP1Instance ttp, TTPSolution s0) {
+  public Joint2optBFCI(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
   
@@ -53,6 +53,7 @@ public class Joint2optBF extends LocalSearch {
     // initial solution data
     int[] tour = sol.getTour();
     int[] pickingPlan = sol.getPickingPlan();
+    int[] mapCI = new int[nbCities];      // city/index store
     
     // delta parameters
     int deltaP, deltaW;
@@ -73,6 +74,11 @@ public class Joint2optBF extends LocalSearch {
     
     
     do {
+      /* map indices to their associated cities */
+      for (int q=0; q<nbCities; q++) { // @todo move this to solution coding?
+        mapCI[tour[q]-1] = q;
+      }
+      
       improv = false;
       nbIter++;
       
@@ -115,12 +121,9 @@ public class Joint2optBF extends LocalSearch {
              * velocity-TSP
              * TSP constrained with knapsack weight
              */
-            // tour index where change happened (from which the item is picked/leaved)
-            int refBF;
-            for (refBF=0; refBF<nbCities; refBF++) {
-              if (A[k]==tour[refBF]) break;
-            }
-            
+            // index where Bit-Flip happened
+            int refBF = mapCI[ A[k]-1 ];
+
             // tour index from which start recalculation
             start = refBF<i-1 ? refBF : i-1;
             

@@ -1,4 +1,4 @@
-package solver;
+package oldsolver;
 
 import solver.LocalSearch;
 import ttp.TTP1Instance;
@@ -14,18 +14,18 @@ import utils.TwoOptHelper;
  * @author kyu
  *
  */
-public class Joint2optBF extends LocalSearch {
+public class Joint2optBFOLD extends LocalSearch {
   
   
-  public Joint2optBF() {
+  public Joint2optBFOLD() {
     super();
   }
   
-  public Joint2optBF(TTP1Instance ttp) {
+  public Joint2optBFOLD(TTP1Instance ttp) {
     super(ttp);
   }
   
-  public Joint2optBF(TTP1Instance ttp, TTPSolution s0) {
+  public Joint2optBFOLD(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
   

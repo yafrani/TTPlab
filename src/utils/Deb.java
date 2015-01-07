@@ -1,12 +1,17 @@
 package utils;
 
+/**
+ * simplify printing and debugging
+ * 
+ * @author kyu
+ *
+ */
 public class Deb {
   
-  /** print functions... */
   public static void echo(Object s) {
     System.out.println(s);
   }
-  public static void echo2(Object s) {
+  public static void echol(Object s) {
     System.out.print(s);
   }
   
@@ -15,18 +20,26 @@ public class Deb {
   }
   
   public static void echo(int[] x) {
+    echo(x,"%d");
+  }
+  
+  public static void echo(int[] x,String forma) {
     String s="";
     for (int i=0; i<x.length; i++)
-      s += String.format("%4d",x[i])+", ";
+      s += String.format(forma,x[i])+", ";
     s = s.substring(0,s.length()-2);
     echo(s+" #");
   }
+  
   public static void echo(double[] x) {
+    echo(x,"%.2f");
+  }
+  
+  public static void echo(double[] x, String forma) {
     String s="";
     for (int i=0; i<x.length; i++)
-      s += String.format("%.2f", x[i])+", ";
+      s += String.format(forma, x[i])+", "; // testing
     s = s.substring(0,s.length()-2);
     echo(s);
   }
-  
 }

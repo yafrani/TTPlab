@@ -16,8 +16,8 @@ public abstract class TTPHeuristic {
   public TTPHeuristic() {
     this.name = this.getClass().getSimpleName();
     
-    this.debug = true;
-    this.log = true;
+    this.debug = false;
+    this.log = false;
   }
   
   public TTPHeuristic(TTP1Instance ttp ) {

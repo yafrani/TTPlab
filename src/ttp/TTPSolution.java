@@ -34,7 +34,7 @@ public class TTPSolution {
   /**
    * weight record at each iteration
    */
-  public int[] weightRecord;
+  public int[] weightRec;
   
   
   public TTPSolution() {
@@ -50,7 +50,7 @@ public class TTPSolution {
     timeAcc = new double[tour.length];
     timeRec = new double[tour.length];
     weightAcc = new int[tour.length];
-    weightRecord = new int[tour.length];
+    weightRec = new int[tour.length];
   }
   
   public TTPSolution(int m, int n) {
@@ -62,7 +62,7 @@ public class TTPSolution {
     timeAcc = new double[tour.length];
     timeRec = new double[tour.length];
     weightAcc = new int[tour.length];
-    weightRecord = new int[tour.length];
+    weightRec = new int[tour.length];
   }
   
   public TTPSolution(TTPSolution s2) {
@@ -77,7 +77,7 @@ public class TTPSolution {
     this.timeAcc= Arrays.copyOf(s2.timeAcc,s2.timeAcc.length);
     this.timeRec= Arrays.copyOf(s2.timeRec,s2.timeRec.length);
     this.weightAcc = Arrays.copyOf(s2.weightAcc,s2.weightAcc.length);
-    this.weightRecord = Arrays.copyOf(s2.weightRecord,s2.weightRecord.length);
+    this.weightRec = Arrays.copyOf(s2.weightRec,s2.weightRec.length);
   }
   
   @Override
@@ -103,6 +103,21 @@ public class TTPSolution {
   @Override
   public TTPSolution clone() {
     return new TTPSolution(this);
+  }
+  
+  @Override
+  public boolean equals(Object o2) {
+    
+    TTPSolution s2 = (TTPSolution) o2;
+    
+    for (int i=0; i<this.tour.length; i++) {
+      if (this.tour[i]!=s2.tour[i]) return false;
+    }
+    for (int i=0; i<this.pickingPlan.length; i++) {
+      if (this.pickingPlan[i]!=s2.pickingPlan[i]) return false;
+    }
+    
+    return true;
   }
   
   // getters

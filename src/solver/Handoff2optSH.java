@@ -105,10 +105,10 @@ public class Handoff2optSH extends LocalSearch {
           // recalculate velocities from start
           for (int r=start; r<nbCities; r++) {
             
-            wc += TwoOptHelper.get2opt(r, sol.weightRecord, i, j);
+            wc += TwoOptHelper.get2optValue(r, sol.weightRec, i, j);
             
-            int c1 = TwoOptHelper.get2opt(r, tour, i, j)-1;
-            int c2 = TwoOptHelper.get2opt((r+1)%nbCities, tour, i, j)-1; // todo: avoid using the % operator...
+            int c1 = TwoOptHelper.get2optValue(r, tour, i, j)-1;
+            int c2 = TwoOptHelper.get2optValue((r+1)%nbCities, tour, i, j)-1; // todo: avoid using the % operator...
             
             ft2 += D[c1][c2] / (maxSpeed-wc*C);
             
