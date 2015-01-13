@@ -1,4 +1,5 @@
 package mantesting;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -21,7 +22,6 @@ import ttp.TTPSolution;
 import utils.Deb;
 import utils.Log;
 import utils.RandStr;
-
 
 public class TestAll {
   

@@ -174,8 +174,6 @@ public class JointN1BF extends LocalSearch {
           
           // recalculate velocities from start
           for (int r=refBF; r<nbCities; r++) {
-            
-            // add delta stating from refBF
             wc = sol.weightAcc[r] + deltaW;
             ft += D[tour[r]-1][tour[(r+1)%nbCities]-1] / (maxSpeed-wc*C);
           }

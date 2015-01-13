@@ -153,7 +153,8 @@ public class Joint2optBFOLD extends LocalSearch {
             
             ob2 = fp2 - ft2*R;
             
-            
+//            Deb.echo("("+i+","+j+","+k+") iBF:"+refBF+" || "+"ft: "+ ft2 + " | G: " + ob2 + " | fp: "+fp2);
+
             // update best
             if (ob2 > obBest) {
               
