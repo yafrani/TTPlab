@@ -31,7 +31,7 @@ public class TestOne {
     };
     
     /* instance information */
-    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[4]);
+    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[2]);
     Deb.echo(ttp);
     Deb.echo("------------------");
     
