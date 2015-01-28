@@ -114,7 +114,7 @@ public class JointN1BF extends LocalSearch {
         // compute objective
         deltaT = - D[c1][c2]/v1 - D[c2][c3]/v2  - D[c3][c4]/v3
                  + D[c1][c3]/v1 + D[c3][c2]/v2i + D[c2][c4]/v3;
-        ft = sol.ft + deltaT;
+        ft = sol.ft + deltaT; // remove ?
         
         /* fix time accumulator */
 //        for (int q=0; q<i+1; q++) {

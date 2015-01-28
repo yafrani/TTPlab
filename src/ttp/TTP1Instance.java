@@ -209,11 +209,12 @@ public class TTP1Instance extends TTPInstance {
         }
         wc += acc;
         velocity = maxSpeed - wc*C;
+        //if (velocity<.1) velocity=.1;
       }
       
       int h = (i+1)%nbCities;
       ft += D[x[i]-1][x[h]-1] / velocity;
-      
+      //Deb.echo(wc);
       // record important data for future use
       s.timeAcc[i] = ft;
       s.timeRec[i] = D[x[i]-1][x[h]-1] / velocity;

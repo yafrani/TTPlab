@@ -19,8 +19,10 @@ public class TestOne {
   public static void main(String[] args) {
     
     String inst[] = {
+        "u724-ttp/u724_n2169_bounded-strongly-corr_06.ttp",
         "my-ttp/sample-data1.ttp",
-        "eil51-ttp/eil51_n50_bounded-strongly-corr_02.ttp",
+        "berlin52-ttp/berlin52_n153_bounded-strongly-corr_01.ttp",
+        "eil51-ttp/eil51_n50_uncorr_01.ttp",
         "eil51-ttp/eil51_n50_bounded-strongly-corr_01.ttp",
         "a280-ttp/a280_n279_uncorr_01.ttp",
         "eil51-ttp/eil51_n500_uncorr_10.ttp",
@@ -31,15 +33,13 @@ public class TestOne {
     };
     
     /* instance information */
-    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[2]);
+    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[0]);
     Deb.echo(ttp);
     Deb.echo("------------------");
     
     /* initial solution s0 */
     Constructive construct = new Constructive(ttp);
     TTPSolution s0 = construct.generate("lg");
-//    s0.setTour(new int[]{1, 26, 31, 8, 22, 28, 3, 36, 35, 20, 2, 29, 21, 16, 50, 34, 30, 9, 49, 10, 39, 33, 45, 15, 44, 42, 40, 19, 41, 13, 25, 14, 24, 43, 7, 23, 48, 6, 27, 51, 46, 12, 47, 18, 4, 17, 37, 5, 38, 11, 32});
-//    s0.setPickingPlan(new int[]{2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 38, 0, 0, 0, 0, 0, 44, 0, 46, 0, 0, 0, 50, 51});
     ttp.objective(s0);
     Deb.echo("s0: \n"+s0);
     Deb.echo("ob: "+s0.ob);
@@ -48,8 +48,8 @@ public class TestOne {
     
     
     /* algorithm */
-//    final LocalSearch algo = new JointN1BF(ttp, s0);
-    final LocalSearch algo = new Joint2optBF(ttp, s0);
+    final LocalSearch algo = new JointN1BF(ttp, s0);
+//    final LocalSearch algo = new Joint2optBF(ttp, s0);
     algo.firstfit();
     algo.debug();
     
@@ -72,12 +72,6 @@ public class TestOne {
         Deb.echo(sx);
         Deb.echo("objective   : " + sx.ob + "\n");
         Deb.echo("Duration    : " + (exTime/1000.0) + " sec");
-//        
-//        // verification
-//        ttp.objective(sx);
-//        Deb.echo("\nVerification");
-//        Deb.echo(sx);
-//        Deb.echo("objective   : " + sx.ob + "\n");
         
       }
     });
