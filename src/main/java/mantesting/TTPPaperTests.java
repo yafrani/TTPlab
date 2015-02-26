@@ -58,8 +58,8 @@ public class TTPPaperTests {
     "kroA100-ttp",
     "pr124-ttp",
     "ch150-ttp",
-    "kroA200-ttp",
     "u159-ttp",
+    "kroA200-ttp",
     "ts225-ttp",
     "a280-ttp",
     "lin318-ttp",
@@ -78,7 +78,7 @@ public class TTPPaperTests {
   
   
   static final int[] knapsackCategories = {
-//    2,// X
+//    2,
     6,
     10,
   };
@@ -94,48 +94,7 @@ public class TTPPaperTests {
   static final int nbRep = 5;
   
   static final String[] exclude = {
-    "eil51_n150_uncorr_06.ttp",
-    "berlin52_n153_uncorr_06.ttp",
-    "eil76_n225_uncorr_06.ttp",
-    "kroA100_n297_uncorr_06.ttp",
-    "pr124_n369_uncorr_06.ttp",
-    "ch150_n447_uncorr_06.ttp",
-    "kroA200_n597_uncorr_06.ttp",
-    "u159_n474_uncorr_06.ttp",
-    "ts225_n672_uncorr_06.ttp",
-    "a280_n837_uncorr_06.ttp",
-    "lin318_n951_uncorr_06.ttp",
-    "u574_n1719_uncorr_06.ttp",
-    "u724_n2169_uncorr_06.ttp",
-    "dsj1000_n2997_uncorr_06.ttp",
-    "rl1304_n3909_uncorr_06.ttp",
-    "eil51_n150_uncorr-similar-weights_06.ttp",
-    "berlin52_n153_uncorr-similar-weights_06.ttp",
-    "eil76_n225_uncorr-similar-weights_06.ttp",
-    "kroA100_n297_uncorr-similar-weights_06.ttp",
-    "pr124_n369_uncorr-similar-weights_06.ttp",
-    "ch150_n447_uncorr-similar-weights_06.ttp",
-    "kroA200_n597_uncorr-similar-weights_06.ttp",
-    "u159_n474_uncorr-similar-weights_06.ttp",
-    "ts225_n672_uncorr-similar-weights_06.ttp",
-    "a280_n837_uncorr-similar-weights_06.ttp",
-    "lin318_n951_uncorr-similar-weights_06.ttp",
-    "u574_n1719_uncorr-similar-weights_06.ttp",
-    "u724_n2169_uncorr-similar-weights_06.ttp",
-    "dsj1000_n2997_uncorr-similar-weights_06.ttp",
-    "rl1304_n3909_uncorr-similar-weights_06.ttp",
-    "eil51_n150_bounded-strongly-corr_06.ttp",
-    "berlin52_n153_bounded-strongly-corr_06.ttp",
-    "eil76_n225_bounded-strongly-corr_06.ttp",
-    "kroA100_n297_bounded-strongly-corr_06.ttp",
-    "pr124_n369_bounded-strongly-corr_06.ttp",
-    "ch150_n447_bounded-strongly-corr_06.ttp",
-    "kroA200_n597_bounded-strongly-corr_06.ttp",
-    "u159_n474_bounded-strongly-corr_06.ttp",
-    "ts225_n672_bounded-strongly-corr_06.ttp",
-    "a280_n837_bounded-strongly-corr_06.ttp",
-    "lin318_n951_bounded-strongly-corr_06.ttp",
-    "u574_n1719_bounded-strongly-corr_06.ttp",
+    
   };
   
   /**

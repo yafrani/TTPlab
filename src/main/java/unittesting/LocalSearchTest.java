@@ -66,7 +66,7 @@ public class LocalSearchTest {
     // config algorithm
     try {
       Class<?> cl = Class.forName(algoCls);
-      Constructor<?> cons = cl.getConstructor(new Class[]{TTP1Instance.class, TTPSolution.class});
+      Constructor<?> cons = cl.getConstructor(TTP1Instance.class, TTPSolution.class);
       algo = (LocalSearch)cons.newInstance(ttp, s0);
       
     } catch (ClassNotFoundException|InstantiationException|
@@ -110,7 +110,7 @@ public class LocalSearchTest {
     try {
       String smplName = algo.getClass().getSimpleName();
       Class<?> cl = Class.forName("oldsolver."+smplName+"OLD");// x
-      Constructor<?> cons = cl.getConstructor(new Class[]{TTP1Instance.class, TTPSolution.class});
+      Constructor<?> cons = cl.getConstructor(TTP1Instance.class, TTPSolution.class);
       LocalSearch alg = (LocalSearch)cons.newInstance(ttp, s0);
       if (firstfit) alg.firstfit();
       else alg.bestfit();

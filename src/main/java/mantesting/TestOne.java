@@ -7,11 +7,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import oldsolver.Handoff2optBF;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
-
-import oldsolver.*;
 import solver.*;
 
 public class TestOne {
@@ -19,7 +18,6 @@ public class TestOne {
   public static void main(String[] args) {
     
     String inst[] = {
-        "u724-ttp/u724_n2169_bounded-strongly-corr_06.ttp",
         "my-ttp/sample-data1.ttp",
         "berlin52-ttp/berlin52_n153_bounded-strongly-corr_01.ttp",
         "eil51-ttp/eil51_n50_uncorr_01.ttp",
@@ -33,7 +31,7 @@ public class TestOne {
     };
     
     /* instance information */
-    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[0]);
+    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[1]);
     Deb.echo(ttp);
     Deb.echo("------------------");
     
@@ -48,8 +46,7 @@ public class TestOne {
     
     
     /* algorithm */
-    final LocalSearch algo = new JointN1BF(ttp, s0);
-//    final LocalSearch algo = new Joint2optBF(ttp, s0);
+    final LocalSearch algo = new solver.Handoff2optSH(ttp, s0);
     algo.firstfit();
     algo.debug();
     
@@ -63,6 +60,7 @@ public class TestOne {
         long startTime, stopTime;
         long exTime;
         startTime = System.currentTimeMillis();
+        
         TTPSolution sx = algo.solve();
         
         stopTime = System.currentTimeMillis();
@@ -79,8 +77,7 @@ public class TestOne {
     executor.shutdown();  // reject all further submissions
     
     try {
-      future.get(600, TimeUnit.SECONDS);  //     <-- wait 5 seconds to finish
-        
+      future.get(600000, TimeUnit.SECONDS);  //     <-- wait 5 seconds to finish
     } catch (InterruptedException e) {    //     <-- possible error cases
       System.out.println("job was interrupted");
     } catch (ExecutionException e) {

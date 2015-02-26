@@ -172,7 +172,7 @@ public class JointN1BF extends LocalSearch {
           // starting time
           ft = refBF==0 ? .0 : tacc[refBF-1];
           
-          // recalculate velocities from start
+          // recalculate velocities from bit-flip city
           for (int r=refBF; r<nbCities; r++) {
             wc = sol.weightAcc[r] + deltaW;
             ft += D[tour[r]-1][tour[(r+1)%nbCities]-1] / (maxSpeed-wc*C);
