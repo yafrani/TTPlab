@@ -122,7 +122,7 @@ public class Joint2optBF extends LocalSearch {
           
           
           /* ****************************** */
-          /* on bit flip                    */
+          /* one bit flip                   */
           /* ****************************** */
           for (k=0; k<nbItems; k++) {
             

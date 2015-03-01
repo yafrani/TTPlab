@@ -21,7 +21,7 @@ import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
 import utils.Log;
-import utils.RandStr;
+import utils.RandGen;
 
 public class TestAll {
   
@@ -160,7 +160,7 @@ public class TestAll {
             out.println(ttpi+"; "+ob+"; "+time);
             
             /* log results */
-            String namePrefix = "RES."+ttpi.replace('/', '#')+"."+codeS0+"-"+algo.getName()+"."+RandStr.rand(nbIt/2);
+            String namePrefix = "RES."+ttpi.replace('/', '#')+"."+codeS0+"-"+algo.getName()+"."+ RandGen.randStr(nbIt / 2);
             Log log = new Log(namePrefix);
             log.print(sx+"\n"+
                       "Objective: "+sx.ob+"\n"+

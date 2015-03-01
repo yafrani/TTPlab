@@ -173,7 +173,6 @@ public class TTP1Instance extends TTPInstance {
    * objective function
    * 
    * @param s the TTP solution
-   * @return the objective value
    */
   public void objective(TTPSolution s) {
     
@@ -220,7 +219,10 @@ public class TTP1Instance extends TTPInstance {
       s.timeRec[i] = D[x[i]-1][x[h]-1] / velocity;
       s.weightAcc[i] = wc;
       s.weightRec[i] = acc;
+      // map indices to their associated cities
+      s.mapCI[x[i]-1] = i;
     }
+
     ob = fp - ft*rent;
     
     // solution properties

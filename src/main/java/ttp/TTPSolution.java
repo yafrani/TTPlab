@@ -21,22 +21,18 @@ public class TTPSolution {
   public double ob;
   public long wend;
   
-  /**
-   * time accumulator
-   */
+  // time accumulator
   public double[] timeAcc;
+  // time record
   public double[] timeRec;
-  /**
-   * weight accumulator
-   */
+  // weight accumulator
   public int[] weightAcc;
-  
-  /**
-   * weight record at each iteration
-   */
+  // weight record at each iteration
   public int[] weightRec;
-  
-  
+  // tour mapper
+  public int[] mapCI;
+
+
   public TTPSolution() {
     
   }
@@ -51,6 +47,7 @@ public class TTPSolution {
     timeRec = new double[tour.length];
     weightAcc = new int[tour.length];
     weightRec = new int[tour.length];
+    mapCI = new int[tour.length];
   }
   
   public TTPSolution(int m, int n) {
@@ -63,9 +60,11 @@ public class TTPSolution {
     timeRec = new double[tour.length];
     weightAcc = new int[tour.length];
     weightRec = new int[tour.length];
+    mapCI = new int[tour.length];
   }
   
   public TTPSolution(TTPSolution s2) {
+
     this.tour = Arrays.copyOf(s2.tour,s2.tour.length);
     this.pickingPlan = Arrays.copyOf(s2.pickingPlan,s2.pickingPlan.length);
     
@@ -78,6 +77,7 @@ public class TTPSolution {
     this.timeRec= Arrays.copyOf(s2.timeRec,s2.timeRec.length);
     this.weightAcc = Arrays.copyOf(s2.weightAcc,s2.weightAcc.length);
     this.weightRec = Arrays.copyOf(s2.weightRec,s2.weightRec.length);
+    this.mapCI = Arrays.copyOf(s2.mapCI,s2.mapCI.length);
   }
   
   @Override
