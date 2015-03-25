@@ -46,10 +46,11 @@ public class TestOne {
       "berlin52-ttp/berlin52_n510_uncorr-similar-weights_07.ttp",
       "rl1304-ttp/rl1304_n1303_uncorr_10.ttp",
       "bier127-ttp/bier127_n1260_uncorr-similar-weights_10.ttp",
+
     };
 
     /* instance information */
-    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[2]);
+    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[1]);
     Deb.echo(ttp);
     Deb.echo("------------------");
     

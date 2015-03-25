@@ -1,5 +1,6 @@
 package solver;
 
+import mantesting.TestReduct;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -78,8 +79,8 @@ public class Cosolver2opt extends LocalSearch {
     int rrMin;
     int rrMax;
     int rrGap;
-    rrMin = Math.round(nbCities*(float).05)+1;
-    rrMax = Math.round(nbCities*(float).21);
+    rrMin = Math.round(nbCities*(float) TestReduct.RRMIN)+1;
+    rrMax = Math.round(nbCities*(float) TestReduct.RRMAX);
     rrGap = 1;
 
     // bit-flip reduction
@@ -88,7 +89,7 @@ public class Cosolver2opt extends LocalSearch {
 
 
 
-    Deb.echo(rrMin+"/"+rrMax+"//"+rrGap);
+    //Deb.echo(rrMin+"/"+rrMax+"//"+rrGap);
 
 
 

@@ -50,6 +50,8 @@ public class TTPPaperTests {
   
   
   static final String[] instFolders = {
+    "eil51-ttp",
+    "berlin52-ttp",
     "eil76-ttp",
     "kroA100-ttp",
     "ch150-ttp",
