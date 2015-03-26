@@ -1,0 +1,13 @@
+# logs and unwanted
+logs/*
+results/junk/
+TTP1_data/*
+
+# bin outputs
+build/*
+target/*
+
+# hidden stuff
+.gradle/
+.idea/workspace.xml
+.idea/tasks.xml
