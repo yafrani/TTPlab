@@ -1,26 +1,27 @@
 package solver;
 
-import mantesting.TestCLI;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
 import utils.Quicksort;
 import utils.TwoOptHelper;
 
-/**
- * Created by kyu on 2/26/15.
- */
-public class Cosolver2opt extends LocalSearch {
+import java.util.ArrayList;
 
-  public Cosolver2opt() {
+/**
+ * Created by kyu on 4/7/15.
+ */
+public class CosolverLarge2 extends LocalSearch {
+
+  public CosolverLarge2() {
     super();
   }
 
-  public Cosolver2opt(TTP1Instance ttp) {
+  public CosolverLarge2(TTP1Instance ttp) {
     super(ttp);
   }
 
-  public Cosolver2opt(TTP1Instance ttp, TTPSolution s0) {
+  public CosolverLarge2(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
 
@@ -44,18 +45,16 @@ public class Cosolver2opt extends LocalSearch {
     long capacity = ttp.getCapacity();
     double C = (maxSpeed - minSpeed) / capacity;
     double R = ttp.getRent();
-    int[] w = ttp.getWeights();
 
     // initial solution data
     int[] tour = sol.getTour();
     int[] pickingPlan = sol.getPickingPlan();
 
     // delta parameters
-    int deltaP, deltaW;
     double deltaT;
 
     // improvement indicator
-    boolean improv, improv1,improv2;
+    boolean improv, improv1, improv2;
 
     // best solution
     int iBest=0, jBest=0, kBest=0;
@@ -65,20 +64,24 @@ public class Cosolver2opt extends LocalSearch {
     // neighbor solution
     int fp;
     double ft, G;
-    int nbIter = 0, nbIter1 = 0, nbIter2 = 0;
-    int wc;
-    int i, j, k;
+    int nbIter = 0, nbIter1, nbIter2;
+    int wc, origBF;
+    int i, j, k, r, itr;
 
-    // KP step
-    double[] scores = new double[nbItems];
-    int itr;
-    int[] sortedItems;
+    // distances of all tour cities (city -> end)
+    long[] L = new long[nbCities];
+    // current weight
+    double wCurr = .0;
+    // time approximations
+    double t1, t2, t3, a, b1, b2;
 
+    // Delaunay triangulation
+    ArrayList<Integer>[] candidates = ttp.delaunay();
 
     do {
       improv = false;
       nbIter++;
-
+      nbIter1 = 0;
       /*===================*
        * sub-problem 1:    *
        * TSP with knapsack *
@@ -87,9 +90,14 @@ public class Cosolver2opt extends LocalSearch {
         improv1 = false;
         nbIter1++;
 
-        // slow 2-opt
+        // fast 2-opt
         for (i = 1; i < nbCities - 1; i++) {
-          for (j = i + 1; j < nbCities; j++) {
+
+          int node1 = tour[i] - 1;
+
+          for (int node2 : candidates[node1]) {
+
+            j = sol.mapCI[node2];
 
             /* calculate final time with partial delta */
             ft = sol.ft;
@@ -146,56 +154,131 @@ public class Cosolver2opt extends LocalSearch {
       if (!improv) break;
 
 
+
+
+
+
+
+
+
       /*=================*
        * sub-problem 2   *
        * KP with routing *
        *=================*/
-      for (k = 0; k < nbItems; k++) {
-        scores[k] = sol.mapCI[A[k] - 1] * ttp.profitOf(k) / ttp.weightOf(k);
+
+      /*=================*
+       * pre-processing  *
+       *=================*/
+      // store `distance to end` of each tour city
+      L[nbCities-1] = D[tour[nbCities-1] - 1][0];
+      for (i=nbCities-2; i >= 0; i--) {
+        L[i] = L[i+1] + D[tour[i+1] - 1][tour[i] - 1];
       }
+
+      // sort item according to score
+      double[] scores = new double[nbItems];
+      int[] sortedItems;
+      for (k = 0; k < nbItems; k++) {
+        // index where Bit-Flip happened
+        origBF = sol.mapCI[A[k] - 1];
+        // calculate time approximations
+        t1 = L[origBF]*(1/(maxSpeed-C*ttp.weightOf(k)) - 1/maxSpeed);
+        // affect score to item
+        scores[k] = (ttp.profitOf(k)-R*t1) / ttp.weightOf(k);
+        // empty the knapsack
+        pickingPlan[k] = 0;
+      }
+
+      // evaluate solution after emptying knapsack
+      ttp.objective(sol);
+
+      // sort items according to score
       Quicksort qs = new Quicksort(scores);
       qs.sort();
       sortedItems = qs.getIndices();
 
-      /* fast bit-flip */
+      /* loop & insert items */
+      int nbInserts = 0;
+      wCurr = .0;
+      int v2=0,v3=0;
+      for (itr = 0; itr < nbItems; itr++) {
+
+        k = sortedItems[itr];
+
+        // check if new weight doesn't exceed knapsack capacity
+        if (wCurr + ttp.weightOf(k) > capacity) {
+          continue;
+        }
+
+        // index where Bit-Flip happened
+        origBF = sol.mapCI[A[k] - 1];
+
+        /* insert item if it has a potential gain */
+        // time approximations t2 (worst-case time)
+        t2 = L[origBF] * (1/(maxSpeed-C*(wCurr+ttp.weightOf(k))) - 1/(maxSpeed-C*wCurr));
+        if (ttp.profitOf(k) > R*t2) {v2++;
+          pickingPlan[k] = A[k];
+          wCurr += ttp.weightOf(k);
+        }
+        else {
+          // time approximations t3 (expected time)
+          a = wCurr / L[0];
+          b1 = maxSpeed - C * (wCurr + ttp.weightOf(k));
+          b2 = maxSpeed - C * wCurr;
+          t3 = (1 / a) * Math.log(
+            ( (a * L[0] + b1) * (a * (L[0] - L[origBF]) + b2) ) /
+            ( (a * (L[0] - L[origBF]) + b1) * (a * L[0] + b2) )
+          );
+          if (ttp.profitOf(k) > R*t3) {v3++;
+            pickingPlan[k] = A[k];
+            wCurr += ttp.weightOf(k);
+          }
+          else continue;
+        }
+        nbInserts++;
+      } // END FOR k
+      Deb.echo("V: "+v2+" ' "+v3);
+      Deb.echo(">>>"+nbInserts+"/"+nbItems+" // "+wCurr);
+      //if (true) return null;
+
+      // evaluate solution & update vectors
+      ttp.objective(sol);
+
+      // debug msg
+      if (this.debug) {
+        Deb.echo(">> KRP pre-processing: ob-best=" + sol.ob);
+        Deb.echo("   wend: "+sol.wend);
+      }
+
+
+
+      /*======================*
+       * eliminating bit-flip *
+       *======================*/
+      nbIter2 = 0;
       do {
         improv2 = false;
         nbIter2++;
 
         // browse items in the new order...
-        for (itr = 0; itr < nbItems; itr++) {
+        for (k = 0; k < nbItems; k++) {
 
-          k = sortedItems[itr];
-
-          /* check if new weight doesn't exceed knapsack capacity */
-          if (pickingPlan[k] == 0 && ttp.weightOf(k) > sol.wend) {
+          // check if picked
+          if (pickingPlan[k] == 0) {
             continue;
           }
 
-          /* calculate deltaP and deltaW */
-          if (pickingPlan[k] == 0) {
-            deltaP = ttp.profitOf(k);
-            deltaW = ttp.weightOf(k);
-          } else {
-            deltaP = -ttp.profitOf(k);
-            deltaW = -ttp.weightOf(k);
-          }
-          fp = sol.fp + deltaP;
+          fp = sol.fp - ttp.profitOf(k);
 
-
-          /*
-           * velocity-TSP
-           * TSP constrained with knapsack weight
-           */
           // index where Bit-Flip happened
-          int origBF = sol.mapCI[A[k] - 1];
+          origBF = sol.mapCI[A[k] - 1];
 
           // starting time
           ft = origBF == 0 ? .0 : sol.timeAcc[origBF - 1];
 
           // recalculate velocities from bit-flip city
-          for (int r = origBF; r < nbCities; r++) {
-            wc = sol.weightAcc[r] + deltaW;
+          for (r = origBF; r < nbCities; r++) {
+            wc = sol.weightAcc[r] - ttp.weightOf(k);;
             ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
           }
 
@@ -208,10 +291,10 @@ public class Cosolver2opt extends LocalSearch {
             GBest = G;
             improv2 = true;
             if (firstfit) break;
+            //break;
           }
 
         } // END FOR k
-
 
         /* update if improvement */
         if (improv2) {
@@ -219,7 +302,7 @@ public class Cosolver2opt extends LocalSearch {
           improv = true;
 
           // bit-flip
-          pickingPlan[kBest] = pickingPlan[kBest] != 0 ? 0 : A[kBest];
+          pickingPlan[kBest] = 0;
 
           // evaluate & update vectors
           ttp.objective(sol);
@@ -233,7 +316,6 @@ public class Cosolver2opt extends LocalSearch {
       } while (improv2);
 
 
-
       // debug msg
       if (this.debug) {
         Deb.echo("Best "+nbIter+":");
@@ -242,8 +324,8 @@ public class Cosolver2opt extends LocalSearch {
         Deb.echo("wend   : "+sol.wend);
         Deb.echo("---");
       }
-    } while(improv);
 
+    } while (improv);
 
     return sol;
   }

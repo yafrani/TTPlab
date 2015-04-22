@@ -20,7 +20,7 @@ public class Deb {
   }
   
   public static void echo(int[] x) {
-    echo(x,"%d");
+    echo(x,"%2d");
   }
   
   public static void echo(int[] x,String forma) {

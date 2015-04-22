@@ -10,11 +10,18 @@ import utils.TwoOptHelper;
  * junk testing
  */
 public class TestJunk {
-  
+  public static void main(String[] args) {
+    int[] pp = {1,2,3,4,5,6,7};
+    int[] pp1 = pp.clone();
+    pp1[1]=11;
+    Deb.echo(pp);
+    Deb.echo(pp1);
+  }
+
   public static void mainx(String[] args) {
     int[] tour = {1,3,5,4,6,2};
     int nbCities = tour.length;
-    
+
     // map indices to their associated cities
     int[] mapIC = new int[nbCities];
     for (int i=0; i<nbCities; i++) {
@@ -26,22 +33,22 @@ public class TestJunk {
     Deb.echol("tacc: "); Deb.echo(mapIC);
     //Deb.echol(": "); Deb.echo(mapIC);
   }
-  
-  public static void main(String[] args) {
-    
+
+  public static void main2(String[] args) {
+
     /* instance information */
     String inst = "my-ttp/sample-data-10.ttp";
     inst = "eil51-ttp/eil51_n50_uncorr_01.ttp";
     inst = "a280-ttp/a280_n279_uncorr_01.ttp";
     TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst);
     Deb.echo(ttp);
-    
+
     /* initial solution s0 */
     Constructive construct = new Constructive(ttp);
     TTPSolution s0 = construct.generate("sg");
     //s0.setTour(new int[]{1,3,5,4,6,2});
     ttp.objective(s0);
-    
+
     /* before */
     int[] x = s0.getTour();
     int[] z = s0.getPickingPlan();
@@ -63,10 +70,10 @@ public class TestJunk {
     TwoOptHelper.do2opt(x, i, j);
     //int k=3;      // bit-flip
     //z[k] = z[k]!=0 ? 0 : A[k];
-    
+
     // compute objective value
     ttp.objective(s0);
-    
+
     Deb.echo("neighbor solution:");
     //Deb.echol("z   :"); Deb.echo(z,"%4d");
     Deb.echol("x   :"); Deb.echo(x,"%4d");
@@ -77,6 +84,6 @@ public class TestJunk {
     //Deb.echo("ob = "+s0.ob);
     //Deb.echo("ft = "+s0.ft);
     //Deb.echo("fp = "+s0.fp);
-    
+
   }
 }

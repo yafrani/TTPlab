@@ -60,7 +60,11 @@ public class Constructive extends TTPHeuristic {
       case 'l':
         x = linkernTour();
       break;
-      
+
+      case 'd':
+        x = linkernDelaunayTour();
+        break;
+
       case 'o':
         x = optimalTour();
       break;
@@ -222,8 +226,6 @@ public class Constructive extends TTPHeuristic {
   
   /**
    * use Lin-Kernighan TSP tour
-   * 
-   * @return
    */
   public int[] linkernTour() {
     int nbCities = ttp.getNbCities();
@@ -260,9 +262,52 @@ public class Constructive extends TTPHeuristic {
     
     return tour;
   }
-  
-  
-  
+
+
+
+  /**
+   * use Lin-Kernighan TSP tour
+   * and Delaunay triangulation method
+   * for neighborhood reduction
+   */
+  public int[] linkernDelaunayTour() {
+    int nbCities = ttp.getNbCities();
+    int[] tour = new int[nbCities];
+
+    String fileName = ttp.getName().replaceAll("-.+", "");
+    String dirName = "./TTP1_data/"+fileName+"-ttp";
+    fileName += ".linkern.del.tour";
+    //Deb.echo(dirName + "/" + fileName);
+
+    File file = new File(dirName + "/" + fileName);
+    BufferedReader br = null;
+
+    try {
+      br = new BufferedReader(new FileReader(file));
+      String line;
+
+      // scan tour
+      while ((line = br.readLine()) != null) {
+
+        if (line.startsWith("TOUR_SECTION")) {
+
+          for (int j=0; j<nbCities; j++) {
+            line = br.readLine();
+            tour[j] = Integer.parseInt(line);
+          }
+        }
+      } // end while
+
+      br.close();
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+
+    return tour;
+  }
+
+
+
   /**
    * empty knapsack
    * 

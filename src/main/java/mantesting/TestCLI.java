@@ -12,34 +12,32 @@ import ttp.TTPSolution;
 import utils.Deb;
 import solver.*;
 
-public class TestOne {
+public class TestCLI {
 
   public static void main(String[] args) {
 
-    String[] inst = {
-      "eil51-ttp/eil51_n50_uncorr_10.ttp",
-      "a280-ttp/a280_n279_bounded-strongly-corr_01.ttp",
-      "fnl4461-ttp/fnl4461_n4460_bounded-strongly-corr_01.ttp",
-      "fnl4461-ttp/fnl4461_n22300_uncorr-similar-weights_05.ttp",
-      "fnl4461-ttp/fnl4461_n44600_uncorr_01.ttp",
-    };
+    Deb.echo(">>"+args[0]);
+    //if (true) return;
+
+    String inst = args[0];
 
     /* instance information */
-    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[0]);
+    final TTP1Instance ttp = new TTP1Instance(inst);
     Deb.echo(ttp);
     Deb.echo("------------------");
-    
+
     /* initial solution s0 */
     Constructive construct = new Constructive(ttp);
     TTPSolution s0 = construct.generate("lr");
     ttp.objective(s0);
-    //Deb.echo("s0  : \n"+s0);
+    Deb.echo("s0  : \n"+s0);
     Deb.echo("ob  : "+s0.ob);
     Deb.echo("wend: "+s0.wend);
     Deb.echo("==================");
 
+
     /* algorithm */
-    final LocalSearch algo = new Cosolver2opt(ttp, s0);
+    final LocalSearch algo = new CosolverLarge(ttp, s0);
     //algo.firstfit();
     algo.debug();
 
@@ -48,27 +46,26 @@ public class TestOne {
     Future<?> future = executor.submit(new Runnable() {
       @Override
       public void run() {
-        
+
         long startTime, stopTime;
         long exTime;
         startTime = System.currentTimeMillis();
-        
+
         TTPSolution sx = algo.solve();
-        
+
         stopTime = System.currentTimeMillis();
         exTime = stopTime - startTime;
-        
-        
-        Deb.echo(sx);
 
+
+        Deb.echo(sx);
         Deb.echo("objective   : " + sx.ob);
         Deb.echo("Duration    : " + (exTime/1000.0) + " sec");
-        
+
       }
     });
-    
+
     executor.shutdown();  // reject all further submissions
-    
+
     try {
       future.get(600000, TimeUnit.SECONDS);  //     <-- wait 5 seconds to finish
     } catch (InterruptedException e) {    //     <-- possible error cases
