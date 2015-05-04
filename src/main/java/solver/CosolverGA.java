@@ -14,7 +14,7 @@ import java.util.ArrayList;
 /**
  * Created by kyu on 4/7/15.
  */
-public class CosolverGA extends LocalSearch {
+public class CosolverGA extends CosolverBase {
 
   public CosolverGA() {
     super();
@@ -53,7 +53,7 @@ public class CosolverGA extends LocalSearch {
 
     // pre-process the knapsack
     // insert and eliminate items
-    insertItems(sol);
+    insertAndEliminate(sol);
 
     // delta parameters
     double deltaT;
@@ -78,9 +78,11 @@ public class CosolverGA extends LocalSearch {
     ArrayList<Integer>[] candidates = ttp.delaunay();
 
     // GA params
-    int MAX_ITR = 100;
-    int popSize = 100, selectSize = 50, mutationSize = 10;
-
+    int MAX_ITR = 200;
+    double mutationRate = .001, selectionRate = .75;
+    int popSize = 200,
+        selectSize = (int) Math.round(selectionRate * popSize);
+    selectSize = selectSize%2==0 ? selectSize:selectSize-1;
 
 
 
@@ -162,7 +164,12 @@ public class CosolverGA extends LocalSearch {
 
       } while (improv1);
 
+
       if (!improv) break;
+
+
+
+
 
 
 
@@ -178,13 +185,16 @@ public class CosolverGA extends LocalSearch {
        * KP with routing   *
        *===================*/
       nbIter2 = 0;
+      int noImprovCounter=0;
 
-      // create initial population
+      /* create initial population */
       TTPSolution[] pop = new TTPSolution[popSize];
       pop[0] = new TTPSolution(tour, pickingPlan.clone());
       ttp.objective(pop[0]);
-      // diversify the initial population
-      for (i=1; i<popSize; i++) {
+
+      // 1/4 of the population is a mutation of the best found
+      // picking plan so far
+      for (i=1; i<popSize/4; i++) {
         int[] pp = pickingPlan.clone();
         TTPSolution x = new TTPSolution(tour, pp);
         long w2 = capacity - pop[0].wend;
@@ -204,28 +214,34 @@ public class CosolverGA extends LocalSearch {
         }
         pop[i] = x;
       }
-      for (int u=1;u<popSize;u++) {
-        ttp.objective(pop[u]);
-        //Deb.echo(u+": "+pop[u].wend);
+
+      // 3/4 of the population are random individuals
+      Constructive construct = new Constructive(ttp);
+      for (i=popSize/4; i<popSize; i++) {
+        int[] pp = construct.randomPickingPlan();
+        pop[i] = new TTPSolution(tour, pp);
       }
 
-      // debug
-//      for (i=0; i< popSize; i++) {
-//        Deb.echo(pop[i].getPickingPlan());
-//      }
+      // calculate objective
+      for (i=1; i<popSize; i++) {
+        ttp.objective(pop[i]);
+      }
 
-      //if(true) return null;
 
       do {
 
         improv2 = false;
         nbIter2++;
 
-        /* evaluate */
-        Deb.echo("## EVALUATION ##");
+        /*
+         * Evaluate
+         */
+        //Deb.echo("## EVALUATION ##");
+
+        // compute fitness
         double min = Double.MAX_VALUE;
         for (i=0; i < popSize; i++) {
-          ttp.objective(pop[i]);
+          //ttp.objective(pop[i]); // TODO remove this...
           if (pop[i].ob < min) min = pop[i].ob;
         }
         min = min < 0 ? -min : 0;
@@ -251,7 +267,7 @@ public class CosolverGA extends LocalSearch {
         // sorted population
         TTPSolution spop[] = new TTPSolution[popSize];
         for (i=0; i < popSize; i++) {
-          spop[i] = pop[sortIdx[i]];
+          spop[i] = pop[sortIdx[i]]; // TODO remove `spop` later...
         }
 
         // accumulated fitness
@@ -261,174 +277,164 @@ public class CosolverGA extends LocalSearch {
           accFit[i] = accFit[i-1] + normFit[i];
         }
 
-        //for (i=0; i<popSize; i++) {
-        //  Deb.echo(i+": "+spop[i].ob+" / "+accFit[i]+" / "+normFit[i]);
-        //}
-        //if (true) return null;
 
-//        Deb.echol("SORT: "); Deb.echo(sortInd);
-//        Deb.echol("NORM: "); Deb.echo(normFit);
-//        Deb.echol("ACCF: "); Deb.echo(accFit);
-
-        /* simple roulette selection */
-        Deb.echo("## SELECTION ##");
-        int[] selectIdx = new int[selectSize];
-        for (i=0; i < selectSize; i++) {
-          double RR = Math.random();
-          //Deb.echo("R: "+RR);
-          selectIdx[i] = -1;
-          for (j=0; j < popSize; j++) {
-            // check if already selected
-            boolean ok = true;
-            for (k=0; k < i+1; k++) {
-              if (selectIdx[k]==j) {
-                ok = false;
-                break;
-              }
-            }
-            if (!ok) {
-              RR = Math.random();
-              Deb.echo(i+" >> "+j);
-              //i--;
-              //continue;
-              //continue;
-            }
-            // select
-            if (ok && accFit[j] > RR) {
-              selectIdx[i] = j;
-              break;
-              //Deb.echo(sortInd[j]+" is selected");
-            }
-          }
-        }
-        Deb.echol("selected: "); Deb.echo(selectIdx);
-
-        /* crossover */
-        Deb.echo("## CROSSOVER ##");
+        /*
+         * Roulette/group selection
+         */
+        //Deb.echo("## SELECTION ##");
+        int pi1=0, pi2=0;
+        double RR;
         int[][] childrenPP = new int[selectSize][nbItems];
         TTPSolution[] children = new TTPSolution[selectSize];
-        int nbChildren = 0, n;
-        for (i=0; i < selectSize/2; i++) {
-          do {
-            Deb.echo(">>>>>>>>>>>>>>>>>>>>>>>==OK");
-            n = RandGen.randInt(0, selectSize - 1);
-          } while(n==i);
 
-          //n = selectSize-1-i;
-          double CR = Math.random();
-          Deb.echo(">>>> "+selectIdx[i]+" & "+selectIdx[n]+" "+CR);
+        for (i=0; i < selectSize-1; i+=2) {
 
-          // reproduction
-          int v1 = new Double(nbItems * CR).intValue(); // cross point
-
-          // make a one point crossover
-          for (j=0; j < v1; j++) {
-            childrenPP[i][j] = spop[selectIdx[n]].getPickingPlan()[j];
-            childrenPP[n][j] = spop[selectIdx[i]].getPickingPlan()[j];
+          /*
+           * Crossover
+           */
+          // first parent
+          RR = Math.random();
+          for (j = 0; j < popSize; j++) {
+            if (accFit[j] > RR) {
+              pi1 = j;
+              break;
+            }
           }
-          for (j=v1; j < nbItems; j++) {
-            childrenPP[n][j] = spop[selectIdx[i]].getPickingPlan()[j];
-            childrenPP[i][j] = spop[selectIdx[n]].getPickingPlan()[j];
+
+          // second parent
+          RR = Math.random();
+          for (j = 0; j < popSize && j != pi1; j++) {
+            if (accFit[j] > RR) {
+              pi2 = j;
+              break;
+            }
+          }
+
+          // cross point
+          int cp = RandGen.randInt(0,nbItems-1);
+          int[] ppp1 = spop[pi1].getPickingPlan();
+          int[] ppp2 = spop[pi2].getPickingPlan();
+
+          long childW1 = 0, childW2 = 0;
+          // make a one point crossover
+          for (j=0; j < cp; j++) {
+            childrenPP[i][j] = ppp1[j];
+            childrenPP[i+1][j] = ppp2[j];
+            // recover weights
+            childW1 += ppp1[j]!=0 ? ttp.weightOf(j):0;
+            childW2 += ppp2[j]!=0 ? ttp.weightOf(j):0;
+          }
+          for (j=cp; j < nbItems; j++) {
+            childrenPP[i][j] = ppp2[j];
+            childrenPP[i+1][j] = ppp1[j];
+            // recover weights
+            childW1 += ppp2[j]!=0 ? ttp.weightOf(j):0;
+            childW2 += ppp1[j]!=0 ? ttp.weightOf(j):0;
           }
           TTPSolution child1 = new TTPSolution(tour, childrenPP[i]);
-          TTPSolution child2 = new TTPSolution(tour, childrenPP[n]);
-          ttp.objective(child1); // TODO not necessary... replace with simple
-          ttp.objective(child2); // weight calculation
+          TTPSolution child2 = new TTPSolution(tour, childrenPP[i+1]);
 
-          if (child1.wend >= 0) {
-            children[nbChildren++] = child1;
+          //Deb.echo("===> ch1 "+childW1);
+          //Deb.echo("===> ch2 "+childW2);
+
+          //ttp.objective(child1); // TODO| not necessary... replace with
+          //ttp.objective(child2); // TODO| partial delta
+
+          //Deb.echo("***> ch1 "+(capacity-child1.wend));
+          //Deb.echo("***> ch2 "+(capacity-child2.wend));
+
+          //if (true) return null;
+
+          if (childW1 <= capacity) {
+            children[i] = child1;
           } else {
             Deb.echo("===========");
-            children[nbChildren++] = pop[selectIdx[i]];
+            children[i] = spop[pi1];
           }
-
-          if (child2.wend >= 0) {
-            children[nbChildren++] = child2;
+          if (childW2 <= capacity) {
+            children[i+1] = child2;
           } else {
             Deb.echo("===========");
-            children[nbChildren++] = pop[selectIdx[n]];
+            children[i+1] = spop[pi2];
           }
 
-//          if (child1.wend < 0 && child2.wend < 0) {
-//            Deb.echo(">>"+i+" > "+child1.wend+"/"+child2.wend);
-//            i--;
-//          }
-        }
-
-        Deb.echo("nbCh: "+nbChildren);
-
-        /* mutation */
-        Deb.echo("## MUTATION ##");
-        for (int u=0; u<mutationSize; u++) {
-          int randIdx = RandGen.randInt(0, nbChildren-1);
-          int[] pp = children[randIdx].getPickingPlan();
-          // bit-flip
-          int randGene = RandGen.randInt(0, nbItems-1);
-          if (pp[randGene]==0 && ttp.weightOf(randGene) > children[randIdx].wend) {
-            u--;
-            continue;
+          /*
+           * Mutation
+           */
+          int[] pp = children[i].getPickingPlan();
+          for (j=0; j<nbItems; j++) {
+            if (Math.random() < mutationRate) {
+              if (pp[j] == 0 && ttp.weightOf(j) > children[i].wend) break;
+              pp[j] = pp[j] != 0 ? 0 : A[j];
+            }
           }
-          pp[randGene] = pp[randGene]!=0 ? 0:A[randGene];
+          pp = children[i+1].getPickingPlan();
+          for (j=0; j<nbItems; j++) {
+            if (Math.random() < mutationRate) {
+              // bit-flip
+              if (pp[j] == 0 && ttp.weightOf(j) > children[i+1].wend) break;
+              pp[j] = pp[j] != 0 ? 0 : A[j];
+            }
+          }
+
           // recompute objective
-          ttp.objective(children[randIdx]);
-          //Deb.echo("OK"+u);
+          ttp.objective(children[i]); // TODO: replace with partial delta
+          // recompute objective
+          ttp.objective(children[i+1]); // TODO: replace with partial delta
+
         }
 
-        /* new generation */
-        int nbSelects = 0;
-        for (int u = 0; u < selectSize; u++) {
-          if (selectIdx[u]==-1) {
-            continue;
-          }
-          pop[nbSelects++] = pop[selectIdx[u]];
+        /*
+         * new generation
+         */
+        for (i = 0; i < selectSize; i++) {
+          pop[i] = children[i];
         }
+        //for (i = selectSize; i < popSize; i++) {
+          //pop[i] = children[i-selectSize];
+        //}
 
-        for (int u = nbSelects; u < nbSelects + nbChildren; u++) {
-          pop[u] = children[u-nbSelects];
-        }
-        // best solution
+        // get best solution
         TTPSolution bestGen = pop[0];
-        for (int u=1;u<popSize;u++) {
-          if (pop[u].ob > bestGen.ob) {
-            bestGen = pop[u];
+        for (i=1; i<popSize; i++) {
+          if (pop[i].ob > bestGen.ob) {
+            bestGen = pop[i];
           }
         }
 
-        for (i=0; i<popSize; i++) {
-          //Deb.echo(i+": "+spop[i].ob+" / "+accFit[i]+" / "+normFit[i]);
-          Deb.echol(">>>"); Deb.echo(pop[i].getPickingPlan());
-        }
-        //if (true) return null;
 
-
-
-
-        // update best if improvment
+        // update best if improvement
         if (bestGen.ob > GBest) {
-
+          Deb.echo(nbIter2+" >>> "+noImprovCounter);
+          noImprovCounter = 0;
           improv = true;
 
           // evaluate & update vectors
-          ttp.objective(sol);
+          sol = bestGen.clone();
+          //ttp.objective(sol);
 
-          sol = bestGen;
           GBest = bestGen.ob;
 
           // debug msg
           if (this.debug) {
-            Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" + sol.ob);
+            //Deb.echo(">> IMPROVEMENT MADE!");
+            Deb.echo(">> GA KRP: " + nbIter2 + " | ob-best=" + sol.ob);
           }
+        }
+        else {
+          noImprovCounter++;
+        }
+
+        // debug msg
+        if (this.debug) {
+          //Deb.echo(">> GA KRP: " + nbIter2 + " | ob-best=" + sol.ob);
         }
 
         nbIter2++;
 
 
-        // debug msg
-        if (this.debug) {
-          Deb.echo(">> GA KRP: " + nbIter2 + " | ob-best=" + sol.ob);
-        }
 
-      } while(nbIter2 < MAX_ITR);
+      } while (noImprovCounter<MAX_ITR);
 
 
 
@@ -447,342 +453,5 @@ public class CosolverGA extends LocalSearch {
     } while (improv);
 
     return sol;
-  }
-
-
-  /**
-   * KP pre-processing
-   * base on the item insertion heuristic
-   */
-  public void insertItems(TTPSolution sol) {
-
-    // TTP data
-    int nbCities = ttp.getNbCities();
-    int nbItems = ttp.getNbItems();
-    long[][] D = ttp.getDist();
-    int[] A = ttp.getAvailability();
-    double maxSpeed = ttp.getMaxSpeed();
-    double minSpeed = ttp.getMinSpeed();
-    long capacity = ttp.getCapacity();
-    double C = (maxSpeed - minSpeed) / capacity;
-    double R = ttp.getRent();
-
-    // initial solution data
-    int[] tour = sol.getTour();
-    int[] pickingPlan = sol.getPickingPlan();
-
-    // neighbor solution
-    int origBF;
-    int i, k, itr;
-
-    // distances of all tour cities (city -> end)
-    long[] L = new long[nbCities];
-    // current weight
-    double wCurr;
-    // time approximations
-    double t1, t2, t3, a, b1, b2;
-
-    // store `distance to end` of each tour city
-    L[nbCities-1] = D[tour[nbCities-1] - 1][0];
-    for (i=nbCities-2; i >= 0; i--) {
-      L[i] = L[i+1] + D[tour[i+1] - 1][tour[i] - 1];
-    }
-
-    // sort item according to score
-    double[] scores = new double[nbItems];
-    int[] sortedItems;
-    int[] insertedItems = new int[nbItems];
-
-    for (k = 0; k < nbItems; k++) {
-      // index where Bit-Flip happened
-      origBF = sol.mapCI[A[k] - 1];
-      // calculate time approximations
-      t1 = L[origBF]*(1/(maxSpeed-C*ttp.weightOf(k)) - 1/maxSpeed);
-      // affect score to item
-      scores[k] = (ttp.profitOf(k)-R*t1) / ttp.weightOf(k);
-      // empty the knapsack
-      pickingPlan[k] = 0;
-    }
-
-    // evaluate solution after emptying knapsack
-    ttp.objective(sol);
-
-    // sort items according to score
-    Quicksort qs = new Quicksort(scores);
-    qs.sort();
-    sortedItems = qs.getIndices();
-
-    // loop & insert items
-    int nbInserts = 0;
-    wCurr = .0;
-    int v2=0,v3=0;
-    for (itr = 0; itr < nbItems; itr++) {
-
-      k = sortedItems[itr];
-
-      // check if new weight doesn't exceed knapsack capacity
-      if (wCurr + ttp.weightOf(k) > capacity) {
-        continue;
-      }
-
-      // index where Bit-Flip happened
-      origBF = sol.mapCI[A[k] - 1];
-
-      /* insert item if it has a potential gain */
-      // time approximations t2 (worst-case time)
-      t2 = L[origBF] * (1/(maxSpeed-C*(wCurr+ttp.weightOf(k))) - 1/(maxSpeed-C*wCurr));
-      if (ttp.profitOf(k) > R*t2) {v2++;
-        pickingPlan[k] = A[k];
-        wCurr += ttp.weightOf(k);
-        insertedItems[nbInserts++] = k;
-      }
-      else {
-        // time approximations t3 (expected time)
-        a = wCurr / L[0];
-        b1 = maxSpeed - C * (wCurr + ttp.weightOf(k));
-        b2 = maxSpeed - C * wCurr;
-        t3 = (1 / a) * Math.log(
-          ( (a * L[0] + b1) * (a * (L[0] - L[origBF]) + b2) ) /
-            ( (a * (L[0] - L[origBF]) + b1) * (a * L[0] + b2) )
-        );
-        if (ttp.profitOf(k) > R*t3) {v3++;
-          pickingPlan[k] = A[k];
-          wCurr += ttp.weightOf(k);
-          insertedItems[nbInserts++] = k;
-        }
-        else continue;
-      }
-    } // END FOR k
-
-    // evaluate solution & update vectors
-    ttp.objective(sol);
-
-    // debug msg
-    if (this.debug) {
-      Deb.echo(">> item insertion: best=" + sol.ob);
-      Deb.echo("   wend: "+sol.wend);
-
-      Deb.echo("==> nb t2: "+v2+" | nb t3: "+v3);
-      Deb.echo("==> nb inserted: "+nbInserts+"/"+nbItems+"("+
-        String.format("%.2f", (nbInserts * 100.0) / nbItems)+"%)");
-      Deb.echo("==> w_curr: "+wCurr);
-    }
-
-    eliminateItems(sol, insertedItems, nbInserts);
-    Deb.echo("==============================================");
-  }
-
-  /**
-   * search heuristic to eliminate some items
-   */
-  public void eliminateItems(TTPSolution sol, int[] insertedItems, int nbInserts) {
-
-    // TTP data
-    int nbCities = ttp.getNbCities();
-    int nbItems = ttp.getNbItems();
-    long[][] D = ttp.getDist();
-    int[] A = ttp.getAvailability();
-    double maxSpeed = ttp.getMaxSpeed();
-    double minSpeed = ttp.getMinSpeed();
-    long capacity = ttp.getCapacity();
-    double C = (maxSpeed - minSpeed) / capacity;
-    double R = ttp.getRent();
-
-    // initial solution data
-    int[] tour = sol.getTour();
-    int[] pickingPlan = sol.getPickingPlan();
-
-    // improvement indicator
-    boolean improv2;
-
-    // best solution
-    int kBest=0;
-    double GBest = sol.ob;
-
-    // neighbor solution
-    int fp;
-    double ft, G;
-    int nbIter2 = 0;
-    int wc, origBF;
-    int k, r, itr;
-
-
-
-    do {
-      improv2 = false;
-      nbIter2++;
-
-      // browse items in the new order...
-      for (itr = 0; itr < nbInserts; itr++) {
-        k = insertedItems[itr];
-        // check if picked
-        //if (pickingPlan[k] == 0) {
-        //  continue;
-        //}
-
-        fp = sol.fp - ttp.profitOf(k);
-
-        // index where Bit-Flip happened
-        origBF = sol.mapCI[A[k] - 1];
-
-        // starting time
-        ft = origBF == 0 ? .0 : sol.timeAcc[origBF - 1];
-
-        // recalculate velocities from bit-flip city
-        for (r = origBF; r < nbCities; r++) {
-          wc = sol.weightAcc[r] - ttp.weightOf(k);;
-          ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
-        }
-
-        G = fp - ft * R;
-
-        // update best
-        if (G > GBest) {
-
-          kBest = k;
-          GBest = G;
-          improv2 = true;
-          if (firstfit) break;
-        }
-
-      } // END FOR k
-
-        /* update if improvement */
-      if (improv2) {
-
-        // bit-flip
-        pickingPlan[kBest] = 0;
-
-        // evaluate & update vectors
-        ttp.objective(sol);
-
-        // debug msg
-        if (this.debug) {
-          Deb.echo(">> item elimination: best=" + sol.ob);
-        }
-      }
-
-    } while (improv2);
-
-  }
-
-
-  public void oneBitFlip(TTPSolution sol) {
-
-    // TTP data
-    int nbCities = ttp.getNbCities();
-    int nbItems = ttp.getNbItems();
-    long[][] D = ttp.getDist();
-    int[] A = ttp.getAvailability();
-    double maxSpeed = ttp.getMaxSpeed();
-    double minSpeed = ttp.getMinSpeed();
-    long capacity = ttp.getCapacity();
-    double C = (maxSpeed - minSpeed) / capacity;
-    double R = ttp.getRent();
-
-    // initial solution data
-    int[] tour = sol.getTour();
-    int[] pickingPlan = sol.getPickingPlan();
-
-    // delta parameters
-    double deltaT;
-    int deltaP, deltaW;
-
-    // improvement indicator
-    boolean improv, improv1, improv2;
-
-    // best solution
-    int iBest=0, jBest=0, kBest=0;
-    double GBest = sol.ob;
-    double ftBest = sol.ft;
-
-    // neighbor solution
-    int fp;
-    double ft, G;
-    int nbIter = 0, nbIter1, nbIter2;
-    int wc, origBF;
-    int i, j, k, r, itr;
-
-    // Delaunay triangulation
-    ArrayList<Integer>[] candidates = ttp.delaunay();
-
-
-    nbIter2 = 0;
-    do {
-      improv2 = false;
-      nbIter2++;
-
-      // browse items in the new order...
-      for (k = 0; k < nbItems; k++) {
-
-        // check if picked
-          /*if (nbIter==1) {
-            if(pickingPlan[k] == 0) {
-              //Deb.echo("OK11");
-              continue;
-            }
-          }
-          else
-          */
-        if (pickingPlan[k] == 0 && ttp.weightOf(k) > sol.wend) {
-          continue;
-        }
-
-          /* calculate deltaP and deltaW */
-        if (pickingPlan[k] == 0) {
-          deltaP = ttp.profitOf(k);
-          deltaW = ttp.weightOf(k);
-        } else {
-          deltaP = -ttp.profitOf(k);
-          deltaW = -ttp.weightOf(k);
-        }
-        fp = sol.fp + deltaP;
-
-        // index where Bit-Flip happened
-        origBF = sol.mapCI[A[k] - 1];
-
-        // starting time
-        ft = origBF == 0 ? .0 : sol.timeAcc[origBF - 1];
-
-        // recalculate velocities from bit-flip city
-        for (r = origBF; r < nbCities; r++) {
-          wc = sol.weightAcc[r] + deltaW;
-          ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
-        }
-
-        G = fp - ft * R;
-
-        // update best
-        if (G > GBest) {
-
-          kBest = k;
-          GBest = G;
-          improv2 = true;
-          if (firstfit) break;
-          //break;
-        }
-
-      } // END FOR k
-
-        /* update if improvement */
-      if (improv2) {
-
-        improv = true;
-
-        // bit-flip
-        //pickingPlan[kBest] = 0;
-        pickingPlan[kBest] = pickingPlan[kBest] != 0 ? 0 : A[kBest];
-
-        // evaluate & update vectors
-        ttp.objective(sol);
-
-        // debug msg
-        if (this.debug) {
-          Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" + sol.ob);
-        }
-      }
-
-    } while (improv2);
-
   }
 }

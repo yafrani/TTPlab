@@ -23,7 +23,8 @@ public class TTP1Instance extends TTPInstance {
    * knapsack renting ratio per time unit
    */
   protected double rent;
-  
+
+
   
   /**
    * instance to string
@@ -213,12 +214,13 @@ public class TTP1Instance extends TTPInstance {
       
       int h = (i+1)%nbCities;
       ft += D[x[i]-1][x[h]-1] / velocity;
-      //Deb.echo(wc);
+
       // record important data for future use
       s.timeAcc[i] = ft;
       s.timeRec[i] = D[x[i]-1][x[h]-1] / velocity;
       s.weightAcc[i] = wc;
       s.weightRec[i] = acc;
+
       // map indices to their associated cities
       s.mapCI[x[i]-1] = i;
     }
@@ -231,7 +233,19 @@ public class TTP1Instance extends TTPInstance {
     s.wend = capacity-wc;
     s.ob = ob;
   }
-  
+
+  /**
+   * fitness for GA
+   */
+  public double fitness(TTPSolution s) {
+    double fit = .0;
+
+
+
+
+    return fit;
+  }
+
   public double getRent() {
     return rent;
   }
