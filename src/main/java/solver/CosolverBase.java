@@ -50,7 +50,7 @@ public abstract class CosolverBase extends LocalSearch {
     // distances of all tour cities (city -> end)
     long[] L = new long[nbCities];
     // current weight
-    double wCurr;
+    long wCurr;
     // time approximations
     double t1, t2, t3, a, b1, b2;
 
@@ -86,7 +86,7 @@ public abstract class CosolverBase extends LocalSearch {
 
     // loop & insert items
     int nbInserts = 0;
-    wCurr = .0;
+    wCurr = 0;
     int v2=0,v3=0;
     for (itr = 0; itr < nbItems; itr++) {
 
@@ -145,13 +145,14 @@ public abstract class CosolverBase extends LocalSearch {
 
     // best solution
     int kBest=0;
-    double GBest = sol.ob;
+    long GBest = sol.ob;
 
     // neighbor solution
-    int fp;
-    double ft, G;
+    long fp;
+    long ft, G;
     int nbIter2 = 0;
-    int wc, r;
+    long wc;
+    int r;
 
 
 
@@ -173,7 +174,7 @@ public abstract class CosolverBase extends LocalSearch {
         origBF = sol.mapCI[A[k] - 1];
 
         // starting time
-        ft = origBF == 0 ? .0 : sol.timeAcc[origBF - 1];
+        ft = origBF == 0 ? 0 : sol.timeAcc[origBF - 1];
 
         // recalculate velocities from bit-flip city
         for (r = origBF; r < nbCities; r++) {
@@ -181,7 +182,7 @@ public abstract class CosolverBase extends LocalSearch {
           ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
         }
 
-        G = fp - ft * R;
+        G = Math.round(fp - ft * R);
 
         // update best
         if (G > GBest) {
@@ -209,7 +210,7 @@ public abstract class CosolverBase extends LocalSearch {
         }
       }
 
-    } while (improv2);
+    } while (nbIter2<3);
 
   }
 

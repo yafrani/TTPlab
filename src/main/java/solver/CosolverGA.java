@@ -56,22 +56,23 @@ public class CosolverGA extends CosolverBase {
     insertAndEliminate(sol);
 
     // delta parameters
-    double deltaT;
-    int deltaP, deltaW;
+    long deltaT;
+    long deltaP, deltaW;
 
     // improvement indicator
     boolean improv, improv1, improv2;
 
     // best solution
     int iBest=0, jBest=0, kBest=0;
-    double GBest = sol.ob;
-    double ftBest = sol.ft;
+    long GBest = sol.ob;
+    long ftBest = sol.ft;
 
     // neighbor solution
-    int fp;
-    double ft, G;
+    long fp;
+    long ft, G;
     int nbIter = 0, nbIter1, nbIter2;
-    int wc, origBF;
+    long wc;
+    int origBF;
     int i, j, k, q, r, itr;
 
     // Delaunay triangulation
@@ -80,7 +81,7 @@ public class CosolverGA extends CosolverBase {
     // GA params
     int MAX_ITR = 200;
     double mutationRate = .001, selectionRate = .75;
-    int popSize = 200,
+    int popSize = 20,
         selectSize = (int) Math.round(selectionRate * popSize);
     selectSize = selectSize%2==0 ? selectSize:selectSize-1;
 
@@ -165,7 +166,7 @@ public class CosolverGA extends CosolverBase {
       } while (improv1);
 
 
-      if (!improv) break;
+      //if (!improv) break;
 
 
 
@@ -185,7 +186,7 @@ public class CosolverGA extends CosolverBase {
        * KP with routing   *
        *===================*/
       nbIter2 = 0;
-      int noImprovCounter=0;
+      int noImprovementCounter = 0;
 
       /* create initial population */
       TTPSolution[] pop = new TTPSolution[popSize];
@@ -228,6 +229,12 @@ public class CosolverGA extends CosolverBase {
       }
 
 
+      /*__________*/
+      /*          */
+      /*          */
+      /* START GA */
+      /*          */
+      /*__________*/
       do {
 
         improv2 = false;
@@ -239,14 +246,14 @@ public class CosolverGA extends CosolverBase {
         //Deb.echo("## EVALUATION ##");
 
         // compute fitness
-        double min = Double.MAX_VALUE;
+        long min = Long.MAX_VALUE;
         for (i=0; i < popSize; i++) {
           //ttp.objective(pop[i]); // TODO remove this...
           if (pop[i].ob < min) min = pop[i].ob;
         }
         min = min < 0 ? -min : 0;
-        double sumFit = .0;
-        double fitList[] = new double[popSize];
+        long sumFit = 0;
+        long fitList[] = new long[popSize];
         for (i=0; i < popSize; i++) {
           fitList[i] = pop[i].ob + min;
           sumFit += fitList[i];
@@ -256,7 +263,7 @@ public class CosolverGA extends CosolverBase {
         double normFit[] = new double[popSize];
         for (i=0; i < popSize; i++) {
           normFit[i] = fitList[i] / sumFit;
-          //Deb.echo(u+" >> "+fitList[u] +" | "+normFit[u]);
+          //Deb.echo(i+" >> "+pop[i].ob+"//"+fitList[i] +" | "+normFit[i]);
         }
 
         // sort individuals
@@ -318,14 +325,14 @@ public class CosolverGA extends CosolverBase {
           long childW1 = 0, childW2 = 0;
           // make a one point crossover
           for (j=0; j < cp; j++) {
-            childrenPP[i][j] = ppp1[j];
+            childrenPP[i  ][j] = ppp1[j];
             childrenPP[i+1][j] = ppp2[j];
             // recover weights
             childW1 += ppp1[j]!=0 ? ttp.weightOf(j):0;
             childW2 += ppp2[j]!=0 ? ttp.weightOf(j):0;
           }
           for (j=cp; j < nbItems; j++) {
-            childrenPP[i][j] = ppp2[j];
+            childrenPP[i  ][j] = ppp2[j];
             childrenPP[i+1][j] = ppp1[j];
             // recover weights
             childW1 += ppp2[j]!=0 ? ttp.weightOf(j):0;
@@ -333,17 +340,18 @@ public class CosolverGA extends CosolverBase {
           }
           TTPSolution child1 = new TTPSolution(tour, childrenPP[i]);
           TTPSolution child2 = new TTPSolution(tour, childrenPP[i+1]);
-
-          //Deb.echo("===> ch1 "+childW1);
-          //Deb.echo("===> ch2 "+childW2);
-
-          //ttp.objective(child1); // TODO| not necessary... replace with
-          //ttp.objective(child2); // TODO| partial delta
-
-          //Deb.echo("***> ch1 "+(capacity-child1.wend));
-          //Deb.echo("***> ch2 "+(capacity-child2.wend));
-
-          //if (true) return null;
+//
+//          Deb.echo(">>>> CP  "+cp/(nbItems+.0));
+//          Deb.echo("===> ch1 "+childW1);
+//          Deb.echo("===> ch2 "+childW2);
+//
+//          ttp.objective(child1); // TODO| not necessary... replace with
+//          ttp.objective(child2); // TODO| partial delta
+//
+//          Deb.echo("***> ch1 "+(capacity-child1.wend));
+//          Deb.echo("***> ch2 "+(capacity-child2.wend));
+//
+//          if (true) return null;
 
           if (childW1 <= capacity) {
             children[i] = child1;
@@ -405,8 +413,8 @@ public class CosolverGA extends CosolverBase {
 
         // update best if improvement
         if (bestGen.ob > GBest) {
-          Deb.echo(nbIter2+" >>> "+noImprovCounter);
-          noImprovCounter = 0;
+          Deb.echo(nbIter2+" >>> "+noImprovementCounter);
+          noImprovementCounter = 0;
           improv = true;
 
           // evaluate & update vectors
@@ -422,19 +430,19 @@ public class CosolverGA extends CosolverBase {
           }
         }
         else {
-          noImprovCounter++;
+          noImprovementCounter++;
         }
 
         // debug msg
-        if (this.debug) {
-          //Deb.echo(">> GA KRP: " + nbIter2 + " | ob-best=" + sol.ob);
-        }
+        //if (this.debug) {
+        //  Deb.echo(">> GA KRP: " + nbIter2 + " | ob-best=" + sol.ob);
+        //}
 
         nbIter2++;
 
 
 
-      } while (noImprovCounter<MAX_ITR);
+      } while (noImprovementCounter<MAX_ITR);
 
 
 

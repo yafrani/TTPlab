@@ -52,16 +52,17 @@ public class Handoff2optSH extends LocalSearch {
     
     ttp.objective(sol);
     
-    int fp2 = sol.fp;
-    double ft2, ob2 = .0;
+    long fp2 = sol.fp;
+    long ft2, ob2 = 0;
     int nbIter = 0;
-    int wc, start;
+    long wc;
+    int start;
     int i, j;
     
     
     /* best solution params */
     int iBest = 0, jBest = 0;
-    double obBest = sol.ob;
+    long obBest = sol.ob;
     TTPSolution sBest = sol;
     boolean improv = false;
     
@@ -70,13 +71,13 @@ public class Handoff2optSH extends LocalSearch {
     // partial distance from city x_i
     long di;
     // partial time with item k collected from city x_i
-    double tik;
+    long tik;
     // item scores
     double[] score = new double[nbItems];
     // total time with no items collected
-    double t_ = sol.ft;
+    long t_ = sol.ft;
     // total time with only item k collected
-    double tik_;
+    long tik_;
     // fitness value
     double u[] = new double[nbItems];
     
@@ -99,10 +100,10 @@ public class Handoff2optSH extends LocalSearch {
             start = i-1;
             
             // time and weight to start with
-            ft2 = start==0 ? .0 : sol.timeAcc[start-1];
+            ft2 = start==0 ? 0 : sol.timeAcc[start-1];
             wc = start==0 ? 0 : sol.weightAcc[start-1];
             
-            int[] wcR = new int[nbCities];
+            long[] wcR = new long[nbCities];
             
             // recalculate velocities from start
             for (int r=start; r<nbCities; r++) {
@@ -117,7 +118,7 @@ public class Handoff2optSH extends LocalSearch {
               wcR[r] = wc;
             }
             
-            ob2 = fp2 - ft2*R;
+            ob2 = Math.round(fp2 - ft2*R);
             
             // update best
             if (ob2 > obBest) {
@@ -171,7 +172,7 @@ public class Handoff2optSH extends LocalSearch {
         //P.echo2("["+k+"]"+(i+1)+"~");
         
         // time to start with
-        tik = i==0 ? .0 : sol.timeAcc[i-1];
+        tik = i==0 ? 0 : sol.timeAcc[i-1];
         int iw = ttp.weightOf(k),
             ip = ttp.profitOf(k);
         

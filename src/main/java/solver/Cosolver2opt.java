@@ -63,10 +63,10 @@ public class Cosolver2opt extends LocalSearch {
     double ftBest = sol.ft;
 
     // neighbor solution
-    int fp;
-    double ft, G;
+    long fp;
+    long ft, G;
     int nbIter = 0, nbIter1 = 0, nbIter2 = 0;
-    int wc;
+    long wc;
     int i, j, k;
 
     // KP step
@@ -191,7 +191,7 @@ public class Cosolver2opt extends LocalSearch {
           int origBF = sol.mapCI[A[k] - 1];
 
           // starting time
-          ft = origBF == 0 ? .0 : sol.timeAcc[origBF - 1];
+          ft = origBF == 0 ? 0 : sol.timeAcc[origBF - 1];
 
           // recalculate velocities from bit-flip city
           for (int r = origBF; r < nbCities; r++) {
@@ -199,7 +199,7 @@ public class Cosolver2opt extends LocalSearch {
             ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
           }
 
-          G = fp - ft * R;
+          G = Math.round(fp - ft * R);
 
           // update best
           if (G > GBest) {

@@ -185,8 +185,8 @@ public class TTP1Instance extends TTPInstance {
     
     int wc = 0;  // current weight
     int fp = 0;  // final profit
-    double ft = .0; // tour time
-    double ob = .0; // objective value
+    long ft = 0; // tour time
+    long ob = 0; // objective value
     
     int[] selectedItems = new int[this.nbItems]; // remove this... (memory abuse)
     
@@ -217,7 +217,7 @@ public class TTP1Instance extends TTPInstance {
 
       // record important data for future use
       s.timeAcc[i] = ft;
-      s.timeRec[i] = D[x[i]-1][x[h]-1] / velocity;
+      s.timeRec[i] = Math.round(D[x[i]-1][x[h]-1] / velocity);
       s.weightAcc[i] = wc;
       s.weightRec[i] = acc;
 
@@ -225,7 +225,7 @@ public class TTP1Instance extends TTPInstance {
       s.mapCI[x[i]-1] = i;
     }
 
-    ob = fp - ft*rent;
+    ob = Math.round(fp - ft*rent);
     
     // solution properties
     s.fp = fp;

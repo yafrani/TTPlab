@@ -24,8 +24,18 @@ public class TwoOptHelper {
     }
     return tour[k];
   }
-  
-  
+
+  /**
+   * get tour value using 2opt technique
+   */
+  public static long get2optValue(int k, long[] vect, int i, int j) {
+
+    if (k>=i && k<=j) {
+      return vect[j-k+i];
+    }
+    return vect[k];
+  }
+
   /**
    * get tour index after 2opt is applied
    * 

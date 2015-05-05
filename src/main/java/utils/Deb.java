@@ -22,7 +22,6 @@ public class Deb {
   public static void echo(int[] x) {
     echo(x,"%2d");
   }
-  
   public static void echo(int[] x,String forma) {
     String s="";
     for (int i=0; i<x.length; i++)
@@ -30,11 +29,21 @@ public class Deb {
     s = s.substring(0,s.length()-2);
     echo(s+" #");
   }
-  
+
+  public static void echo(long[] x) {
+    echo(x,"%2d");
+  }
+  public static void echo(long[] x,String forma) {
+    String s="";
+    for (int i=0; i<x.length; i++)
+      s += String.format(forma,x[i])+", ";
+    s = s.substring(0,s.length()-2);
+    echo(s+" #");
+  }
+
   public static void echo(double[] x) {
     echo(x,"%.2f");
   }
-  
   public static void echo(double[] x, String forma) {
     String s="";
     for (int i=0; i<x.length; i++)

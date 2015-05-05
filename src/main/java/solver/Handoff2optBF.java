@@ -50,15 +50,16 @@ public class Handoff2optBF extends LocalSearch {
     int[] tour = sol.getTour();
     int[] pickingPlan = sol.getPickingPlan();
     
-    int fp2 = sol.fp;
-    double ft2, ob2 = .0;
+    long fp2 = sol.fp;
+    long ft2, ob2 = 0;
     int nbIter = 0;
-    int wc, start;
+    long wc;
+    int start;
     int i=3, j=7;
     
     // best sol params
     int iBest=0, jBest=0, kBest=0;
-    double obBest=sol.ob;
+    long obBest = sol.ob;
     TTPSolution sBest = sol;
     
     boolean improv = false;
@@ -79,10 +80,10 @@ public class Handoff2optBF extends LocalSearch {
           start = i-1;
           
           // time and weight to start with
-          ft2 = start==0 ? .0 : sol.timeAcc[start-1];
+          ft2 = start==0 ? 0 : sol.timeAcc[start-1];
           wc = start==0 ? 0 : sol.weightAcc[start-1];
           
-          int[] wcR = new int[nbCities];
+          long[] wcR = new long[nbCities];
           
           // recalculate velocities from start
           for (int r=start; r<nbCities; r++) {
@@ -99,7 +100,7 @@ public class Handoff2optBF extends LocalSearch {
             //    " ft "+String.format("%.2f", ft2));
           }
           
-          ob2 = fp2 - ft2*R;
+          ob2 = Math.round(fp2 - ft2*R);
           
           if (ob2 > obBest) {
             iBest = i;

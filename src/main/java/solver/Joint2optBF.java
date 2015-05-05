@@ -55,25 +55,25 @@ public class Joint2optBF extends LocalSearch {
     int[] mapCI = new int[nbCities];      // city/index store
     
     // delta parameters
-    int deltaP, deltaW;
-    double deltaT = .0;
+    long deltaP, deltaW;
+    double deltaT;
     
     // improvement indicator
     boolean improv;
     
     // best solution
     int iBest=0, jBest=0, kBest=0;
-    double GBest = sol.ob;
+    long GBest = sol.ob;
     
     // neighbor solution
-    int fp = 0;
-    double ft = .0, G = .0;
+    long[] tacc = new long[nbCities];  // tmp time acc
+    long[] wacc = new long[nbCities];
+    long fp = 0;
+    long ft = 0, G = 0;
+    long wc;
+    int i, j, k;
     int nbIter = 0;
-    int wc;
-    int i=3, j=7, k=5;
-    double[] tacc = new double[nbCities];  // tmp time acc
-    int[] wacc = new int[nbCities];
-    
+
     do {
       /* map indices to their associated cities */
       for (int q=0; q<nbCities; q++) { // @todo move this to solution coding?
@@ -94,9 +94,9 @@ public class Joint2optBF extends LocalSearch {
           }
           
           /* calculate final time with partial delta */
-          ft = sol.ft;
+          double ftd = sol.ft;
           wc = i-2 < 0 ? 0 : sol.weightAcc[i-2]; // fix index...
-          double ftacc = i-2 < 0 ? .0 : sol.timeAcc[i-2]; // @todo remove ftacc, use integer suite numbers
+          long ftacc = i-2 < 0 ? 0 : sol.timeAcc[i-2]; // @todo remove ftacc, use integer suite numbers
           
           for (int q=i-1; q<=j; q++) {
             
@@ -107,20 +107,24 @@ public class Joint2optBF extends LocalSearch {
             deltaT = -sol.timeRec[q] + D[c1][c2]/(maxSpeed-wc*C);
             
             // accumulate final time
-            ft = ft + deltaT;
+            ftd = ftd + deltaT;
             
             // fix time accumulator
-            ftacc = ftacc + D[c1][c2]/(maxSpeed-wc*C);
+            ftacc = Math.round( ftacc + D[c1][c2]/(maxSpeed-wc*C) );
             
             tacc[q] = ftacc; // need to continue 'till the end...
             wacc[q] = wc;
           }
+
           for (int q=j+1;q<nbCities;q++) {
-            double diff = sol.timeAcc[q]-sol.timeAcc[q-1];
+            long diff = sol.timeAcc[q]-sol.timeAcc[q-1];
             tacc[q] = tacc[q-1] + diff;
           }
           
-          
+
+
+
+
           /* ****************************** */
           /* one bit flip                   */
           /* ****************************** */
@@ -163,7 +167,7 @@ public class Joint2optBF extends LocalSearch {
             
             // starting history params
             wc = newBF==0 ?  0 : wacc[newBF-1];
-            ft = newBF==0 ? .0 : tacc[newBF-1];
+            ft = newBF==0 ?  0 : tacc[newBF-1];
             
             // recalculate velocities from start
             for (int r=newBF; r<nbCities; r++) {
@@ -178,7 +182,7 @@ public class Joint2optBF extends LocalSearch {
             // remove delta
             sol.weightRec[origBF] -= deltaW;
             
-            G = fp - ft*R;
+            G = Math.round(fp - ft*R);
 //            Deb.echo("("+i+","+j+","+k+") iBF:"+refBF+" || "+"ft: "+ ft + " | G: " + G + " | fp: "+fp);
             
             // update best
@@ -198,7 +202,7 @@ public class Joint2optBF extends LocalSearch {
         } // END FOR j
         if (firstfit && improv) break;
       } // END FOR i
-      
+
       /*
        * test improvement
        */

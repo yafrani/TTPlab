@@ -64,28 +64,21 @@ public class CosolverBitFlip extends CosolverBase {
 
     // best solution
     int iBest=0, jBest=0, kBest=0;
-    double GBest = sol.ob;
-    double ftBest = sol.ft;
+    long GBest = sol.ob;
+    long ftBest = sol.ft;
 
     // neighbor solution
-    int fp;
-    double ft, G;
+    long fp;
+    long ft, G;
     int nbIter = 0, nbIter1, nbIter2;
-    int wc, origBF;
-    int i, j, k, r, itr;
-
-    // distances of all tour cities (city -> end)
-    long[] L = new long[nbCities];
-    // current weight
-    double wCurr = .0;
-    // time approximations
-    double t1, t2, t3, a, b1, b2;
+    long wc;
+    int origBF;
+    int i, j, k, r;
 
     // Delaunay triangulation
     ArrayList<Integer>[] candidates = ttp.delaunay();
 
     do {
-      //insertAndEliminate(sol);
 
       improv = false;
       nbIter++;
@@ -173,7 +166,7 @@ public class CosolverBitFlip extends CosolverBase {
        * sub-problem 2   *
        * KP with routing *
        *=================*/
-
+      //firstfit = true;
       nbIter2 = 0;
       do {
         improv2 = false;
@@ -206,7 +199,7 @@ public class CosolverBitFlip extends CosolverBase {
           origBF = sol.mapCI[A[k] - 1];
 
           // starting time
-          ft = origBF == 0 ? .0 : sol.timeAcc[origBF - 1];
+          ft = origBF == 0 ? 0 : sol.timeAcc[origBF - 1];
 
           // recalculate velocities from bit-flip city
           for (r = origBF; r < nbCities; r++) {
@@ -214,7 +207,7 @@ public class CosolverBitFlip extends CosolverBase {
             ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
           }
 
-          G = fp - ft * R;
+          G = Math.round(fp - ft * R);
 
           // update best
           if (G > GBest) {

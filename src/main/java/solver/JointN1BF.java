@@ -57,7 +57,7 @@ public class JointN1BF extends LocalSearch {
     int nbIter = 0;
     
     // delta parameters
-    int deltaP, deltaW;
+    long deltaP, deltaW;
     double deltaT;
     
     // swapped cities
@@ -68,16 +68,16 @@ public class JointN1BF extends LocalSearch {
     
     // best solution params
     int iBest=0, kBest=0;
-    double GBest = sol.ob;
+    long GBest = sol.ob;
     
     // neighbor solution data
-    int fp = sol.fp;
-    double ft = sol.ft, G = sol.ob;
-    int wc,       // current weight
-        newWA,
-        oldWA;    // saved WA at swap index
+    long fp = sol.fp;
+    long ft = sol.ft, G = sol.ob;
+    long wc,       // current weight
+         newWA,
+         oldWA;    // saved WA at swap index
     int refBF;    // one-bit-flip index
-    double[] tacc = new double[nbCities];  // tmp time acc
+    long[] tacc = new long[nbCities];  // tmp time acc
     
     do {
       
@@ -114,17 +114,17 @@ public class JointN1BF extends LocalSearch {
         // compute objective
         deltaT = - D[c1][c2]/v1 - D[c2][c3]/v2  - D[c3][c4]/v3
                  + D[c1][c3]/v1 + D[c3][c2]/v2i + D[c2][c4]/v3;
-        ft = sol.ft + deltaT; // remove ?
+        ft = Math.round(sol.ft + deltaT); // remove ?
         
         /* fix time accumulator */
 //        for (int q=0; q<i+1; q++) {
 //          tacc[q] = sol.timeAcc[q];
 //        }
         if (i-2>-1) tacc[i-2] = sol.timeAcc[i-2]; // @todo sufficient ?
-        tacc[i-1] = sol.timeAcc[i-1] - D[c1][c2]/v1 + D[c1][c3]/v1;
-        tacc[i] = tacc[i-1] + D[c2][c3]/v2i;
+        tacc[i-1] = Math.round(sol.timeAcc[i-1] - D[c1][c2]/v1 + D[c1][c3]/v1);
+        tacc[i] = Math.round(tacc[i-1] + D[c2][c3]/v2i);
         for (int r=i+1; r<nbCities; r++) {
-          tacc[r] = sol.timeAcc[r] + deltaT;
+          tacc[r] = Math.round(sol.timeAcc[r] + deltaT);
         }
         
         /* apply a swap between node i and node i+1 */
@@ -170,7 +170,7 @@ public class JointN1BF extends LocalSearch {
           refBF = mapCI[ A[k]-1 ];
           
           // starting time
-          ft = refBF==0 ? .0 : tacc[refBF-1];
+          ft = refBF==0 ? 0 : tacc[refBF-1];
           
           // recalculate velocities from bit-flip city
           for (int r=refBF; r<nbCities; r++) {
@@ -179,7 +179,7 @@ public class JointN1BF extends LocalSearch {
           }
           
           /* compute objective value */
-          G = fp - ft*R;
+          G = Math.round(fp - ft*R);
           
           if (G > GBest) {
             iBest = i;

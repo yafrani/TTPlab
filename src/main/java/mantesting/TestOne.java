@@ -31,7 +31,7 @@ public class TestOne {
     };
 
     /* instance information */
-    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[7]);
+    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[5]);
     Deb.echo(ttp);
     Deb.echo("------------------");
     
@@ -46,7 +46,7 @@ public class TestOne {
 
     /* algorithm */
     final LocalSearch algo = new CosolverBitFlip(ttp, s0);
-    //algo.firstfit();
+    algo.firstfit();
     algo.debug();
 
     /* execute */
