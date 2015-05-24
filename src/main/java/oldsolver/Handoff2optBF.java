@@ -1,5 +1,6 @@
-package solver;
+package oldsolver;
 
+import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;

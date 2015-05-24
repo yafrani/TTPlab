@@ -17,10 +17,23 @@ public class TestOne {
   public static void main(String[] args) {
 
     String[] inst = {
+      "a280-ttp/a280_n279_bounded-strongly-corr_01.ttp",
+      "eil51-ttp/eil51_n50_bounded-strongly-corr_10.ttp",
+      "a280-ttp/a280_n2790_uncorr_10.ttp",
+      "fnl4461-ttp/fnl4461_n22300_uncorr-similar-weights_05.ttp",
+      "a280-ttp/a280_n279_uncorr_01.ttp",
+      "a280-ttp/a280_n1395_uncorr-similar-weights_05.ttp",
+      "fnl4461-ttp/fnl4461_n44600_uncorr_10.ttp",
+      "fnl4461-ttp/fnl4461_n22300_uncorr-similar-weights_05.ttp",
+      "fnl4461-ttp/fnl4461_n44600_uncorr_10.ttp",
+      "rl1304-ttp/rl1304_n13030_bounded-strongly-corr_10.ttp",
+      "u724-ttp/u724_n7230_bounded-strongly-corr_10.ttp",
+      "rl1304_n1303_bounded-strongly-corr_01.ttp",
+      "a280-ttp/a280_n2790_uncorr_10.ttp",
       "eil51-ttp/eil51_n50_uncorr_10.ttp",
+      "a280-ttp/a280_n1395_bounded-strongly-corr_01.ttp",
       "a280-ttp/a280_n279_bounded-strongly-corr_01.ttp",
       "a280-ttp/a280_n1395_uncorr-similar-weights_05.ttp",
-      "a280-ttp/a280_n2790_uncorr_10.ttp",
       "fnl4461-ttp/fnl4461_n4460_bounded-strongly-corr_01.ttp",
       "fnl4461-ttp/fnl4461_n22300_uncorr-similar-weights_05.ttp",
       "fnl4461-ttp/fnl4461_n44600_uncorr_10.ttp",
@@ -31,10 +44,10 @@ public class TestOne {
     };
 
     /* instance information */
-    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[5]);
+    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[0]);
     Deb.echo(ttp);
     Deb.echo("------------------");
-    
+
     /* initial solution s0 */
     Constructive construct = new Constructive(ttp);
     TTPSolution s0 = construct.generate("lz");
@@ -60,7 +73,7 @@ public class TestOne {
         startTime = System.currentTimeMillis();
         
         TTPSolution sx = algo.solve();
-        
+
         stopTime = System.currentTimeMillis();
         exTime = stopTime - startTime;
         
@@ -69,7 +82,7 @@ public class TestOne {
 
         Deb.echo("objective   : " + sx.ob);
         Deb.echo("Duration    : " + (exTime/1000.0) + " sec");
-        
+
       }
     });
     

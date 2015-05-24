@@ -1,4 +1,4 @@
-package unittesting;
+package regressiontesting;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -9,7 +9,7 @@ public class Joint2optBFFirstFitTest extends LocalSearchTest {
 
   @Before
   public void init() {
-    algoCls = "solver.Joint2optBF";
+    algoCls = "oldsolver.Joint2optBF";
     firstfit = false;
   }
   

@@ -345,14 +345,14 @@ public class Constructive extends TTPHeuristic {
     long maxCapacity = capacity/h;
     
     // item scores
-    double[] score = new double[n];
+    Double[] score = new Double[n];
     
     for (int k=0; k<n; k++) {
-      score[k] = ttp.profitOf(k)/ttp.weightOf(k);
+      score[k] = ttp.profitOf(k) / (ttp.weightOf(k) + .0);
     }
     
     // sort
-    Quicksort qs = new Quicksort(score);
+    Quicksort<Double> qs = new Quicksort(score);
     qs.sort();
     
     int[] si = qs.getIndices();
@@ -483,7 +483,7 @@ public class Constructive extends TTPHeuristic {
     double tik;
     
     // item scores
-    double[] score = new double[n];
+    Double[] score = new Double[n];
     
     // total time with no items collected
     double t_ = s.ft;
@@ -524,7 +524,7 @@ public class Constructive extends TTPHeuristic {
       //P.echo(k+" : "+u[k]);
     }
     
-    Quicksort qs = new Quicksort(score);
+    Quicksort<Double> qs = new Quicksort<Double>(score);
     qs.sort();
     int[] si = qs.getIndices();
     int wc = 0;

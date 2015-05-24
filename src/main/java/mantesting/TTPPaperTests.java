@@ -44,7 +44,7 @@ public class TTPPaperTests {
    * r: random
    * g: greedy
    */
-  static final char ppAlgo = 'g';
+  static final char ppAlgo = 'z';
   
   
   
@@ -64,10 +64,11 @@ public class TTPPaperTests {
     "u724-ttp",
     "dsj1000-ttp",
     "rl1304-ttp",
-    "fl1577-ttp",
-    "d2103-ttp",
-    "pcb3038-ttp",
-    "fnl4461-ttp",
+
+//    "fl1577-ttp",
+//    "d2103-ttp",
+//    "pcb3038-ttp",
+//    "fnl4461-ttp",
 
 //    "brd14051-ttp",
 //    "d15112-ttp",
@@ -77,43 +78,27 @@ public class TTPPaperTests {
 //    "usa13509-ttp",
 
 
-
-//    "eil51-ttp",
-//    "berlin52-ttp",
-//    "eil76-ttp",
-//    "kroA100-ttp",
-//    "pr124-ttp",
-//    "ch150-ttp",
-//    "u159-ttp",
-//    "kroA200-ttp",
-//    "ts225-ttp",
-//    "a280-ttp",
-//    "lin318-ttp",
-//    "u574-ttp",
-//    "u724-ttp",
-//    "dsj1000-ttp",
-//    "rl1304-ttp",
   };
 
 
   static final String[] KPTypes = {
-//    "uncorr",
-//    "uncorr-similar-weights",
+    "uncorr",
+    "uncorr-similar-weights",
     "bounded-strongly-corr",
   };
   
   
   static final int[] knapsackCategories = {
-//    2,
-//    6,
+    1,
+    5,
     10,
   };
   
   
   static final int[] itemFactor = {
     1,
-//    3,
-//    10,
+    5,
+    10,
   };
   
   
@@ -130,8 +115,8 @@ public class TTPPaperTests {
     
     
     /* algorithm settings */
-    final LocalSearch algo = new Cosolver2opt();
-    //algo.firstfit();
+    final LocalSearch algo = new CosolverBitFlip();
+    algo.firstfit();
     algo.noDebug();
     algo.noLog();
     

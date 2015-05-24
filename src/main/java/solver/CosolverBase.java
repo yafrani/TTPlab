@@ -61,7 +61,7 @@ public abstract class CosolverBase extends LocalSearch {
     }
 
     // sort item according to score
-    double[] scores = new double[nbItems];
+    Double[] scores = new Double[nbItems];
     int[] sortedItems;
     int[] insertedItems = new int[nbItems];
 
@@ -80,7 +80,7 @@ public abstract class CosolverBase extends LocalSearch {
     ttp.objective(sol);
 
     // sort items according to score
-    Quicksort qs = new Quicksort(scores);
+    Quicksort<Double> qs = new Quicksort<>(scores);
     qs.sort();
     sortedItems = qs.getIndices();
 

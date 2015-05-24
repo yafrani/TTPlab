@@ -4,6 +4,7 @@ import solver.Constructive;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
+import utils.Quicksort;
 import utils.TwoOptHelper;
 
 /**
@@ -11,53 +12,25 @@ import utils.TwoOptHelper;
  */
 public class TestJunk {
 
-  /* program n_select=1000 times selects one of n=4 elements with weights weight[i].
-   * Selections are summed up in counter[i]. For the weights as given in the example
-   * below one expects that elements 0,1,2 and 3 will be selected (on average)
-   * 200, 150, 600 and 50 times, respectively.  In good agreement with exemplary run.
-   */
-  public static void main(String [] args) {
-    int n=4;
-    double [] weight = new double [n];
-    weight[0]=0.4;
-    weight[1]=0.3;
-    weight[2]=1.2;
-    weight[3]=0.1;
-    double max_weight=1.2;
-    int  [] counter = new int[n];
-    int n_select=1000;
-    int index=0;
-    boolean notaccepted;
-    for (int i=0; i<n_select; i++){
-      notaccepted=true;
-      while (notaccepted){
-        index= (int)(n*Math.random());
-        if(Math.random()<weight[index]/max_weight) {notaccepted=false;}
-      }
-      counter[index]++;
-    }
-    for (int i=0; i<n; i++){
-      System.out.println("counter["+i+"]="+counter[i]);
-    }
-  }
-  public static void main2b(String[] args) {
 
-    String inst = "eil51-ttp/eil51_n50_uncorr_01.ttp";
+  public static void main(String[] args) {
+
+    String inst = "berlin52-ttp/berlin52_n153_bounded-strongly-corr_10.ttp";
     TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst);
     Deb.echo(ttp);
 
     Constructive construct = new Constructive(ttp);
-    TTPSolution s0 = construct.generate("lr");
-    ttp.objective(s0);
-    Deb.echo("ob  : "+s0.ob);
-    Deb.echo("wend: "+s0.wend);
-    Deb.echo("==================");
+//    TTPSolution s0 = construct.generate("lr");
+//    ttp.objective(s0);
+//    Deb.echo("ob  : "+s0.ob);
+//    Deb.echo("wend: "+s0.wend);
+//    Deb.echo("==================");
 
     // problem data
     int nbItems = ttp.getNbItems(), nbCities = ttp.getNbCities();
     long[][] D = ttp.getDist();
-    int[] tour = s0.getTour();
-    int[] pickingPlan = s0.getPickingPlan();
+//    int[] tour = s0.getTour();
+//    int[] pickingPlan = s0.getPickingPlan();
     int[] A = ttp.getAvailability();
     double maxSpeed = ttp.getMaxSpeed();
     double minSpeed = ttp.getMinSpeed();
@@ -65,29 +38,53 @@ public class TestJunk {
     double C = (maxSpeed - minSpeed) / capacity;
     double R = ttp.getRent();
 
-    // algo data
-    int i, k, origBF;
-    double t1;
-    // scores
-    double[] scores = new double[nbItems];
-    // distances map
-    long[] L = new long[nbCities];
-    L[nbCities-1] = D[tour[nbCities-1] - 1][0];
-    for (i=nbCities-2; i >= 0; i--) {
-      L[i] = L[i+1] + D[tour[i+1] - 1][tour[i] - 1];
+
+    // include in TTP init...
+//    ttp.clusterItems();
+//    ArrayList<Integer> [] cl = ttp.getClusters();
+//    for (ArrayList<Integer> x : cl) {
+//      System.out.println(x);
+//    }
+
+    int N = 10;
+    Long fit1[] = new Long[N], fit2[] = new Long[N];
+    TTPSolution s = construct.generate("lg");
+    ttp.objective(s); long obj = s.ob;
+    int[] tour = s.getTour();
+    int[] pickingPlan = s.getPickingPlan();
+    Deb.echo(">>>"+obj);
+    for (int k=0; k<N; k++) {
+
+      // bit-flip
+      pickingPlan[k] = pickingPlan[k] != 0 ? 0 : A[k];
+
+      ttp.objective(s);
+      fit1[k] = s.ob;
+
+      /* fitness test... */
+      long deltaW = pickingPlan[k]==0 ? -ttp.weightOf(k) : ttp.weightOf(k);
+      int origBF = s.mapCI[A[k] - 1];
+      long A1 = origBF == 0 ? 0 : s.timeAcc[origBF - 1];
+      fit2[k] = Math.round( A1 - (1.0/deltaW)*(obj - A1) );
+
+      Deb.echo(fit1[k]+" || "+fit2[k]);
+
+      // bit-flip
+      pickingPlan[k] = pickingPlan[k] != 0 ? 0 : A[k];
     }
 
-    for (k = 0; k < nbItems; k++) {
-      // index where Bit-Flip happened
-      origBF = s0.mapCI[A[k] - 1];
-      // calculate time approximations
-      t1 = L[origBF]*(1/(maxSpeed-C*ttp.weightOf(k)) - 1/maxSpeed);
-      // affect score to item
-      scores[k] = (ttp.profitOf(k)-R*t1) / ttp.weightOf(k);
-      // empty the knapsack
-      pickingPlan[k] = 0;
-    }
+    ttp.objective(s); obj = s.ob;
+    Deb.echo(">>>"+obj);
 
+    Quicksort<Long> qs = new Quicksort<>(fit1);
+    qs.sort();
+    int x1[] = qs.getIndices();
+    Deb.echo(x1);
+
+    qs = new Quicksort<>(fit2);
+    qs.sort();
+    int x2[] = qs.getIndices();
+    Deb.echo(x2);
   }
 
 

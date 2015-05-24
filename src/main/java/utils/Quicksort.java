@@ -7,12 +7,12 @@ package utils;
  * @author kyu
  *
  */
-public class Quicksort {
-  
-  private double[] data;
+public class Quicksort<T extends Comparable<T>> {
+
+  private T[] data;
   private int[] indices;
-  
-  public Quicksort(double[] values) {
+
+  public Quicksort(T[] values) {
     this.data = values;
     this.indices = new int[this.data.length];
     
@@ -43,14 +43,14 @@ public class Quicksort {
     int i = low, j = high;
     
     // Get the pivot element from the middle of the list
-    double pivot = data[low + (high-low)/2];
-    
+    T pivot = data[low + (high-low)/2];
+
     // Divide into two lists
     while (i <= j) {
-  	  while (data[i] > pivot) {
+  	  while (data[i].compareTo(pivot) > 0) {
   	    i++;
   	  }
-  	  while (data[j] < pivot) {
+  	  while (data[j].compareTo(pivot) < 0) {
   	    j--;
   	  }
   	  
@@ -70,13 +70,10 @@ public class Quicksort {
   
   /**
    * swap two elements
-   * 
-   * @param i
-   * @param j
    */
   private void swap(int i, int j) {
-    
-    double tmpd = data[i];
+
+    T tmpd = data[i];
     data[i] = data[j];
     data[j] = tmpd;
     

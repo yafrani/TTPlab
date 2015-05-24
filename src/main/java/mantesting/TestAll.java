@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import solver.Constructive;
-import solver.JointN1BF;
+import oldsolver.JointN1BF;
 import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;

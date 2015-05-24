@@ -30,8 +30,10 @@ public abstract class TTPInstance {
   protected int[] weights;
   
   protected File ttpFile;
-  
-  
+
+  // item clusters per city
+  protected ArrayList<Integer>[] clusters;
+
   @Override
   public String toString() {
     
@@ -121,7 +123,10 @@ public abstract class TTPInstance {
   public long getCapacity() {
     return capacity;
   }
-  
+  public ArrayList<Integer>[] getClusters() {
+    return clusters;
+  }
+
   
   public int profitOf(int i) {
     return this.profits[i];
@@ -186,4 +191,24 @@ public abstract class TTPInstance {
 
     return null;
   }
+
+
+  /**
+   * organize items per city
+   */
+  public void clusterItems() {
+
+    clusters = new ArrayList[nbCities];
+    int i;
+
+    // init cluster arrays
+    for (i=0; i<nbCities; i++) {
+      clusters[i] = new ArrayList<>();
+    }
+    // fill clusters
+    for (i=0; i<nbItems; i++) {
+      clusters[ availability[i]-1 ].add(i);
+    }
+  }
+
 }

@@ -1,5 +1,6 @@
-package solver;
+package oldsolver;
 
+import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -120,7 +121,7 @@ public class Joint2optBF extends LocalSearch {
             long diff = sol.timeAcc[q]-sol.timeAcc[q-1];
             tacc[q] = tacc[q-1] + diff;
           }
-          
+
 
 
 

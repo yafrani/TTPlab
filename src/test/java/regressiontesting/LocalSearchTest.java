@@ -1,4 +1,4 @@
-package unittesting;
+package regressiontesting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -45,7 +45,7 @@ public class LocalSearchTest {
   
   
   // algo params
-  String algoCls = "solver.JointN1BF"; // default algo is N1BF
+  String algoCls = "oldsolver.JointN1BF"; // default algo is N1BF
   boolean firstfit = true;
   
   

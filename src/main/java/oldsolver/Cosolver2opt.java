@@ -1,6 +1,6 @@
-package solver;
+package oldsolver;
 
-import mantesting.TestCLI;
+import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -70,7 +70,7 @@ public class Cosolver2opt extends LocalSearch {
     int i, j, k;
 
     // KP step
-    double[] scores = new double[nbItems];
+    Double[] scores = new Double[nbItems];
     int itr;
     int[] sortedItems;
 
@@ -151,9 +151,9 @@ public class Cosolver2opt extends LocalSearch {
        * KP with routing *
        *=================*/
       for (k = 0; k < nbItems; k++) {
-        scores[k] = sol.mapCI[A[k] - 1] * ttp.profitOf(k) / ttp.weightOf(k);
+        scores[k] = sol.mapCI[A[k] - 1] * ttp.profitOf(k) / (ttp.weightOf(k)+.0);
       }
-      Quicksort qs = new Quicksort(scores);
+      Quicksort<Double> qs = new Quicksort<>(scores);
       qs.sort();
       sortedItems = qs.getIndices();
 

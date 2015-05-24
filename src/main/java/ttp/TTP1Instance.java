@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import utils.CityCoordinates;
+import utils.Deb;
 
 /**
  * TTP1 instance
@@ -18,7 +20,7 @@ import utils.CityCoordinates;
  * 
  */
 public class TTP1Instance extends TTPInstance {
-  
+
   /**
    * knapsack renting ratio per time unit
    */
@@ -167,51 +169,48 @@ public class TTP1Instance extends TTPInstance {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
+    clusterItems();
   }
-  
-  
+
+
+  public double getRent() {
+    return rent;
+  }
+
+
   /**
    * objective function
-   * 
+   *
    * @param s the TTP solution
    */
   public void objective(TTPSolution s) {
-    
+
     int[] x = s.getTour();
     int[] z = s.getPickingPlan();
-    
+
     long[][] D = getDist();
     double C = (maxSpeed-minSpeed)/capacity; // velocity const
-    
-    int wc = 0;  // current weight
-    int fp = 0;  // final profit
-    long ft = 0; // tour time
-    long ob = 0; // objective value
-    
-    int[] selectedItems = new int[this.nbItems]; // remove this... (memory abuse)
-    
-    double velocity = 1.0;
-    
+    double velocity;
+
+    int wc = 0;   // current weight
+    int fp = 0;   // final profit
+    long ft = 0;  // tour time
+    long ob;      // objective value
+
+
     // visit all cities
     for (int i=0; i<this.nbCities; i++) {
-      int k = 0;
-      for (int j=0; j<this.nbItems; j++) {
-        if (z[j]==x[i]) {
-          selectedItems[k++] = j;
-        }
-      }
       int acc=0;
-      if (k > 0) {
-        for (int j=0;j<k;j++) {
-          //wc += weights[selectedItems[j]];
-          fp += profits[selectedItems[j]];
-          acc += weights[selectedItems[j]];
+      for (int j : clusters[ x[i]-1 ]) {
+        if (z[j]!=0) {
+          fp += profits[j];
+          acc += weights[j];
         }
-        wc += acc;
-        velocity = maxSpeed - wc*C;
-        //if (velocity<.1) velocity=.1;
       }
-      
+
+      wc += acc;
+      velocity = maxSpeed - wc*C;
+
       int h = (i+1)%nbCities;
       ft += D[x[i]-1][x[h]-1] / velocity;
 
@@ -226,7 +225,7 @@ public class TTP1Instance extends TTPInstance {
     }
 
     ob = Math.round(fp - ft*rent);
-    
+
     // solution properties
     s.fp = fp;
     s.ft = ft;
@@ -234,19 +233,7 @@ public class TTP1Instance extends TTPInstance {
     s.ob = ob;
   }
 
-  /**
-   * fitness for GA
-   */
-  public double fitness(TTPSolution s) {
-    double fit = .0;
 
 
 
-
-    return fit;
-  }
-
-  public double getRent() {
-    return rent;
-  }
 }

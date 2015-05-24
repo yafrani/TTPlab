@@ -1,4 +1,4 @@
-package unittesting;
+package regressiontesting;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

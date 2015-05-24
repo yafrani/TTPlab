@@ -1,5 +1,6 @@
-package solver;
+package oldsolver;
 
+import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -73,7 +74,7 @@ public class Handoff2optSH extends LocalSearch {
     // partial time with item k collected from city x_i
     long tik;
     // item scores
-    double[] score = new double[nbItems];
+    Double[] score = new Double[nbItems];
     // total time with no items collected
     long t_ = sol.ft;
     // total time with only item k collected

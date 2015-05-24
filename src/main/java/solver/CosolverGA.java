@@ -3,10 +3,7 @@ package solver;
 import ttp.TTP1Instance;
 
 import ttp.TTPSolution;
-import utils.Deb;
-import utils.Quicksort;
-import utils.RandGen;
-import utils.TwoOptHelper;
+import utils.*;
 
 import java.util.ArrayList;
 
@@ -260,14 +257,14 @@ public class CosolverGA extends CosolverBase {
         }
 
         // normalize fitness
-        double normFit[] = new double[popSize];
+        Double normFit[] = new Double[popSize];
         for (i=0; i < popSize; i++) {
-          normFit[i] = fitList[i] / sumFit;
+          normFit[i] = fitList[i] / (sumFit+.0);
           //Deb.echo(i+" >> "+pop[i].ob+"//"+fitList[i] +" | "+normFit[i]);
         }
 
         // sort individuals
-        Quicksort qs = new Quicksort(normFit);
+        Quicksort<Double> qs = new Quicksort<>(normFit);
         qs.sort();
         int[] sortIdx = qs.getIndices();
 
