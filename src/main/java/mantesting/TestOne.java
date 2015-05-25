@@ -17,10 +17,10 @@ public class TestOne {
   public static void main(String[] args) {
 
     String[] inst = {
-      "a280-ttp/a280_n279_bounded-strongly-corr_01.ttp",
       "eil51-ttp/eil51_n50_bounded-strongly-corr_10.ttp",
-      "a280-ttp/a280_n2790_uncorr_10.ttp",
       "fnl4461-ttp/fnl4461_n22300_uncorr-similar-weights_05.ttp",
+      "a280-ttp/a280_n279_bounded-strongly-corr_01.ttp",
+      "a280-ttp/a280_n2790_uncorr_10.ttp",
       "a280-ttp/a280_n279_uncorr_01.ttp",
       "a280-ttp/a280_n1395_uncorr-similar-weights_05.ttp",
       "fnl4461-ttp/fnl4461_n44600_uncorr_10.ttp",
@@ -58,7 +58,7 @@ public class TestOne {
     Deb.echo("==================");
 
     /* algorithm */
-    final LocalSearch algo = new CosolverBitFlip(ttp, s0);
+    final LocalSearch algo = new CosolverTS(ttp, s0);
     algo.firstfit();
     algo.debug();
 

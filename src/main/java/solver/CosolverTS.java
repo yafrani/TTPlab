@@ -63,16 +63,16 @@ public class CosolverTS extends CosolverBase {
 
     // best solution
     int iBest=-1, jBest=-1, kBest=-1;
-    long GBest = sol.ob;
-    long ftBest = sol.ft;
+    double GBest = sol.ob;
+    double ftBest = sol.ft;
 
     // neighbor solution
     long fp;
-    long ft, G;
-    int nbIter = 0, nbIter1, nbIter2;
+    double ft, G;
     long wc;
     int origBF;
     int i, j, k, r;
+    int nbIter = 0, nbIter1, nbIter2;
 
     // Delaunay triangulation
     ArrayList<Integer>[] candidates = ttp.delaunay();
@@ -80,7 +80,7 @@ public class CosolverTS extends CosolverBase {
     // tabu search params
     LinkedList<Integer> tabuList = new LinkedList<>();
     int maxTabuSize = 100, tabuTenure = 200, tabuCount;
-    long GBestCand;
+    double GBestCand;
     int kBestCand = -1;
 
 
@@ -179,14 +179,14 @@ public class CosolverTS extends CosolverBase {
        *=================*/
       nbIter2 = 0;
       pickingPlan = sol.getPickingPlan();
-      maxTabuSize = nbItems/4;
+      maxTabuSize = nbItems/10;
       tabuTenure = 200;
       tabuList = new LinkedList<>();
       tabuCount = 0;
 
       do {
         nbIter2++;
-        GBestCand = Long.MIN_VALUE;
+        GBestCand = Double.MIN_VALUE;
 
         // TODO: reduce nb of candidates (insert/eliminate, score sorting, etc.)
         for (k = 0; k < nbItems; k++) {
@@ -223,7 +223,7 @@ public class CosolverTS extends CosolverBase {
             ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
           }
 
-          G = Math.round(fp - ft * R);
+          G = fp - ft * R;
 
           //Deb.echo(">>>>>>>>>>>>>>"+G);
           /* update best candidate */

@@ -64,13 +64,13 @@ public class Joint2optBF extends LocalSearch {
     
     // best solution
     int iBest=0, jBest=0, kBest=0;
-    long GBest = sol.ob;
+    double GBest = sol.ob;
     
     // neighbor solution
-    long[] tacc = new long[nbCities];  // tmp time acc
+    double[] tacc = new double[nbCities];  // tmp time acc
     long[] wacc = new long[nbCities];
     long fp = 0;
-    long ft = 0, G = 0;
+    double ft = 0, G = 0;
     long wc;
     int i, j, k;
     int nbIter = 0;
@@ -97,7 +97,7 @@ public class Joint2optBF extends LocalSearch {
           /* calculate final time with partial delta */
           double ftd = sol.ft;
           wc = i-2 < 0 ? 0 : sol.weightAcc[i-2]; // fix index...
-          long ftacc = i-2 < 0 ? 0 : sol.timeAcc[i-2]; // @todo remove ftacc, use integer suite numbers
+          double ftacc = i-2 < 0 ? 0 : sol.timeAcc[i-2]; // @todo remove ftacc, use integer suite numbers
           
           for (int q=i-1; q<=j; q++) {
             
@@ -118,7 +118,7 @@ public class Joint2optBF extends LocalSearch {
           }
 
           for (int q=j+1;q<nbCities;q++) {
-            long diff = sol.timeAcc[q]-sol.timeAcc[q-1];
+            double diff = sol.timeAcc[q]-sol.timeAcc[q-1];
             tacc[q] = tacc[q-1] + diff;
           }
 

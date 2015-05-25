@@ -6,7 +6,8 @@ import java.util.Arrays;
  * a TTP solution
  * 
  * tour: cities references, starts from 1
- * picking plan: 0 if the item is not picked, city reference (i) if picked (from city i)
+ * picking plan: '0' if the item is not picked,
+ *               'city reference (i)' if picked (from city i)
  * 
  * @author kyu
  *
@@ -17,14 +18,14 @@ public class TTPSolution {
   private int[] pickingPlan;
   
   public long fp;
-  public long ft;
-  public long ob;
+  public double ft;
+  public double ob;
   public long wend;
-  
+
   // time accumulator
-  public long[] timeAcc;
+  public double[] timeAcc;
   // time record
-  public long[] timeRec;
+  public double[] timeRec;
   // weight accumulator
   public long[] weightAcc;
   // weight record at each iteration
@@ -38,13 +39,13 @@ public class TTPSolution {
   }
   
   public TTPSolution(int[] tour, int[] pickingPlan) {
-    
+
     this.tour = tour;
     this.pickingPlan = pickingPlan;
-    
+
     // records
-    timeAcc = new long[tour.length];
-    timeRec = new long[tour.length];
+    timeAcc = new double[tour.length];
+    timeRec = new double[tour.length];
     weightAcc = new long[tour.length];
     weightRec = new long[tour.length];
     mapCI = new int[tour.length];
@@ -54,10 +55,10 @@ public class TTPSolution {
     
     this.tour = new int[m];
     this.pickingPlan = new int[n];
-    
+
     // records
-    timeAcc = new long[tour.length];
-    timeRec = new long[tour.length];
+    timeAcc = new double[tour.length];
+    timeRec = new double[tour.length];
     weightAcc = new long[tour.length];
     weightRec = new long[tour.length];
     mapCI = new int[tour.length];

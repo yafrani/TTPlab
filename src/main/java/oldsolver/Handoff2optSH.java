@@ -54,7 +54,7 @@ public class Handoff2optSH extends LocalSearch {
     ttp.objective(sol);
     
     long fp2 = sol.fp;
-    long ft2, ob2 = 0;
+    double ft2, ob2 = 0;
     int nbIter = 0;
     long wc;
     int start;
@@ -63,7 +63,7 @@ public class Handoff2optSH extends LocalSearch {
     
     /* best solution params */
     int iBest = 0, jBest = 0;
-    long obBest = sol.ob;
+    double obBest = sol.ob;
     TTPSolution sBest = sol;
     boolean improv = false;
     
@@ -72,13 +72,13 @@ public class Handoff2optSH extends LocalSearch {
     // partial distance from city x_i
     long di;
     // partial time with item k collected from city x_i
-    long tik;
+    double tik;
     // item scores
     Double[] score = new Double[nbItems];
     // total time with no items collected
-    long t_ = sol.ft;
+    double t_ = sol.ft;
     // total time with only item k collected
-    long tik_;
+    double tik_;
     // fitness value
     double u[] = new double[nbItems];
     

@@ -62,7 +62,6 @@ public abstract class CosolverBase extends LocalSearch {
 
     // sort item according to score
     Double[] scores = new Double[nbItems];
-    int[] sortedItems;
     int[] insertedItems = new int[nbItems];
 
     for (k = 0; k < nbItems; k++) {
@@ -82,12 +81,12 @@ public abstract class CosolverBase extends LocalSearch {
     // sort items according to score
     Quicksort<Double> qs = new Quicksort<>(scores);
     qs.sort();
-    sortedItems = qs.getIndices();
+    int[] sortedItems = qs.getIndices();
 
     // loop & insert items
     int nbInserts = 0;
     wCurr = 0;
-    int v2=0,v3=0;
+    int v2 = 0, v3 = 0;
     for (itr = 0; itr < nbItems; itr++) {
 
       k = sortedItems[itr];
@@ -144,15 +143,15 @@ public abstract class CosolverBase extends LocalSearch {
     boolean improv2;
 
     // best solution
-    int kBest=0;
-    long GBest = sol.ob;
+    int kBest = 0;
+    double GBest = sol.ob;
 
     // neighbor solution
     long fp;
-    long ft, G;
-    int nbIter2 = 0;
+    double ft, G;
     long wc;
     int r;
+    int nbIter2 = 0;
 
 
 

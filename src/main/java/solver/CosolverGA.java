@@ -53,7 +53,7 @@ public class CosolverGA extends CosolverBase {
     insertAndEliminate(sol);
 
     // delta parameters
-    long deltaT;
+    double deltaT;
     long deltaP, deltaW;
 
     // improvement indicator
@@ -61,12 +61,12 @@ public class CosolverGA extends CosolverBase {
 
     // best solution
     int iBest=0, jBest=0, kBest=0;
-    long GBest = sol.ob;
-    long ftBest = sol.ft;
+    double GBest = sol.ob;
+    double ftBest = sol.ft;
 
     // neighbor solution
     long fp;
-    long ft, G;
+    double ft, G;
     int nbIter = 0, nbIter1, nbIter2;
     long wc;
     int origBF;
@@ -243,14 +243,14 @@ public class CosolverGA extends CosolverBase {
         //Deb.echo("## EVALUATION ##");
 
         // compute fitness
-        long min = Long.MAX_VALUE;
+        double min = Double.MAX_VALUE;
         for (i=0; i < popSize; i++) {
           //ttp.objective(pop[i]); // TODO remove this...
           if (pop[i].ob < min) min = pop[i].ob;
         }
         min = min < 0 ? -min : 0;
-        long sumFit = 0;
-        long fitList[] = new long[popSize];
+        double sumFit = 0;
+        double fitList[] = new double[popSize];
         for (i=0; i < popSize; i++) {
           fitList[i] = pop[i].ob + min;
           sumFit += fitList[i];

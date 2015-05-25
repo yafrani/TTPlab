@@ -69,16 +69,16 @@ public class JointN1BF extends LocalSearch {
     
     // best solution params
     int iBest=0, kBest=0;
-    long GBest = sol.ob;
+    double GBest = sol.ob;
     
     // neighbor solution data
     long fp = sol.fp;
-    long ft = sol.ft, G = sol.ob;
+    double ft = sol.ft, G = sol.ob;
     long wc,       // current weight
          newWA,
          oldWA;    // saved WA at swap index
     int refBF;    // one-bit-flip index
-    long[] tacc = new long[nbCities];  // tmp time acc
+    double[] tacc = new double[nbCities];  // tmp time acc
     
     do {
       

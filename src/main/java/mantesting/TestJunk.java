@@ -47,9 +47,9 @@ public class TestJunk {
 //    }
 
     int N = 10;
-    Long fit1[] = new Long[N], fit2[] = new Long[N];
+    Double fit1[] = new Double[N], fit2[] = new Double[N];
     TTPSolution s = construct.generate("lg");
-    ttp.objective(s); long obj = s.ob;
+    ttp.objective(s); double obj = s.ob;
     int[] tour = s.getTour();
     int[] pickingPlan = s.getPickingPlan();
     Deb.echo(">>>"+obj);
@@ -64,8 +64,8 @@ public class TestJunk {
       /* fitness test... */
       long deltaW = pickingPlan[k]==0 ? -ttp.weightOf(k) : ttp.weightOf(k);
       int origBF = s.mapCI[A[k] - 1];
-      long A1 = origBF == 0 ? 0 : s.timeAcc[origBF - 1];
-      fit2[k] = Math.round( A1 - (1.0/deltaW)*(obj - A1) );
+      double A1 = origBF == 0 ? 0 : s.timeAcc[origBF - 1];
+      fit2[k] = A1 - (1.0/deltaW)*(obj - A1);
 
       Deb.echo(fit1[k]+" || "+fit2[k]);
 
@@ -76,7 +76,7 @@ public class TestJunk {
     ttp.objective(s); obj = s.ob;
     Deb.echo(">>>"+obj);
 
-    Quicksort<Long> qs = new Quicksort<>(fit1);
+    Quicksort<Double> qs = new Quicksort<>(fit1);
     qs.sort();
     int x1[] = qs.getIndices();
     Deb.echo(x1);

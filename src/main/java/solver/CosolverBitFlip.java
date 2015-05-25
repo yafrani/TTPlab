@@ -63,21 +63,26 @@ public class CosolverBitFlip extends CosolverBase {
 
     // best solution
     int iBest=0, jBest=0, kBest=0;
-    long GBest = sol.ob;
-    long ftBest = sol.ft;
+    double GBest = sol.ob;
+    double ftBest = sol.ft;
 
     // neighbor solution
     long fp;
-    long ft, G;
-    int nbIter = 0, nbIter1, nbIter2;
+    double ft, G;
     long wc;
     int origBF;
     int i, j, k, r;
+    int nbIter = 0, nbIter1, nbIter2;
 
     // Delaunay triangulation
     ArrayList<Integer>[] candidates = ttp.delaunay();
 
+
+
+
     do {
+
+      tour = sol.getTour();
 
       improv = false;
       nbIter++;
@@ -89,7 +94,6 @@ public class CosolverBitFlip extends CosolverBase {
       do {
         improv1 = false;
         nbIter1++;
-        tour=sol.getTour();
 
         // fast 2-opt
         for (i = 1; i < nbCities - 1; i++) {
@@ -114,14 +118,7 @@ public class CosolverBitFlip extends CosolverBase {
             }
 
             // retrieve neighbor's final time
-            ft = Math.round(ft + deltaT);
-
-            TwoOptHelper.do2opt(tour, i, j);
-            ttp.objective(sol);
-            if (ft!=sol.ft) Deb.echo(ft + "||"+sol.ft+":"+(ft-sol.ft));
-            else Deb.echo("***");
-            TwoOptHelper.do2opt(tour, i, j);
-            ttp.objective(sol);
+            ft = ft + deltaT;
 
             // update best
             if (ft < ftBest) {
@@ -158,7 +155,7 @@ public class CosolverBitFlip extends CosolverBase {
         }
 
       } while (improv1);
-
+      //if (true) return sol;
       //if (!improv) break;
 
 
@@ -214,7 +211,7 @@ public class CosolverBitFlip extends CosolverBase {
             ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
           }
 
-          G = Math.round(fp - ft * R);
+          G = fp - ft * R;
 
           // update best
           if (G > GBest) {

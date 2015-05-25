@@ -64,7 +64,7 @@ public class Cosolver2opt extends LocalSearch {
 
     // neighbor solution
     long fp;
-    long ft, G;
+    double ft, G;
     int nbIter = 0, nbIter1 = 0, nbIter2 = 0;
     long wc;
     int i, j, k;

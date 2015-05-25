@@ -51,8 +51,8 @@ public class Handoff2optBF extends LocalSearch {
     int[] tour = sol.getTour();
     int[] pickingPlan = sol.getPickingPlan();
     
-    long fp2 = sol.fp;
-    long ft2, ob2 = 0;
+    double fp2 = sol.fp;
+    double ft2, ob2 = 0;
     int nbIter = 0;
     long wc;
     int start;
@@ -60,7 +60,7 @@ public class Handoff2optBF extends LocalSearch {
     
     // best sol params
     int iBest=0, jBest=0, kBest=0;
-    long obBest = sol.ob;
+    double obBest = sol.ob;
     TTPSolution sBest = sol;
     
     boolean improv = false;

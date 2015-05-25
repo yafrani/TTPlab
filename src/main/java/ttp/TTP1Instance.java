@@ -192,15 +192,16 @@ public class TTP1Instance extends TTPInstance {
     double C = (maxSpeed-minSpeed)/capacity; // velocity const
     double velocity;
 
-    int wc = 0;   // current weight
-    int fp = 0;   // final profit
-    long ft = 0;  // tour time
-    long ob;      // objective value
+    long acc;       // iteration weight accumulator
+    long wc = 0;    // current weight
+    long fp = 0;    // final profit
+    double ft = 0;  // tour time
+    double ob;      // objective value
 
 
     // visit all cities
     for (int i=0; i<this.nbCities; i++) {
-      int acc=0;
+      acc = 0;
       for (int j : clusters[ x[i]-1 ]) {
         if (z[j]!=0) {
           fp += profits[j];
@@ -216,7 +217,7 @@ public class TTP1Instance extends TTPInstance {
 
       // record important data for future use
       s.timeAcc[i] = ft;
-      s.timeRec[i] = Math.round(D[x[i]-1][x[h]-1] / velocity);
+      s.timeRec[i] = D[x[i]-1][x[h]-1] / velocity;
       s.weightAcc[i] = wc;
       s.weightRec[i] = acc;
 
@@ -224,7 +225,7 @@ public class TTP1Instance extends TTPInstance {
       s.mapCI[x[i]-1] = i;
     }
 
-    ob = Math.round(fp - ft*rent);
+    ob = fp - ft*rent;
 
     // solution properties
     s.fp = fp;
