@@ -24,7 +24,7 @@ public abstract class TTPInstance {
   protected double maxSpeed;
   protected String edgeWeightType;
   protected CityCoordinates[] coordinates;
-  protected long[][] dist;
+  protected long[][] dist = null;
   protected int[] availability;
   protected int[] profits;
   protected int[] weights;
@@ -135,6 +135,13 @@ public abstract class TTPInstance {
     return this.weights[i];
   }
 
+  // used to simulate the distance matrix
+  public long distFor(int i, int j) {
+    if (dist==null) {
+      return Math.round(this.coordinates[i].distanceEuclid(this.coordinates[j]));
+    }
+    return dist[i][j];
+  }
 
   /**
    * get delaunay candidates

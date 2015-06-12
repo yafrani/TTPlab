@@ -11,17 +11,17 @@ import java.util.ArrayList;
 /**
  * Created by kyu on 4/7/15.
  */
-public class CosolverGA extends CosolverBase {
+public class Cosolver2GA extends CosolverBase {
 
-  public CosolverGA() {
+  public Cosolver2GA() {
     super();
   }
 
-  public CosolverGA(TTP1Instance ttp) {
+  public Cosolver2GA(TTP1Instance ttp) {
     super(ttp);
   }
 
-  public CosolverGA(TTP1Instance ttp, TTPSolution s0) {
+  public Cosolver2GA(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
 
@@ -120,7 +120,7 @@ public class CosolverGA extends CosolverBase {
               int c1 = TwoOptHelper.get2optValue(q, tour, i, j) - 1;
               int c2 = TwoOptHelper.get2optValue((q + 1) % nbCities, tour, i, j) - 1;
 
-              deltaT += -sol.timeRec[q] + D[c1][c2] / (maxSpeed - wc * C);
+              deltaT += -sol.timeRec[q] + ttp.distFor(c1, c2) / (maxSpeed - wc * C);
             }
 
             // retrieve neighbor's final time

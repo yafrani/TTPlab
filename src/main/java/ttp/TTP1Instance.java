@@ -137,11 +137,13 @@ public class TTP1Instance extends TTPInstance {
           }
           
           // distance matrix
-          this.setDist(new long[this.nbCities][this.nbCities]);
-          for (int i=0; i<nbCities; i++) {
-            for (int j=0; j<nbCities; j++) {
-              getDist()[i][j] = Math.round(this.coordinates[i].distanceEuclid(this.coordinates[j]));
-              //System.out.println(this.coord[i] + "&" + this.coord[j] + "->" + dist[i][j]);
+          if (nbCities < 5000) {
+            this.setDist(new long[this.nbCities][this.nbCities]);
+            for (int i = 0; i < nbCities; i++) {
+              for (int j = 0; j < nbCities; j++) {
+                getDist()[i][j] = Math.round(this.coordinates[i].distanceEuclid(this.coordinates[j]));
+                //System.out.println(this.coord[i] + "&" + this.coord[j] + "->" + dist[i][j]);
+              }
             }
           }
         }
@@ -213,11 +215,11 @@ public class TTP1Instance extends TTPInstance {
       velocity = maxSpeed - wc*C;
 
       int h = (i+1)%nbCities;
-      ft += D[x[i]-1][x[h]-1] / velocity;
+      ft += distFor(x[i]-1,x[h]-1) / velocity;
 
       // record important data for future use
       s.timeAcc[i] = ft;
-      s.timeRec[i] = D[x[i]-1][x[h]-1] / velocity;
+      s.timeRec[i] = distFor(x[i]-1, x[h]-1) / velocity;
       s.weightAcc[i] = wc;
       s.weightRec[i] = acc;
 

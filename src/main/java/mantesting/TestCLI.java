@@ -37,7 +37,7 @@ public class TestCLI {
 
 
     /* algorithm */
-    final LocalSearch algo = new CosolverBitFlip(ttp, s0);
+    final LocalSearch algo = new Cosolver2B(ttp, s0);
     //algo.firstfit();
     algo.debug();
 

@@ -1,27 +1,28 @@
 package solver;
 
 import ttp.TTP1Instance;
+
 import ttp.TTPSolution;
 import utils.Deb;
 import utils.TwoOptHelper;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
 
 /**
  * Created by kyu on 4/7/15.
  */
-public class CosolverTS extends CosolverBase {
+public class Cosolver2B extends CosolverBase {
 
-  public CosolverTS() {
+  public Cosolver2B() {
     super();
   }
 
-  public CosolverTS(TTP1Instance ttp) {
+  public Cosolver2B(TTP1Instance ttp) {
     super(ttp);
   }
 
-  public CosolverTS(TTP1Instance ttp, TTPSolution s0) {
+  public Cosolver2B(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
 
@@ -33,7 +34,7 @@ public class CosolverTS extends CosolverBase {
     ttp.objective(s0);
 
     // copy initial solution into improved solution
-    TTPSolution sol = s0.clone(), sBest = s0.clone();
+    TTPSolution sol = s0.clone();//, sBest = s0.clone();
 
     // TTP data
     int nbCities = ttp.getNbCities();
@@ -59,10 +60,10 @@ public class CosolverTS extends CosolverBase {
     int deltaP, deltaW;
 
     // improvement indicator
-    boolean improv, improv1;
+    boolean improv, improv1, improv2;
 
     // best solution
-    int iBest=-1, jBest=-1, kBest=-1;
+    int iBest=0, jBest=0, kBest=0;
     double GBest = sol.ob;
     double ftBest = sol.ft;
 
@@ -77,28 +78,20 @@ public class CosolverTS extends CosolverBase {
     // Delaunay triangulation
     ArrayList<Integer>[] candidates = ttp.delaunay();
 
-    // tabu search params
-    LinkedList<Integer> tabuList = new LinkedList<>();
-    int maxTabuSize = 100, tabuTenure = 200, tabuCount;
-    double GBestCand;
-    int kBestCand = -1;
 
 
 
     do {
 
+      tour = sol.getTour();
+
       improv = false;
       nbIter++;
-
-
-
+      nbIter1 = 0;
       /*===================*
        * sub-problem 1:    *
        * TSP with knapsack *
        *===================*/
-      nbIter1 = 0;
-      tour = sol.getTour();
-
       do {
         improv1 = false;
         nbIter1++;
@@ -122,12 +115,11 @@ public class CosolverTS extends CosolverBase {
               int c1 = TwoOptHelper.get2optValue(q, tour, i, j) - 1;
               int c2 = TwoOptHelper.get2optValue((q + 1) % nbCities, tour, i, j) - 1;
 
-              deltaT += -sol.timeRec[q] + D[c1][c2] / (maxSpeed - wc * C);
+              deltaT += -sol.timeRec[q] + ttp.distFor(c1,c2) / (maxSpeed - wc * C);
             }
 
             // retrieve neighbor's final time
-            ft += deltaT;
-
+            ft = ft + deltaT;
 
             // update best
             if (ft < ftBest) {
@@ -152,20 +144,21 @@ public class CosolverTS extends CosolverBase {
 
           // 2opt invert
           TwoOptHelper.do2opt(tour, iBest, jBest);
-          sol.setTour(tour);
+
           // evaluate & update vectors
           ttp.objective(sol);
 
           // debug msg
           if (this.debug) {
-            Deb.echo(ftBest+">> TSKP: " + nbIter1 + " | ob-best=" + sol.ob);
+            Deb.echo(">> TSKP: " + nbIter1 + " | ob-best=" + sol.ob + " | ft-best="+ftBest);
           }
         }
 
       } while (improv1);
-
+      //if (true) return sol;
       //if (!improv) break;
-      sBest = sol.clone();
+
+
 
 
 
@@ -177,19 +170,22 @@ public class CosolverTS extends CosolverBase {
        * sub-problem 2   *
        * KP with routing *
        *=================*/
+
       nbIter2 = 0;
-      pickingPlan = sol.getPickingPlan();
-      maxTabuSize = nbItems/10;
-      tabuTenure = 200;
-      tabuList = new LinkedList<>();
-      tabuCount = 0;
+      double T = 1000.0;
+      double alpha = .95;
 
       do {
+        improv2 = false;
         nbIter2++;
-        GBestCand = Double.MIN_VALUE;
 
-        // TODO: reduce nb of candidates (insert/eliminate, score sorting, etc.)
+        // browse items in the new order...
         for (k = 0; k < nbItems; k++) {
+
+          /* cleanup and stop execution if interrupted */
+          if (Thread.currentThread().isInterrupted()) {
+            return sol;
+          }
 
           /* check if new weight doesn't exceed knapsack capacity */
           if (pickingPlan[k] == 0 && ttp.weightOf(k) > sol.wend) {
@@ -220,64 +216,74 @@ public class CosolverTS extends CosolverBase {
           // recalculate velocities from bit-flip city
           for (r = origBF; r < nbCities; r++) {
             wc = sol.weightAcc[r] + deltaW;
-            ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
+            ft += ttp.distFor(tour[r]-1,tour[(r + 1) % nbCities] - 1) / (maxSpeed - wc * C);
           }
 
           G = fp - ft * R;
 
-          //Deb.echo(">>>>>>>>>>>>>>"+G);
-          /* update best candidate */
-          // TODO: tabu test could be used before evaluation ?
-          if ( G > GBestCand && !tabuList.contains(k) ) {
-            kBestCand = k;
-            GBestCand = G;
-            //if (firstfit) break;
+          // update best
+          if (G > GBest) {
+            kBest = k;
+            GBest = G;
+
+            improv2 = true;
+            if (firstfit) break;
+            //if (G<1300000) break;
+
+            //if ( StrictMath.random() < Math.exp(-1.0/T) ) {
+            //  Deb.echo("FIRST FIT "+T + " / " + Math.exp(-1.0/T));
+            //  break;
+            //}
           }
 
         } // END FOR k
 
-        /* update current solution */
-        // bit-flip
-        pickingPlan[kBestCand] = pickingPlan[kBestCand] != 0 ? 0 : A[kBestCand];
-        sol.setPickingPlan(pickingPlan);
-        // re-evaluate & update vectors
-        ttp.objective(sol);
+        T = T * .7;
 
-        /* update best solution if improvement */
-        Deb.echo(GBestCand +"///"+sol.ob);
-        if ( GBestCand > GBest ) {
-          Deb.echo("***************");
+        /* update if improvement */
+        if (improv2) {
+
           improv = true;
-          GBest = GBestCand;
-          sBest = sol.clone();
-        }
-        else { // no improvement made
-          tabuCount++;
-        }
 
-        /* update tabu list */
-        if (tabuList.isEmpty() || kBestCand != tabuList.getFirst()) {
-          tabuList.addFirst(kBestCand);
-          if (tabuList.size() > maxTabuSize) {
-            tabuList.removeLast();
+          // bit-flip
+          pickingPlan[kBest] = pickingPlan[kBest] != 0 ? 0 : A[kBest];
+
+
+          /* ================================================ */
+
+          /* evaluate & update vectors */
+          if (pickingPlan[kBest] != 0) {
+            deltaP = ttp.profitOf(kBest);
+            deltaW = ttp.weightOf(kBest);
+          } else {
+            deltaP = -ttp.profitOf(kBest);
+            deltaW = -ttp.weightOf(kBest);
+          }
+          fp = sol.fp + deltaP;
+          origBF = sol.mapCI[A[kBest] - 1];
+          ft = origBF == 0 ? 0 : sol.timeAcc[origBF - 1];
+          for (r = origBF; r < nbCities; r++) {
+            // recalculate velocities from bit-flip city
+            wc = sol.weightAcc[r] + deltaW;
+            ft += ttp.distFor(tour[r] - 1, tour[(r + 1) % nbCities] - 1) / (maxSpeed - wc * C);
+            // recover wacc and tacc
+            sol.weightAcc[r] = wc;
+            sol.timeAcc[r] = ft;
+          }
+          G = fp - ft * R;
+          sol.ob = G;
+          sol.fp = fp;
+          sol.ft = ft;
+          sol.wend = capacity - sol.weightAcc[nbCities - 1];
+          /* ================================================ */
+
+          // debug msg
+          if (this.debug) {
+            Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" + sol.ob+"/"+sol.ft);
           }
         }
 
-        // debug msg
-        if (this.debug) {
-          Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" + sol.ob);
-          //Deb.echo(tabuCount + " ~ " + tabuList.size() + " ~ " + tabuList);
-        }
-
-      } while (tabuCount < tabuTenure);
-
-      //Deb.echo("===================");
-      //if (true) return sBest;
-
-
-
-      sol = sBest.clone();
-
+      } while (improv2);
 
 
       // debug msg
@@ -289,9 +295,13 @@ public class CosolverTS extends CosolverBase {
         Deb.echo("---");
       }
 
+      // to compute all solution params: timeRec, weightRec ...
+      // TODO: might be avoided
+      ttp.objective(sol);
+
     } while (improv);
 
-    return sBest;
+    return sol;
   }
 
 }

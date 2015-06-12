@@ -1,9 +1,9 @@
 package solver;
 
 import ttp.TTP1Instance;
-
 import ttp.TTPSolution;
 import utils.Deb;
+import utils.RandGen;
 import utils.TwoOptHelper;
 
 import java.util.ArrayList;
@@ -11,17 +11,17 @@ import java.util.ArrayList;
 /**
  * Created by kyu on 4/7/15.
  */
-public class CosolverBitFlip extends CosolverBase {
+public class Cosolver2SA extends CosolverBase {
 
-  public CosolverBitFlip() {
+  public Cosolver2SA() {
     super();
   }
 
-  public CosolverBitFlip(TTP1Instance ttp) {
+  public Cosolver2SA(TTP1Instance ttp) {
     super(ttp);
   }
 
-  public CosolverBitFlip(TTP1Instance ttp, TTPSolution s0) {
+  public Cosolver2SA(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
 
@@ -71,7 +71,7 @@ public class CosolverBitFlip extends CosolverBase {
     double ft, G;
     long wc;
     int origBF;
-    int i, j, k, r;
+    int i, j, k, r, c1, c2, q;
     int nbIter = 0, nbIter1, nbIter2;
 
     // Delaunay triangulation
@@ -108,20 +108,20 @@ public class CosolverBitFlip extends CosolverBase {
             ft = sol.ft;
             wc = i - 2 < 0 ? 0 : sol.weightAcc[i - 2]; // fix index...
             deltaT = 0;
-            for (int q = i - 1; q <= j; q++) {
+            for (q = i - 1; q <= j; q++) {
 
               wc += TwoOptHelper.get2optValue(q, sol.weightRec, i, j);
-              int c1 = TwoOptHelper.get2optValue(q, tour, i, j) - 1;
-              int c2 = TwoOptHelper.get2optValue((q + 1) % nbCities, tour, i, j) - 1;
+              c1 = TwoOptHelper.get2optValue(q, tour, i, j) - 1;
+              c2 = TwoOptHelper.get2optValue((q + 1) % nbCities, tour, i, j) - 1;
 
-              deltaT += -sol.timeRec[q] + D[c1][c2] / (maxSpeed - wc * C);
+              deltaT += -sol.timeRec[q] + ttp.distFor(c1,c2) / (maxSpeed - wc * C);
             }
 
             // retrieve neighbor's final time
             ft = ft + deltaT;
 
             // update best
-            if (ft < ftBest) {
+            if (ft < ftBest) { // epsilon ?
               iBest = i;
               jBest = j;
               ftBest = ft;
@@ -149,14 +149,16 @@ public class CosolverBitFlip extends CosolverBase {
 
           // debug msg
           if (this.debug) {
-            Deb.echo(ftBest+">> TSKP: " + nbIter1 + " | ob-best=" + sol.ob);
-            //Deb.echo(">> TSKP: " + nbIter1 + " | ob-best=" + sol.ob);
+            Deb.echo(">> TSKP: " + nbIter1 + " | ob-best=" + sol.ob + " | ft-best="+ftBest);
           }
         }
 
       } while (improv1);
       //if (true) return sol;
-      //if (!improv) break;
+
+      //ttp.objective(sol); // to compute sol.timeAcc
+
+      if (!improv) break;
 
 
 
@@ -170,19 +172,21 @@ public class CosolverBitFlip extends CosolverBase {
        * sub-problem 2   *
        * KP with routing *
        *=================*/
-      //firstfit = true;
+
       nbIter2 = 0;
+      double T = 100.0;
+      double alpha = .95;
+
       do {
-        improv2 = false;
         nbIter2++;
 
-        // browse items in the new order...
-        for (k = 0; k < nbItems; k++) {
+        for (int u=0; u<nbItems/10; u++) {
+
+          // browse items randomly
+          k = RandGen.randInt(0, nbItems - 1);
 
           /* check if new weight doesn't exceed knapsack capacity */
-          if (pickingPlan[k] == 0 && ttp.weightOf(k) > sol.wend) {
-            continue;
-          }
+          if (pickingPlan[k] == 0 && ttp.weightOf(k) > sol.wend) continue;
 
           /* calculate deltaP and deltaW */
           if (pickingPlan[k] == 0) {
@@ -194,67 +198,100 @@ public class CosolverBitFlip extends CosolverBase {
           }
           fp = sol.fp + deltaP;
 
-
           /*
-           * velocity-TSP
-           * TSP constrained with knapsack weight
+           * handle velocity constraint
            */
           // index where Bit-Flip happened
           origBF = sol.mapCI[A[k] - 1];
 
           // starting time
-          ft = origBF == 0 ? 0 : sol.timeAcc[origBF - 1];
+          ft = origBF == 0 ? .0 : sol.timeAcc[origBF - 1];
 
           // recalculate velocities from bit-flip city
+          // to recover objective value
           for (r = origBF; r < nbCities; r++) {
             wc = sol.weightAcc[r] + deltaW;
-            ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
+            ft += ttp.distFor(tour[r] - 1, tour[(r + 1) % nbCities] - 1) / (maxSpeed - wc * C);
           }
 
+          // compute objective
           G = fp - ft * R;
 
-          // update best
-          if (G > GBest) {
+          // delta best & current
+          double energy_gap = G - GBest;
 
-            kBest = k;
+          // update if improvement or
+          // acceptance probability satisfied
+          double mu = Math.random();
+          boolean acceptance = energy_gap > 0 ? true : Math.exp(energy_gap / T) > mu;
+          if (acceptance) {
+
+            if (energy_gap > 0) improv = true;
+
+            kBest = k; // TODO useless here...
             GBest = G;
-            improv2 = true;
-            if (firstfit) break;
-          }
 
-        } // END FOR k
+            // bit-flip
+            pickingPlan[kBest] = pickingPlan[kBest] != 0 ? 0 : A[kBest];
 
+            /* ================================================ */
+            // recover accumulation vectors
+            if (pickingPlan[kBest] != 0) {
+              deltaP = ttp.profitOf(kBest);
+              deltaW = ttp.weightOf(kBest);
+            } else {
+              deltaP = -ttp.profitOf(kBest);
+              deltaW = -ttp.weightOf(kBest);
+            }
+            fp = sol.fp + deltaP;
+            origBF = sol.mapCI[A[kBest] - 1];
+            ft = origBF == 0 ? 0 : sol.timeAcc[origBF - 1];
+            for (r = origBF; r < nbCities; r++) {
+              // recalculate velocities from bit-flip city
+              wc = sol.weightAcc[r] + deltaW;
+              ft += ttp.distFor(tour[r] - 1, tour[(r + 1) % nbCities] - 1) / (maxSpeed - wc * C);
+              // recover wacc and tacc
+              sol.weightAcc[r] = wc;
+              sol.timeAcc[r] = ft;
+            }
+            G = fp - ft * R;
+            sol.ob = G;
+            sol.fp = fp;
+            sol.ft = ft;
+            sol.wend = capacity - sol.weightAcc[nbCities - 1];
+            /* ================================================ */
 
-        /* update if improvement */
-        if (improv2) {
-
-          improv = true;
-
-          // bit-flip
-          pickingPlan[kBest] = pickingPlan[kBest] != 0 ? 0 : A[kBest];
-
-          // evaluate & update vectors
-          ttp.objective(sol);
-
-          // debug msg
-          if (this.debug) {
-            Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" + sol.ob);
+            // debug msg
+//            if (this.debug) {
+//              Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" + sol.ob + "/" + sol.ft);
+//            }
           }
         }
 
-      } while (improv2);
+        if (this.debug) {
+          Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" + sol.ob + " / " + sol.ft);
+        }
+
+        // cool down temperature
+        T = T * alpha;
+
+      } while (T > .01);
 
 
       // debug msg
       if (this.debug) {
         Deb.echo("Best "+nbIter+":");
-        Deb.echo(sol);
+        //Deb.echo(sol);
         Deb.echo("ob-best: "+sol.ob);
         Deb.echo("wend   : "+sol.wend);
         Deb.echo("---");
       }
 
-    } while (improv);
+      // to compute all solution params: timeRec, weightRec ...
+      // TODO: might be avoided
+      ttp.objective(sol);
+
+    } while (false);
 
     return sol;
   }

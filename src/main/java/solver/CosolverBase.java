@@ -55,9 +55,9 @@ public abstract class CosolverBase extends LocalSearch {
     double t1, t2, t3, a, b1, b2;
 
     // store `distance to end` of each tour city
-    L[nbCities-1] = D[tour[nbCities-1] - 1][0];
+    L[nbCities-1] = ttp.distFor(tour[nbCities-1] - 1,0);
     for (i=nbCities-2; i >= 0; i--) {
-      L[i] = L[i+1] + D[tour[i+1] - 1][tour[i] - 1];
+      L[i] = L[i+1] + ttp.distFor(tour[i+1]-1, tour[i]-1);
     }
 
     // sort item according to score
@@ -178,7 +178,7 @@ public abstract class CosolverBase extends LocalSearch {
         // recalculate velocities from bit-flip city
         for (r = origBF; r < nbCities; r++) {
           wc = sol.weightAcc[r] - ttp.weightOf(k);;
-          ft += D[tour[r] - 1][tour[(r + 1) % nbCities] - 1] / (maxSpeed - wc * C);
+          ft += ttp.distFor(tour[r]-1, tour[(r + 1) % nbCities]-1) / (maxSpeed - wc * C);
         }
 
         G = Math.round(fp - ft * R);

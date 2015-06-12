@@ -24,25 +24,17 @@ public class TTPPaperTests {
   /**
    * max execution time in seconds
    */
-  static final int maxTime = 600;
+  static final int maxTime = 900;
   
   
   /**
    * initial tour generation
-   * l: Lin-Kernighan
-   * o: optimal
-   * r: random
-   * g: greedy
-   * s: simple
    */
   static final char tourAlgo = 'l';
   
   
   /**
    * initial picking plan generation
-   * z: zeros
-   * r: random
-   * g: greedy
    */
   static final char ppAlgo = 'z';
   
@@ -50,55 +42,54 @@ public class TTPPaperTests {
   
   
   static final String[] instFolders = {
-    "eil51-ttp",
+//    "eil51-ttp",
     "berlin52-ttp",
-    "eil76-ttp",
+//    "eil76-ttp",
     "kroA100-ttp",
     "ch150-ttp",
-    "u159-ttp",
-    "kroA200-ttp",
+//    "u159-ttp",
+//    "kroA200-ttp",
+
     "ts225-ttp",
-    "a280-ttp",
+//    "a280-ttp",
     "lin318-ttp",
     "u574-ttp",
-    "u724-ttp",
+//    "u724-ttp",
     "dsj1000-ttp",
     "rl1304-ttp",
-
-//    "fl1577-ttp",
-//    "d2103-ttp",
-//    "pcb3038-ttp",
-//    "fnl4461-ttp",
+    "fl1577-ttp",
+    "d2103-ttp",
+    "pcb3038-ttp",
+    "fnl4461-ttp",
+    "rl11849-ttp",
 
 //    "brd14051-ttp",
-//    "d15112-ttp",
+    "d15112-ttp",
 //    "d18512-ttp",
-//    "pla33810-ttp",
-//    "rl11849-ttp",
-//    "usa13509-ttp",
-
+    "pla33810-ttp",
+    "usa13509-ttp",
 
   };
 
 
   static final String[] KPTypes = {
-    "uncorr",
+//    "uncorr",
     "uncorr-similar-weights",
-    "bounded-strongly-corr",
+//    "bounded-strongly-corr",
   };
   
   
   static final int[] knapsackCategories = {
-    1,
+//    1,
     5,
-    10,
+//    10,
   };
   
   
   static final int[] itemFactor = {
-    1,
+//    1,
     5,
-    10,
+//    10,
   };
   
   
@@ -115,7 +106,7 @@ public class TTPPaperTests {
     
     
     /* algorithm settings */
-    final LocalSearch algo = new CosolverBitFlip();
+    final LocalSearch algo = new Cosolver2B();
     algo.firstfit();
     algo.noDebug();
     algo.noLog();
@@ -157,7 +148,7 @@ public class TTPPaperTests {
                 continue;
               }
               
-              //if (true) continue;
+              if (true) continue;
               
               // TTP instance
               TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+ttpi);
