@@ -16,6 +16,9 @@ public class TestOne {
 
   public static void main(String[] args) {
     String[] inst = {
+      "ts225-ttp/ts225_n1120_uncorr-similar-weights_05.ttp",
+      "eil51-ttp/eil51_n150_uncorr-similar-weights_01.ttp",
+
       "lin318-ttp/lin318_n1585_uncorr-similar-weights_05.ttp",
       "u574-ttp/u574_n2865_uncorr-similar-weights_05.ttp",
       "dsj1000-ttp/dsj1000_n4995_uncorr-similar-weights_05.ttp",
@@ -52,7 +55,7 @@ public class TestOne {
     Deb.echo("==================");
 
     /* algorithm */
-    final LocalSearch algo = new Cosolver2B(ttp, s0);
+    final LocalSearch algo = new CosolverLASA(ttp, s0);
     algo.firstfit();
     algo.debug();
 

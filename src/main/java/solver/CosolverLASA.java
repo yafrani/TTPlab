@@ -7,21 +7,22 @@ import utils.RandGen;
 import utils.TwoOptHelper;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by kyu on 4/7/15.
  */
-public class Cosolver2SA extends CosolverBase {
+public class CosolverLASA extends CosolverBase {
 
-  public Cosolver2SA() {
+  public CosolverLASA() {
     super();
   }
 
-  public Cosolver2SA(TTP1Instance ttp) {
+  public CosolverLASA(TTP1Instance ttp) {
     super(ttp);
   }
 
-  public Cosolver2SA(TTP1Instance ttp, TTPSolution s0) {
+  public CosolverLASA(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
 
@@ -33,7 +34,8 @@ public class Cosolver2SA extends CosolverBase {
     ttp.objective(s0);
 
     // copy initial solution into improved solution
-    TTPSolution sol = s0.clone(), sBest = s0.clone();
+    TTPSolution sol = s0.clone();//
+    TTPSolution sBest = s0.clone();
 
     // TTP data
     int nbCities = ttp.getNbCities();
@@ -59,7 +61,7 @@ public class Cosolver2SA extends CosolverBase {
     int deltaP, deltaW;
 
     // improvement indicator
-    boolean improv1, improv2, improv;
+    boolean improv, improv1, improv2;
 
     // best solution
     int iBest=0, jBest=0, kBest=0;
@@ -80,84 +82,99 @@ public class Cosolver2SA extends CosolverBase {
 
 
 
+    // length of the fitness array
+    int lfa=5000;
+    // fitness array
+    double[] fa = new double[lfa+1];
+    // idle steps
+    int idlestep = 0;
+    int nsteps = 0;
+    int ds;
+
+
     do {
+      tour = sol.getTour();
+
+
+      improv = false;
       nbIter++;
       nbIter1 = 0;
+      for (i=0; i<=lfa; i++) {
+        fa[i] = sol.ft;
+      }
 
       /*===================*
        * sub-problem 1:    *
        * TSP with knapsack *
        *===================*/
-
       do {
         improv1 = false;
-        nbIter1++;
+
+
 
         // fast 2-opt
         for (i = 1; i < nbCities - 1; i++) {
-
           int node1 = tour[i] - 1;
-
           for (int node2 : candidates[node1]) {
-
             j = sol.mapCI[node2];
 
-            /* calculate final time with partial delta */
+            // calculate final time with partial delta
             ft = sol.ft;
             wc = i - 2 < 0 ? 0 : sol.weightAcc[i - 2]; // fix index...
             deltaT = 0;
             for (q = i - 1; q <= j; q++) {
-
               wc += TwoOptHelper.get2optValue(q, sol.weightRec, i, j);
               c1 = TwoOptHelper.get2optValue(q, tour, i, j) - 1;
               c2 = TwoOptHelper.get2optValue((q + 1) % nbCities, tour, i, j) - 1;
-
               deltaT += -sol.timeRec[q] + ttp.distFor(c1,c2) / (maxSpeed - wc * C);
             }
-
             // retrieve neighbor's final time
             ft = ft + deltaT;
 
-            // update best
-            if (ft < ftBest) { // epsilon ?
-              iBest = i;
-              jBest = j;
-              ftBest = ft;
-              improv1 = true;
 
-              if (firstfit) break;
+
+            // employ the LAHC acceptance condition
+            int v = nbIter1 % lfa;
+            boolean accept = ft < sol.ft || ft < fa[v];
+            // when we have an improving move, then this step is not idle
+            if (accept && ft < sol.ft)
+              idlestep = 0;
+            // test acceptance
+            if (accept) {
+              TwoOptHelper.do2opt(tour, i, j);
+              ttp.objective(sol);
+              Deb.echo("===> ACCEPTED : "+ft);
+            }
+            // independently of our acceptance we update the fitness array
+            fa[v] = sol.ft;
+            // if improvement is made
+            if (sol.ft < sBest.ft) {
+              sBest = sol.clone(); // update sBest
             }
 
-            if (firstfit && improv1) break;
+
+
+            nbIter1++;
+            idlestep++;
+
+            if (this.debug) {
+              //Deb.echo(fa);
+              Deb.echo( ">> TSKP: " + nbIter1 +
+                //" | ob=" + String.format("%.0f", sol.ob) +
+                " | ft=" + String.format("%.0f", sol.ft) );
+            }
           } // END FOR j
-          if (firstfit && improv1) break;
+          //if (improv1) break;
         } // END FOR i
 
 
-        /* update if improvement */
-        if (improv1) {
+      } while (nbIter1<1000 || idlestep*50<nbIter1);
 
-          //improv = true;
+      if (true) return sBest;
 
-          // 2opt invert
-          TwoOptHelper.do2opt(tour, iBest, jBest);
+      //ttp.objective(sol); // to compute sol.timeAcc
 
-          // evaluate & update vectors
-          ttp.objective(sol);
-
-          // debug msg
-          if (this.debug) {
-            Deb.echo(">> TSKP: " + nbIter1 + " | ob-best=" + sol.ob + " | ft-best="+ftBest);
-          }
-        }
-
-      } while (improv1);
-      //if (true) return sol;
-
-
-      // in order to compute sol.timeAcc
-      // we need to use objective function
-      ttp.objective(sol);
+      if (!improv) break;
 
 
 
@@ -172,21 +189,12 @@ public class Cosolver2SA extends CosolverBase {
        * KP with routing *
        *=================*/
 
-      improv = false;
       nbIter2 = 0;
-      sBest = sol.clone();
-
-      // SA params
       double T = 100.0;
       double alpha = .95;
-      do {
-        improv2 = false;
-        nbIter2++;
 
-        /* cleanup and stop execution if interrupted */
-        if (Thread.currentThread().isInterrupted()) {
-          return sBest;
-        }
+      do {
+        nbIter2++;
 
         for (int u=0; u<nbItems/10; u++) {
 
@@ -206,35 +214,35 @@ public class Cosolver2SA extends CosolverBase {
           }
           fp = sol.fp + deltaP;
 
-          /* handle velocity constraint */
+          /*
+           * handle velocity constraint
+           */
           // index where Bit-Flip happened
           origBF = sol.mapCI[A[k] - 1];
+
           // starting time
           ft = origBF == 0 ? .0 : sol.timeAcc[origBF - 1];
+
           // recalculate velocities from bit-flip city
           // to recover objective value
           for (r = origBF; r < nbCities; r++) {
             wc = sol.weightAcc[r] + deltaW;
             ft += ttp.distFor(tour[r] - 1, tour[(r + 1) % nbCities] - 1) / (maxSpeed - wc * C);
           }
+
           // compute objective
           G = fp - ft * R;
 
-
-
-
-          double mu = Math.random();
+          // delta best & current
           double energy_gap = G - GBest;
-          //=====================================
+
           // update if improvement or
-          // Boltzmann condition satisfied
-          //=====================================
-          boolean acceptance = energy_gap > 0 || Math.exp(energy_gap / T) > mu;
+          // acceptance probability satisfied
+          double mu = Math.random();
+          boolean acceptance = energy_gap > 0 ? true : Math.exp(energy_gap / T) > mu;
           if (acceptance) {
 
-            if (energy_gap > 0) {
-              improv2 = true;
-            }
+            if (energy_gap > 0) improv = true;
 
             kBest = k; // TODO useless here...
             GBest = G;
@@ -242,9 +250,8 @@ public class Cosolver2SA extends CosolverBase {
             // bit-flip
             pickingPlan[kBest] = pickingPlan[kBest] != 0 ? 0 : A[kBest];
 
-            //===========================================================
+            /* ================================================ */
             // recover accumulation vectors
-            //===========================================================
             if (pickingPlan[kBest] != 0) {
               deltaP = ttp.profitOf(kBest);
               deltaW = ttp.weightOf(kBest);
@@ -268,39 +275,23 @@ public class Cosolver2SA extends CosolverBase {
             sol.fp = fp;
             sol.ft = ft;
             sol.wend = capacity - sol.weightAcc[nbCities - 1];
+            /* ================================================ */
 
-            //===========================================================
-
+            // debug msg
+//            if (this.debug) {
+//              Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" + sol.ob + "/" + sol.ft);
+//            }
           }
-
-
-        }
-
-
-        if (sol.ob > sBest.ob) {
-          sBest = sol.clone();
-          improv = true;
-
-          Deb.echo(">>>>> KRP: " + nbIter2 + " | ob-best=" +
-            String.format("%.2f", sBest.ob));
         }
 
         if (this.debug) {
-          Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" +
-            String.format("%.2f",sol.ob));
+          Deb.echo(">> KRP: " + nbIter2 + " | ob-best=" + sol.ob + " / " + sol.ft);
         }
 
         // cool down temperature
         T = T * alpha;
 
       } while (T > .01);
-
-
-
-      sol = sBest;
-      ttp.objective(sol);
-
-
 
 
       // debug msg
@@ -314,8 +305,9 @@ public class Cosolver2SA extends CosolverBase {
 
       // to compute all solution params: timeRec, weightRec ...
       // TODO: might be avoided
+      ttp.objective(sol);
 
-    } while (improv);
+    } while (false);
 
     return sol;
   }

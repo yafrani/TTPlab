@@ -155,7 +155,7 @@ public class Cosolver2B extends CosolverBase {
         }
 
       } while (improv1);
-      //if (true) return sol;
+      if (true) return sol;
       //if (!improv) break;
 
 
