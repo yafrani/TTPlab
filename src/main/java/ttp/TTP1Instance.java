@@ -137,7 +137,7 @@ public class TTP1Instance extends TTPInstance {
           }
           
           // distance matrix
-          if (nbCities < 5000) {
+          if (nbCities < 10000) {
             this.setDist(new long[this.nbCities][this.nbCities]);
             for (int i = 0; i < nbCities; i++) {
               for (int j = 0; j < nbCities; j++) {
@@ -204,6 +204,7 @@ public class TTP1Instance extends TTPInstance {
     // visit all cities
     for (int i=0; i<this.nbCities; i++) {
       acc = 0;
+      // check only items contained in current city
       for (int j : clusters[ x[i]-1 ]) {
         if (z[j]!=0) {
           fp += profits[j];

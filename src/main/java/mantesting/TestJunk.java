@@ -13,7 +13,7 @@ import utils.TwoOptHelper;
 public class TestJunk {
 
 
-  public static void main(String[] args) {
+  public static void mainxx(String[] args) {
 
     String inst = "berlin52-ttp/berlin52_n153_bounded-strongly-corr_10.ttp";
     TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst);
@@ -92,21 +92,25 @@ public class TestJunk {
 
 
 
-  public static void mainx(String[] args) {
-    int[] tour = {1,3,5,4,6,2};
-    int nbCities = tour.length;
-
-    // map indices to their associated cities
-    int[] mapIC = new int[nbCities];
-    for (int i=0; i<nbCities; i++) {
-      mapIC[tour[i]-1] = i+1;
+  public static void main(String[] args) {
+    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/berlin52-ttp/berlin52_n51_bounded-strongly-corr_01.ttp");
+    Deb.echo(ttp);
+    int[] A = ttp.getAvailability();
+    Constructive construct = new Constructive(ttp);
+    TTPSolution s0 = construct.generate("sz");
+    s0.setTour(new int[]{1,49,32,45,19,41,8,9,10,43,33,51,11,52,13,14,47,26,27,28,12,25,4,6,15,5,24,48,38,40,39,37,46,16,29,30,2,7,42,21,17,3,18,31,22,23,20,50,44,34,35,36});
+    // convert to binary pp
+    int[] raw_pp = new int[]{2,3,4,19,20,21,33,34,35,43,49,50,51};
+    int[] pp = new int[ttp.getNbItems()];
+    for(int r:raw_pp) {
+      pp[r-1] = A[r-1];
     }
-    //Deb.echol("idx  : ");Deb.echo(new int[]{1,2,3,4,5,6});
-    Deb.echol("tour : ");Deb.echo(tour);
-    Deb.echol("wacc: "); Deb.echo(mapIC);
-    Deb.echol("tacc: "); Deb.echo(mapIC);
-    //Deb.echol(": "); Deb.echo(mapIC);
+    Deb.echo(pp);
+    s0.setPickingPlan(pp);
+    ttp.objective(s0);
+    Deb.echo(s0.ob);
   }
+
 
   public static void main2(String[] args) {
 

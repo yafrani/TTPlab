@@ -4,6 +4,10 @@ import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
 import utils.Quicksort;
+import utils.TwoOptHelper;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by kyu on 5/3/15.
@@ -22,11 +26,12 @@ public abstract class CosolverBase extends LocalSearch {
     super(ttp, s0);
   }
 
+
   /**
    * KP pre-processing
    * base on the item insertion heuristic
    */
-  public void insertAndEliminate(TTPSolution sol) {
+  public TTPSolution insertAndEliminate(TTPSolution sol) {
 
     // TTP data
     int nbCities = ttp.getNbCities();
@@ -139,9 +144,15 @@ public abstract class CosolverBase extends LocalSearch {
       Deb.echo("==> w_curr: "+wCurr);
     }
 
-    // improvement indicator
-    boolean improv2;
 
+
+    if (nbItems > 100000 || nbCities > 50000) return sol;
+
+
+
+    //===========================
+    // elimination
+    //===========================
     // best solution
     int kBest = 0;
     double GBest = sol.ob;
@@ -151,66 +162,182 @@ public abstract class CosolverBase extends LocalSearch {
     double ft, G;
     long wc;
     int r;
-    int nbIter2 = 0;
 
 
 
+    // improvement indicator
+    boolean improved = false;
+
+    // browse items in the new order...
+    for (itr = 0; itr < nbInserts; itr++) {
+      k = insertedItems[itr];
+
+      fp = sol.fp - ttp.profitOf(k);
+
+      // index where Bit-Flip happened
+      origBF = sol.mapCI[A[k] - 1];
+
+      // starting time
+      ft = origBF == 0 ? 0 : sol.timeAcc[origBF - 1];
+
+      // recalculate velocities from bit-flip city
+      for (r = origBF; r < nbCities; r++) {
+        wc = sol.weightAcc[r] - ttp.weightOf(k);;
+        ft += ttp.distFor(tour[r]-1, tour[(r + 1) % nbCities]-1) / (maxSpeed - wc * C);
+      }
+
+      G = Math.round(fp - ft * R);
+
+      // update best
+      if (G > GBest) {
+
+        kBest = k;
+        GBest = G;
+        improved = true;
+        if (firstfit) break;
+      }
+
+    } // END FOR k
+
+      /* update if improvement */
+    if (improved) {
+
+      // bit-flip
+      pickingPlan[kBest] = 0;
+
+      // evaluate & update vectors
+      ttp.objective(sol);
+
+      // debug msg
+      if (this.debug) {
+        Deb.echo(">> item elimination: best=" + sol.ob);
+      }
+    }
+
+    return sol;
+  }
+
+
+  /**
+   * deal with the TSKP sub-problem
+   * 2-opt heuristic with Delaunay candidate generator
+   */
+  public TTPSolution ls2opt(TTPSolution sol) {
+
+    // TTP data
+    int nbCities = ttp.getNbCities();
+    int nbItems = ttp.getNbItems();
+    double maxSpeed = ttp.getMaxSpeed();
+    double minSpeed = ttp.getMinSpeed();
+    long capacity = ttp.getCapacity();
+    double C = (maxSpeed - minSpeed) / capacity;
+
+    // initial solution data
+    int[] tour;
+
+    // delta parameters
+    double deltaT;
+
+    // improvement indicator
+    boolean improved;
+
+    // best solution
+    ttp.objective(sol);
+    int iBest=0, jBest=0;
+    double ftBest = sol.ft;
+
+    // neighbor solution
+    double ft;
+    long wc;
+    int i, j, c1, c2, q;
+    int nbIter = 0;
+
+    // Delaunay triangulation
+    ArrayList<Integer>[] candidates = ttp.delaunay();
+
+    // current tour
+    tour = sol.getTour();
+
+    // search params
+    double threshold = -0.1;
+    if (nbItems >= 100000) {
+      threshold = -10;
+    }
+    if (nbCities >= 50000) {
+      threshold = -1000;
+    }
+
+    // search
     do {
-      improv2 = false;
-      nbIter2++;
+      improved = false;
+      nbIter++;
 
-      // browse items in the new order...
-      for (itr = 0; itr < nbInserts; itr++) {
-        k = insertedItems[itr];
-        // check if picked
-        //if (pickingPlan[k] == 0) {
-        //  continue;
-        //}
+      // cleanup and stop execution if interrupted
+      if (Thread.currentThread().isInterrupted()) break;
 
-        fp = sol.fp - ttp.profitOf(k);
+      // fast 2-opt
+      for (i = 1; i < nbCities - 1; i++) {
+        int node1 = tour[i] - 1;
+        for (int node2 : candidates[node1]) {
+          j = sol.mapCI[node2];
 
-        // index where Bit-Flip happened
-        origBF = sol.mapCI[A[k] - 1];
+          // calculate final time with partial delta
+          ft = sol.ft;
+          wc = i - 2 < 0 ? 0 : sol.weightAcc[i - 2]; // fix index...
+          deltaT = 0;
+          for (q = i - 1; q <= j; q++) {
 
-        // starting time
-        ft = origBF == 0 ? 0 : sol.timeAcc[origBF - 1];
+            wc += TwoOptHelper.get2optValue(q, sol.weightRec, i, j);
+            c1 = TwoOptHelper.get2optValue(q, tour, i, j) - 1;
+            c2 = TwoOptHelper.get2optValue((q + 1) % nbCities, tour, i, j) - 1;
 
-        // recalculate velocities from bit-flip city
-        for (r = origBF; r < nbCities; r++) {
-          wc = sol.weightAcc[r] - ttp.weightOf(k);;
-          ft += ttp.distFor(tour[r]-1, tour[(r + 1) % nbCities]-1) / (maxSpeed - wc * C);
-        }
+            deltaT += -sol.timeRec[q] + ttp.distFor(c1,c2) / (maxSpeed - wc * C);
+          }
 
-        G = Math.round(fp - ft * R);
+          // retrieve neighbor's final time
+          ft = ft + deltaT;
 
-        // update best
-        if (G > GBest) {
+          // update best
+          if (ft - ftBest < threshold) { // soft condition
+            iBest = i;
+            jBest = j;
+            ftBest = ft;
+            improved = true;
 
-          kBest = k;
-          GBest = G;
-          improv2 = true;
-          if (firstfit) break;
-        }
+            if (firstfit) break;
+          }
 
-      } // END FOR k
+          //if (firstfit && improved) break;
+        } // END FOR j
+        if (firstfit && improved) break;
+      } // END FOR i
 
-        /* update if improvement */
-      if (improv2) {
 
-        // bit-flip
-        pickingPlan[kBest] = 0;
+      //===================================
+      // update if improvement
+      //===================================
+      if (improved) {
+
+        // apply 2-opt move
+        TwoOptHelper.do2opt(tour, iBest, jBest);
 
         // evaluate & update vectors
         ttp.objective(sol);
-
-        // debug msg
-        if (this.debug) {
-          Deb.echo(">> item elimination: best=" + sol.ob);
-        }
       }
 
-    } while (nbIter2<3);
+      // debug msg
+      if (this.debug) {
+        Deb.echo(">> TSKP " + nbIter +
+          ": ob=" + String.format("%.0f",sol.ob) +
+          " | ft=" + String.format("%.0f",sol.ft));
+      }
 
+    } while (improved);
+
+
+    // in order to compute sol.timeAcc
+    // we need to use objective function
+    ttp.objective(sol);
+    return sol;
   }
-
 }

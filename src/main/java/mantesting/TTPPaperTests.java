@@ -24,7 +24,7 @@ public class TTPPaperTests {
   /**
    * max execution time in seconds
    */
-  static final int maxTime = 900;
+  static final int maxTime = 600;
   
   
   /**
@@ -40,35 +40,32 @@ public class TTPPaperTests {
   
   
   
-  
   static final String[] instFolders = {
-//    "eil51-ttp",
-    "berlin52-ttp",
+
+//    // small
 //    "eil76-ttp",
-    "kroA100-ttp",
-    "ch150-ttp",
+//    "kroA100-ttp",
+//    "ch130-ttp",
 //    "u159-ttp",
-//    "kroA200-ttp",
-
-    "ts225-ttp",
 //    "a280-ttp",
-    "lin318-ttp",
-    "u574-ttp",
+//    "u574-ttp",
 //    "u724-ttp",
-    "dsj1000-ttp",
-    "rl1304-ttp",
-    "fl1577-ttp",
-    "d2103-ttp",
-    "pcb3038-ttp",
-    "fnl4461-ttp",
-    "rl11849-ttp",
-
+//    // mid-size
+//    "dsj1000-ttp",
+//    "rl1304-ttp",
+//    "fl1577-ttp",
+//    "d2103-ttp",
+//    "pcb3038-ttp",
+//    "fnl4461-ttp",
+//    "pla7397-ttp",
+//    // large
+//    "rl11849-ttp",
+//    "usa13509-ttp",
 //    "brd14051-ttp",
-    "d15112-ttp",
+//    "d15112-ttp",
 //    "d18512-ttp",
-    "pla33810-ttp",
-    "usa13509-ttp",
-
+    "pla85900-ttp",
+    //"pla33810-ttp",
   };
 
 
@@ -102,32 +99,30 @@ public class TTPPaperTests {
   /**
    * test function
    */
-  public static void main(String[] args) throws FileNotFoundException {
+  public static void main(String[] args) throws FileNotFoundException, InterruptedException {
     
     
     /* algorithm settings */
-    final LocalSearch algo = new Cosolver2B();
-    algo.firstfit();
+    final LocalSearch algo = new Cosolver2SA();
+    //algo.firstfit();
     algo.noDebug();
     algo.noLog();
     
     // constructive algorithm code
     final String codeS0 = tourAlgo + "" + ppAlgo;
-    
-    int nbRepRand = ppAlgo == 'r' ? nbRep : 1;
-    
+
     // save result
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
     String filename = "./results/"+algo.getName()+"."+codeS0+"."+df.format(new Date())+".csv";
     final PrintWriter out = new PrintWriter(filename);
     
     /* test for all instances */
-    for (int u=0;u<nbRepRand;u++) { // instances
-      for (final int ifact : itemFactor) {
-        for (final int kcat : knapsackCategories) {
-          for (final String kptype : KPTypes) {
-            for (final String fold : instFolders) {
-              
+    for (final int ifact : itemFactor) {
+      for (final int kcat : knapsackCategories) {
+        for (final String kptype : KPTypes) {
+          for (final String fold : instFolders) {
+            for (int u=0;u<nbRep;u++) { // instances
+
               String tspi = fold.substring(0, fold.length()-4);
               String dimstr = "";
               for (int i=0;i<tspi.length();i++) {
@@ -147,7 +142,6 @@ public class TTPPaperTests {
                 Deb.echo(">> skipped");
                 continue;
               }
-              
               if (true) continue;
               
               // TTP instance
@@ -219,6 +213,17 @@ public class TTPPaperTests {
                 System.out.println("timeout");
               }
               /* end execution */
+
+
+
+
+              // delay execution
+              int sleepTime;
+              if (dim < 300) sleepTime = 2000;
+              else if (dim < 1000) sleepTime = 5000;
+              else if (dim < 10000) sleepTime = 20000;
+              else sleepTime = 60000;
+              Thread.sleep(sleepTime);
             }
           }
         }

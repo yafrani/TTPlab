@@ -4,21 +4,18 @@ import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
 import utils.RandGen;
+import utils.TwoOptHelper;
 
+import java.util.ArrayList;
 
 /**
  * Created by kyu on 4/7/15.
  */
-public class Cosolver2SA extends CosolverBase {
+public class HybridEALS extends Cosolver2SA {
 
-  public Cosolver2SA() {
-    super();
-  }
-
-  public Cosolver2SA(TTP1Instance ttp) {
+  public HybridEALS(TTP1Instance ttp) {
     super(ttp);
   }
-
 
 
   @Override
@@ -127,28 +124,6 @@ public class Cosolver2SA extends CosolverBase {
     double T_abs = 1;
     double T = 100.0;
     double alpha = .95;
-    double trialFactor;
-    if (nbItems < 500)
-      trialFactor = 1000;
-    else if (nbItems < 1000)
-      trialFactor = 100;
-    else if (nbItems < 5000)
-      trialFactor = 50;
-    else if (nbItems < 20000)
-      trialFactor = 10; //was 5... retest others
-    else if (nbItems < 100000)
-      trialFactor = 1;
-    else if (nbItems < 200000)
-      trialFactor = .04;
-    else
-      trialFactor = .03;
-
-    //if (nbCities > 50000)
-    //  trialFactor = .1;
-
-    long trials = Math.round(nbItems*trialFactor);
-
-    Deb.echo(">>>> TRIAL FACTOR: "+trialFactor);
 
     //===============================================
     // start simulated annealing process
@@ -159,7 +134,7 @@ public class Cosolver2SA extends CosolverBase {
       // cleanup and stop execution if interrupted
       if (Thread.currentThread().isInterrupted()) break;
 
-      for (int u=0; u<trials; u++) {
+      for (int u=0; u<nbItems/10; u++) {
 
         // browse items randomly
         k = RandGen.randInt(0, nbItems - 1);
@@ -243,8 +218,8 @@ public class Cosolver2SA extends CosolverBase {
       }
 
       if (this.debug) {
-        Deb.echo(">> KRP " + nbIter + ": ob=" +
-          String.format("%.0f",sol.ob));
+        Deb.echo(">> KRP: " + nbIter + " | ob-best=" +
+          String.format("%.2f",sol.ob));
       }
 
       // cool down temperature

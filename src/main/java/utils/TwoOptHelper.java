@@ -70,4 +70,49 @@ public class TwoOptHelper {
       tour[j-k+i] = tmp;
     }
   }
+
+
+
+
+
+  public static void doRandExchange(int[] tour) {
+    int pos1,pos2,pos3,
+      n=tour.length;
+
+    pos1 = RandGen.randInt(1, n-11);
+    pos2 = pos1 + RandGen.randInt(2,10);
+
+    int tmp = tour[pos1];
+    tour[pos1] = tour[pos2];
+    tour[pos2] = tmp;
+  }
+
+  public static void doRandDoubleBridge(int[] tour, int Strength) {
+    int pos1,pos2,pos3,
+      l,i,j, n = tour.length;
+    int[] solution=tour, newSolution = new int[n];
+
+    for (l=0; l<Strength; l++) {
+      // 4-Opt double bridge move... pick 3 split points randomly...
+      pos1 = RandGen.randInt(1, n/4);
+      pos2 = pos1 + RandGen.randInt(1, n/4);
+      pos3 = pos2 + RandGen.randInt(1, n/4);
+
+      // Perturb from current solution, in ILS, current solution is the LO...
+      for (i=j=0 ; i<pos1; i++,j++)
+        newSolution[j] = solution[i]; // Part A
+      for (i=pos3; i<n   ; i++,j++)
+        newSolution[j] = solution[i]; // Part D
+      for (i=pos2; i<pos3; i++,j++)
+        newSolution[j] = solution[i]; // Part C
+      for (i=pos1; i<pos2; i++,j++)
+        newSolution[j] = solution[i]; // Part B
+
+      for (i=0; i<n; i++) {
+        solution[i] = newSolution[i]; // put back
+        //solutionMap[solution[i]] = i;
+      }
+    }
+
+  }
 }
