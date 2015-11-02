@@ -143,7 +143,7 @@ public class TestAll {
           public void run() {
             /* execute */
             long startTime = System.currentTimeMillis();
-            TTPSolution sx = algo.solve();
+            TTPSolution sx = algo.search();
             long stopTime = System.currentTimeMillis();
             long exTime = stopTime - startTime;
             double exTimeSec = exTime/1000.0;

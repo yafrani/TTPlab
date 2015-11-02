@@ -26,7 +26,7 @@ public class Cosolver2opt extends LocalSearch {
 
 
   @Override
-  public TTPSolution solve() {
+  public TTPSolution search() {
 
     // calculate initial objective value
     ttp.objective(s0);

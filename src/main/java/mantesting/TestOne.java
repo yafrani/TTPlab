@@ -7,7 +7,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import oldsolver.Joint2optBF;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -18,11 +17,11 @@ public class TestOne {
   public static void main(String[] args) {
 
     String[] inst = {
+//      "a280-ttp/a280_n279_bounded-strongly-corr_03.ttp",
+      "d15112-ttp/d15112_n15111_bounded-strongly-corr_01.ttp",
       "pla85900-ttp/pla85900_n85899_bounded-strongly-corr_01.ttp",
-//      "pla85900-ttp/pla85900_n429495_uncorr-similar-weights_05.ttp",
+      "pla85900-ttp/pla85900_n429495_uncorr-similar-weights_05.ttp",
       "pla85900-ttp/pla85900_n858990_uncorr_10.ttp",
-
-      "a280-ttp/a280_n279_bounded-strongly-corr_01.ttp",
     };
 
     /* instance information */
@@ -31,10 +30,12 @@ public class TestOne {
     Deb.echo("------------------");
 
     /* algorithm */
-    final LocalSearch algo = new Cosolver2SA(ttp);
+    final LocalSearch algo = new CS2SA(ttp);
+//    final Evolution evalgo = new EvoMPXLS(ttp);
 //    algo.firstfit();
-    algo.debug();
 
+    algo.debug();
+//    evalgo.debug();
 
     /* execute */
     ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -44,7 +45,7 @@ public class TestOne {
         long startTime, stopTime;
         long exTime;
         startTime = System.currentTimeMillis();
-        TTPSolution sx = algo.solve();
+        TTPSolution sx = algo.search();
         stopTime = System.currentTimeMillis();
         exTime = stopTime - startTime;
 
@@ -56,7 +57,7 @@ public class TestOne {
     executor.shutdown();  // reject all further submissions
     
     try {
-      future.get(1200, TimeUnit.SECONDS);  //     <-- wait 5 seconds to finish
+      future.get(600, TimeUnit.SECONDS);  //     <-- wait 5 seconds to finish
     } catch (InterruptedException e) {    //     <-- possible error cases
       System.out.println("job was interrupted");
     } catch (ExecutionException e) {

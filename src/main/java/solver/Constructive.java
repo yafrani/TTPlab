@@ -1,9 +1,7 @@
 package solver;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -11,6 +9,7 @@ import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
 import utils.Quicksort;
+import utils.RandGen;
 
 public class Constructive extends TTPHeuristic {
   
@@ -56,7 +55,11 @@ public class Constructive extends TTPHeuristic {
       case 'g':
         x = greedyTour();
       break;
-      
+
+      case 'c':
+        x = chainedLKTour();
+        break;
+
       case 'l':
         x = linkernTour();
       break;
@@ -260,6 +263,51 @@ public class Constructive extends TTPHeuristic {
   }
 
 
+  /**
+   * chained-LK
+   * runtime restricted
+   */
+  public int[] chainedLKTour() {
+
+    int nbCities = ttp.getNbCities();
+    int[] tour = new int[nbCities];
+
+    String fileName = ttp.getName().replaceAll("-.+", "");
+
+    try {
+
+      // execute linkern program
+      //Deb.echo(RandGen.randInt(1, nbCities));
+      String[] cmd = {"./bins/linkern/linkern.sh", fileName, "" + (1+Math.random()), "" + RandGen.randInt(1, nbCities)};
+      Runtime runtime = Runtime.getRuntime();
+      Process proc = runtime.exec(cmd);
+
+      proc.waitFor();
+
+      // read output tour
+      File tourFile = new File("./bins/linkern/"+fileName+".tour");
+      BufferedReader br = new BufferedReader(new FileReader(tourFile));
+      String line;
+      br.readLine(); // skip first line
+      int i = 0;
+      while ((line = br.readLine()) != null) {
+        String[] parts = line.split("\\s+");
+        tour[i++] = 1+Integer.parseInt(parts[0]);
+      }
+      //Deb.echo(tour);
+      tourFile.delete();
+      br.close();
+
+      //Deb.echo("OK? "+tourFile.delete());
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+
+    return tour;
+  }
 
 
 
@@ -502,7 +550,7 @@ public class Constructive extends TTPHeuristic {
   
   
   //testing ...
-  public static void main(String[] args) {
+  public static void mainx(String[] args) {
     Constructive x = new Constructive(new TTP1Instance("./TTP1_data/eil51-ttp/eil51_n50_bounded-strongly-corr_01.ttp"));
     int[] t = x.linkernTour();
     Deb.echo(t);

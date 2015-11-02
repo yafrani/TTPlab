@@ -1,5 +1,7 @@
-package solver;
+package oldsolver;
 
+import solver.Constructive;
+import solver.LocalSearch;
 import ttp.TTP1Instance;
 
 import ttp.TTPSolution;
@@ -11,23 +13,23 @@ import java.util.ArrayList;
 /**
  * Created by kyu on 4/7/15.
  */
-public class Cosolver2GA extends CosolverBase {
+public class CS2GA extends LocalSearch {
 
-  public Cosolver2GA() {
+  public CS2GA() {
     super();
   }
 
-  public Cosolver2GA(TTP1Instance ttp) {
+  public CS2GA(TTP1Instance ttp) {
     super(ttp);
   }
 
-  public Cosolver2GA(TTP1Instance ttp, TTPSolution s0) {
+  public CS2GA(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
 
 
   @Override
-  public TTPSolution solve() {
+  public TTPSolution search() {
 
     // TTP data
     int nbCities = ttp.getNbCities();

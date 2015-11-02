@@ -1,5 +1,6 @@
-package solver;
+package oldsolver;
 
+import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -11,23 +12,23 @@ import java.util.LinkedList;
 /**
  * Created by kyu on 4/7/15.
  */
-public class Cosolver2TS extends CosolverBase {
+public class CS2TS extends LocalSearch {
 
-  public Cosolver2TS() {
+  public CS2TS() {
     super();
   }
 
-  public Cosolver2TS(TTP1Instance ttp) {
+  public CS2TS(TTP1Instance ttp) {
     super(ttp);
   }
 
-  public Cosolver2TS(TTP1Instance ttp, TTPSolution s0) {
+  public CS2TS(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
 
 
   @Override
-  public TTPSolution solve() {
+  public TTPSolution search() {
 
     // calculate initial objective value
     ttp.objective(s0);

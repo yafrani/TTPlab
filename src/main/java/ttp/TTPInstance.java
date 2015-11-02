@@ -150,7 +150,7 @@ public abstract class TTPInstance {
 
     try {
       // write coordinates
-      String fileNameCoord = "bins/" + getName() + ".coord";
+      String fileNameCoord = "bins/delaunay/" + getName() + ".coord";
       File fileCoord = new File(fileNameCoord);
       PrintWriter coordWriter = new PrintWriter(fileCoord);
       coordWriter.println(getNbCities());
@@ -160,7 +160,7 @@ public abstract class TTPInstance {
       coordWriter.close();
 
       // execute delaunay program
-      String[] cmd = {"./bins/dct.sh", fileNameCoord};
+      String[] cmd = {"./bins/delaunay/dct.sh", fileNameCoord};
       Runtime runtime = Runtime.getRuntime();
       Process proc = runtime.exec(cmd);
 

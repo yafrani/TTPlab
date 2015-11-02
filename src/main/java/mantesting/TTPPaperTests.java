@@ -103,7 +103,7 @@ public class TTPPaperTests {
     
     
     /* algorithm settings */
-    final LocalSearch algo = new Cosolver2SA();
+    final LocalSearch algo = new CS2SA();
     //algo.firstfit();
     algo.noDebug();
     algo.noLog();
@@ -168,7 +168,7 @@ public class TTPPaperTests {
                   
                   /* execute */
                   long startTime = System.currentTimeMillis();
-                  TTPSolution sx = algo.solve();
+                  TTPSolution sx = algo.search();
                   long stopTime = System.currentTimeMillis();
                   long exTime = stopTime - startTime;
                   double exTimeSec = exTime/1000.0;

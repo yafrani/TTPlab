@@ -29,7 +29,7 @@ public class Handoff2optBF extends LocalSearch {
   }
   
   @Override
-  public TTPSolution solve() {
+  public TTPSolution search() {
     
     // TTP data
     long[][] D = ttp.getDist();

@@ -1,5 +1,6 @@
-package solver;
+package oldsolver;
 
+import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -7,28 +8,27 @@ import utils.RandGen;
 import utils.TwoOptHelper;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by kyu on 4/7/15.
  */
-public class CosolverLASA extends CosolverBase {
+public class CSLASA extends LocalSearch {
 
-  public CosolverLASA() {
+  public CSLASA() {
     super();
   }
 
-  public CosolverLASA(TTP1Instance ttp) {
+  public CSLASA(TTP1Instance ttp) {
     super(ttp);
   }
 
-  public CosolverLASA(TTP1Instance ttp, TTPSolution s0) {
+  public CSLASA(TTP1Instance ttp, TTPSolution s0) {
     super(ttp, s0);
   }
 
 
   @Override
-  public TTPSolution solve() {
+  public TTPSolution search() {
 
     // calculate initial objective value
     ttp.objective(s0);

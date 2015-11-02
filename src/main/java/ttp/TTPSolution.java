@@ -35,7 +35,7 @@ public class TTPSolution {
 
 
   public TTPSolution() {
-    
+
   }
   
   public TTPSolution(int[] tour, int[] pickingPlan) {

@@ -30,7 +30,7 @@ public class Handoff2optSH extends LocalSearch {
   }
   
   @Override
-  public TTPSolution solve() {
+  public TTPSolution search() {
     
     /* TTP data */
     long[][] D = ttp.getDist();

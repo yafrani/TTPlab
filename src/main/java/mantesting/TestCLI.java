@@ -26,18 +26,8 @@ public class TestCLI {
     Deb.echo(ttp);
     Deb.echo("------------------");
 
-    /* initial solution s0 */
-    Constructive construct = new Constructive(ttp);
-    TTPSolution s0 = construct.generate("lr");
-    ttp.objective(s0);
-    Deb.echo("s0  : \n"+s0);
-    Deb.echo("ob  : "+s0.ob);
-    Deb.echo("wend: "+s0.wend);
-    Deb.echo("==================");
-
-
     /* algorithm */
-    final LocalSearch algo = new Cosolver2B(ttp, s0);
+    final LocalSearch algo = new CS2B(ttp);
     //algo.firstfit();
     algo.debug();
 
@@ -51,7 +41,7 @@ public class TestCLI {
         long exTime;
         startTime = System.currentTimeMillis();
 
-        TTPSolution sx = algo.solve();
+        TTPSolution sx = algo.search();
 
         stopTime = System.currentTimeMillis();
         exTime = stopTime - startTime;

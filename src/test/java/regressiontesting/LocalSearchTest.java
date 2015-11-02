@@ -87,7 +87,7 @@ public class LocalSearchTest {
     
     prepareData(instance);
     
-    TTPSolution sx = algo.solve();
+    TTPSolution sx = algo.search();
 
     double obtained = sx.ob;
     ttp.objective(sx);
@@ -105,7 +105,7 @@ public class LocalSearchTest {
     
     prepareData(instance);
     
-    TTPSolution sn = algo.solve();
+    TTPSolution sn = algo.search();
     
     try {
       String smplName = algo.getClass().getSimpleName();
@@ -114,7 +114,7 @@ public class LocalSearchTest {
       LocalSearch alg = (LocalSearch)cons.newInstance(ttp, s0);
       if (firstfit) alg.firstfit();
       else alg.bestfit();
-      TTPSolution so = alg.solve();
+      TTPSolution so = alg.search();
       
       Deb.echo(ttp.getName()+" "+ttp.getNbCities()+"x"+ttp.getNbItems()+":");
       Deb.echo(" old: "+so.ob + " vs new:" + sn.ob);

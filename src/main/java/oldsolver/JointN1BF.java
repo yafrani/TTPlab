@@ -29,7 +29,7 @@ public class JointN1BF extends LocalSearch {
   }
   
   @Override
-  public TTPSolution solve() {
+  public TTPSolution search() {
     
     // calculate initial objective value
     ttp.objective(s0);
