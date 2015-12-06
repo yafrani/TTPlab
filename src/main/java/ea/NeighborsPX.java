@@ -5,7 +5,7 @@ package ea;
  *
  * Created by kyu on 10/25/15.
  */
-public class Neighbors {
+public class NeighborsPX {
 
   // city
   public int city;

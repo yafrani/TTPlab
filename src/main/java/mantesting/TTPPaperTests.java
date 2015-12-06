@@ -41,10 +41,9 @@ public class TTPPaperTests {
   
   
   static final String[] instFolders = {
-
 //    // small
 //    "eil76-ttp",
-//    "kroA100-ttp",
+    "kroA100-ttp",
 //    "ch130-ttp",
 //    "u159-ttp",
 //    "a280-ttp",
@@ -64,33 +63,33 @@ public class TTPPaperTests {
 //    "brd14051-ttp",
 //    "d15112-ttp",
 //    "d18512-ttp",
-    "pla85900-ttp",
-    //"pla33810-ttp",
+//    "pla33810-ttp",
+//    "pla85900-ttp",
   };
 
 
   static final String[] KPTypes = {
 //    "uncorr",
-    "uncorr-similar-weights",
-//    "bounded-strongly-corr",
+//    "uncorr-similar-weights",
+    "bounded-strongly-corr",
   };
   
   
   static final int[] knapsackCategories = {
-//    1,
-    5,
+    1,
+//    5,
 //    10,
   };
   
   
   static final int[] itemFactor = {
-//    1,
-    5,
+    1,
+//    5,
 //    10,
   };
   
   
-  static final int nbRep = 10;
+  static final int nbRep = 1;
 
   static final String[] exclude = {
     
@@ -105,7 +104,7 @@ public class TTPPaperTests {
     /* algorithm settings */
     final LocalSearch algo = new CS2SA();
     //algo.firstfit();
-    algo.noDebug();
+//    algo.noDebug();
     algo.noLog();
     
     // constructive algorithm code
@@ -142,10 +141,10 @@ public class TTPPaperTests {
                 Deb.echo(">> skipped");
                 continue;
               }
-              if (true) continue;
+              //if (true) continue;
               
               // TTP instance
-              TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+ttpi);
+              TTP1Instance ttp = new TTP1Instance(ttpi);
               
               /* initial solution s0 */
               Constructive construct = new Constructive(ttp);
@@ -155,7 +154,7 @@ public class TTPPaperTests {
               /* algorithm setting */
               algo.setS0(s0);
               algo.setTTP(ttp);
-              
+
               
               /*---------------------------------*
                * execute: interruption sensitive *

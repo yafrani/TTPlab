@@ -9,6 +9,8 @@ package xplab;
 // Any written or oral public presentation of the details of this code
 // (even modified) can be done only with the reference to the author.
 
+import utils.ConfigHelper;
+
 import java.io.*;
 import java.util.*;
 
@@ -16,7 +18,7 @@ public class LAHC_TSPlib {
   // external .tsp file name with dataset. Change this string if
   // you would like to search another instance
   // private static String tspfilename="d:\\jwork01\\tsp001\\rat783.tsp";
-  private static String tspfilename="./TTP1_data/eil51-ttp/eil51.tsp";
+  private static String tspfilename = ConfigHelper.getProperty("tspdata") + "eil51.tsp";
   // the number of cities in the problem
   private static int ncit;
   // Euclidian coordinates of cities

@@ -17,7 +17,10 @@ public class TestOne {
   public static void main(String[] args) {
 
     String[] inst = {
-//      "a280-ttp/a280_n279_bounded-strongly-corr_03.ttp",
+
+      //"berlin52-ttp/berlin52_n51_bounded-strongly-corr_01.ttp",
+      "a280-ttp/a280_n1395_uncorr-similar-weights_05.ttp",
+//      "a280-ttp/a280_n2790_uncorr_10.ttp",
       "d15112-ttp/d15112_n15111_bounded-strongly-corr_01.ttp",
       "pla85900-ttp/pla85900_n85899_bounded-strongly-corr_01.ttp",
       "pla85900-ttp/pla85900_n429495_uncorr-similar-weights_05.ttp",
@@ -25,17 +28,17 @@ public class TestOne {
     };
 
     /* instance information */
-    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst[0]);
+    final TTP1Instance ttp = new TTP1Instance(inst[0]);
     Deb.echo(ttp);
     Deb.echo("------------------");
 
     /* algorithm */
-    final LocalSearch algo = new CS2SA(ttp);
-//    final Evolution evalgo = new EvoMPXLS(ttp);
+//    final LocalSearch algo = new CS2B();
+//    algo.setTTP(ttp);
 //    algo.firstfit();
-
-    algo.debug();
-//    evalgo.debug();
+//    algo.debug();
+    final Evolution evalgo = new EvoTTP(ttp);
+    evalgo.debug();
 
     /* execute */
     ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -45,7 +48,8 @@ public class TestOne {
         long startTime, stopTime;
         long exTime;
         startTime = System.currentTimeMillis();
-        TTPSolution sx = algo.search();
+        TTPSolution sx = evalgo.search();
+//        TTPSolution sx = algo.search();
         stopTime = System.currentTimeMillis();
         exTime = stopTime - startTime;
 

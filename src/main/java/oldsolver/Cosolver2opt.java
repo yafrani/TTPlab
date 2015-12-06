@@ -20,9 +20,6 @@ public class Cosolver2opt extends LocalSearch {
     super(ttp);
   }
 
-  public Cosolver2opt(TTP1Instance ttp, TTPSolution s0) {
-    super(ttp, s0);
-  }
 
 
   @Override

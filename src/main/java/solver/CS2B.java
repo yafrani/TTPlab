@@ -52,7 +52,7 @@ public class CS2B extends LocalSearch {
       improved = false;
 
       // 2-opt heuristic on TSKP
-      sol = ls2opt(sol);
+      sol = fast2opt(sol);
 
       // simple bit-flip on KRP
       sol = lsBitFlip(sol);

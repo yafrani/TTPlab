@@ -4,9 +4,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
+import utils.ConfigHelper;
 import utils.Deb;
 import utils.Quicksort;
 import utils.RandGen;
@@ -64,10 +66,6 @@ public class Constructive extends TTPHeuristic {
         x = linkernTour();
       break;
 
-      case 'o':
-        x = optimalTour();
-      break;
-      
       default:
         x = linkernTour();
       break;
@@ -179,49 +177,9 @@ public class Constructive extends TTPHeuristic {
     }
     return tour;
   }
-  
-  
-  /**
-   * use optimal TSP tour
-   * 
-   * @return
-   */
-  public int[] optimalTour() {
-    int nbCities = ttp.getNbCities();
-    int[] tour = new int[nbCities];
-    
-    String fileName = ttp.getName().replaceAll("-.+", "");
-    String dirName = "./TTP1_data/"+fileName+"-ttp";
-    fileName += ".opt.tour";
-    //Deb.echo(dirName + "/" + fileName);
-    
-    File file = new File(dirName + "/" + fileName);
-    BufferedReader br = null;
-    
-    try {
-      br = new BufferedReader(new FileReader(file));
-      String line;
-      
-      // skip file header
-      br.readLine();
-      br.readLine();
-      br.readLine();
-      br.readLine();
-      
-      // scan tour
-      int i = 0;
-      while ((line = br.readLine()) != null && i<nbCities) {
-        tour[i++] = Integer.parseInt(line);
-      } // end while
-      
-      br.close();
-    } catch (IOException ex) {
-      ex.printStackTrace();
-    }
-    
-    return tour;
-  }
-  
+
+
+
   
   /**
    * use Lin-Kernighan TSP tour
@@ -231,7 +189,7 @@ public class Constructive extends TTPHeuristic {
     int[] tour = new int[nbCities];
     
     String fileName = ttp.getName().replaceAll("-.+", "");
-    String dirName = "./TTP1_data/"+fileName+"-ttp";
+    String dirName = ConfigHelper.getProperty("lktours");
     fileName += ".linkern.tour";
     //Deb.echo(dirName + "/" + fileName);
     
@@ -469,7 +427,7 @@ public class Constructive extends TTPHeuristic {
      * the tour
      * generated using greedy algorithm
      */
-    x = optimalTour();
+    x = linkernTour();
     z = zerosPickingPlan();
     Deb.echo(x);
     Deb.echo(z);
@@ -551,7 +509,7 @@ public class Constructive extends TTPHeuristic {
   
   //testing ...
   public static void mainx(String[] args) {
-    Constructive x = new Constructive(new TTP1Instance("./TTP1_data/eil51-ttp/eil51_n50_bounded-strongly-corr_01.ttp"));
+    Constructive x = new Constructive(new TTP1Instance("eil51-ttp/eil51_n50_bounded-strongly-corr_01.ttp"));
     int[] t = x.linkernTour();
     Deb.echo(t);
   }

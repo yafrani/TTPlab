@@ -24,9 +24,7 @@ public class JointN1BF extends LocalSearch {
     super(ttp);
   }
   
-  public JointN1BF(TTP1Instance ttp, TTPSolution s0) {
-    super(ttp, s0);
-  }
+
   
   @Override
   public TTPSolution search() {

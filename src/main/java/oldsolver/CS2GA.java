@@ -8,6 +8,7 @@ import ttp.TTPSolution;
 import utils.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 
 /**
@@ -23,9 +24,7 @@ public class CS2GA extends LocalSearch {
     super(ttp);
   }
 
-  public CS2GA(TTP1Instance ttp, TTPSolution s0) {
-    super(ttp, s0);
-  }
+
 
 
   @Override
@@ -75,7 +74,7 @@ public class CS2GA extends LocalSearch {
     int i, j, k, q, r, itr;
 
     // Delaunay triangulation
-    ArrayList<Integer>[] candidates = ttp.delaunay();
+    HashSet<Integer>[] candidates = GraphHelper.delaunay(ttp);
 
     // GA params
     int MAX_ITR = 200;

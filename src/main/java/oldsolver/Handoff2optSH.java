@@ -25,9 +25,7 @@ public class Handoff2optSH extends LocalSearch {
     super(ttp);
   }
   
-  public Handoff2optSH(TTP1Instance ttp, TTPSolution s0) {
-    super(ttp, s0);
-  }
+
   
   @Override
   public TTPSolution search() {

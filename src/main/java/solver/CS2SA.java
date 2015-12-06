@@ -3,7 +3,6 @@ package solver;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
-import utils.RandGen;
 
 
 /**
@@ -63,7 +62,7 @@ public class CS2SA extends LocalSearch {
       improved = false;
 
       // 2-opt heuristic on TSKP
-      sol = ls2opt(sol);
+      sol = fast2opt(sol);
       //if (true) break;
 
       // simple bit-flip on KRP

@@ -57,7 +57,7 @@ public class LocalSearchTest {
   private void prepareData(String instance) {
     
     // instance
-    ttp = new TTP1Instance("./TTP1_data/"+instance);
+    ttp = new TTP1Instance(instance);
     
     // initial solution s0
     Constructive construct = new Constructive(ttp);

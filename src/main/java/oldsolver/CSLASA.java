@@ -4,10 +4,12 @@ import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
+import utils.GraphHelper;
 import utils.RandGen;
 import utils.TwoOptHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by kyu on 4/7/15.
@@ -20,10 +22,6 @@ public class CSLASA extends LocalSearch {
 
   public CSLASA(TTP1Instance ttp) {
     super(ttp);
-  }
-
-  public CSLASA(TTP1Instance ttp, TTPSolution s0) {
-    super(ttp, s0);
   }
 
 
@@ -77,7 +75,7 @@ public class CSLASA extends LocalSearch {
     int nbIter = 0, nbIter1, nbIter2;
 
     // Delaunay triangulation
-    ArrayList<Integer>[] candidates = ttp.delaunay();
+    HashSet<Integer>[] candidates = GraphHelper.delaunay(ttp);
 
 
 

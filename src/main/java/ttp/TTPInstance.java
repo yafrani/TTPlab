@@ -126,8 +126,10 @@ public abstract class TTPInstance {
   public ArrayList<Integer>[] getClusters() {
     return clusters;
   }
+  public CityCoordinates[] getCoordinates() {
+    return coordinates;
+  }
 
-  
   public int profitOf(int i) {
     return this.profits[i];
   }
@@ -141,62 +143,6 @@ public abstract class TTPInstance {
       return Math.round(this.coordinates[i].distanceEuclid(this.coordinates[j]));
     }
     return dist[i][j];
-  }
-
-  /**
-   * get delaunay candidates
-   */
-  public ArrayList<Integer>[] delaunay() {
-
-    try {
-      // write coordinates
-      String fileNameCoord = "bins/delaunay/" + getName() + ".coord";
-      File fileCoord = new File(fileNameCoord);
-      PrintWriter coordWriter = new PrintWriter(fileCoord);
-      coordWriter.println(getNbCities());
-      for (CityCoordinates node : coordinates) {
-        coordWriter.println(node.getX() + " " + node.getY());
-      }
-      coordWriter.close();
-
-      // execute delaunay program
-      String[] cmd = {"./bins/delaunay/dct.sh", fileNameCoord};
-      Runtime runtime = Runtime.getRuntime();
-      Process proc = runtime.exec(cmd);
-
-      // read output from Delaunay program
-      BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-
-      // store candidates in a hash table
-      // and instantiate all sub lists
-      ArrayList<Integer>[] arcTable = new ArrayList[nbCities];
-      for (int i=0;i<nbCities;i++) {
-        arcTable[i] = new ArrayList<>();
-      }
-
-      int node1, node2;
-      String line;
-      while ((line = br.readLine()) != null) {
-        String[] parts = line.split("\\s+");
-
-        node1 = Integer.parseInt(parts[0]);
-        node2 = Integer.parseInt(parts[1]);
-
-        arcTable[node1].add(node2);
-        arcTable[node2].add(node1);
-      }
-      br.close();
-
-      // delete coordinates file
-      fileCoord.delete();
-
-      return arcTable;
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    return null;
   }
 
 

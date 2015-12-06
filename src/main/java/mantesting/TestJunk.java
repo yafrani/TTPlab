@@ -16,7 +16,7 @@ public class TestJunk {
   public static void mainxx(String[] args) {
 
     String inst = "berlin52-ttp/berlin52_n153_bounded-strongly-corr_10.ttp";
-    TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst);
+    TTP1Instance ttp = new TTP1Instance(inst);
     Deb.echo(ttp);
 
     Constructive construct = new Constructive(ttp);
@@ -93,7 +93,7 @@ public class TestJunk {
 
 
   public static void main(String[] args) {
-    final TTP1Instance ttp = new TTP1Instance("./TTP1_data/berlin52-ttp/berlin52_n51_bounded-strongly-corr_01.ttp");
+    final TTP1Instance ttp = new TTP1Instance("berlin52-ttp/berlin52_n51_bounded-strongly-corr_01.ttp");
     Deb.echo(ttp);
     int[] A = ttp.getAvailability();
     Constructive construct = new Constructive(ttp);
@@ -118,7 +118,7 @@ public class TestJunk {
     String inst = "my-ttp/sample-data-10.ttp";
     inst = "eil51-ttp/eil51_n50_uncorr_01.ttp";
     inst = "a280-ttp/a280_n279_uncorr_01.ttp";
-    TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+inst);
+    TTP1Instance ttp = new TTP1Instance(inst);
     Deb.echo(ttp);
 
     /* initial solution s0 */

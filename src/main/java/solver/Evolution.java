@@ -22,9 +22,9 @@ public abstract class Evolution extends SearchHeuristic {
 
   // GA params
   public static final double MUTATION_RATE = .01;
-  public static final double SELECTION_RATE = .95;
-  public static final int POP_SIZE = 50;
-  public static final int TOURNAMENT_SIZE = 40;
+  public static final double SELECTION_RATE = .5;
+  public static final int POP_SIZE = 10;
+  public static final int TOURNAMENT_SIZE = 6;
 
   Population pop;
 

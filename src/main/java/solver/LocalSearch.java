@@ -2,12 +2,10 @@ package solver;
 
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
-import utils.Deb;
-import utils.Quicksort;
-import utils.RandGen;
-import utils.TwoOptHelper;
+import utils.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * local search algorithms
@@ -18,6 +16,7 @@ import java.util.ArrayList;
 public abstract class LocalSearch extends SearchHeuristic {
 
   protected TTPSolution s0;
+  protected HashSet<Integer>[] candidates;
 
   // initial solution
   public void setS0(TTPSolution s0) {
@@ -39,14 +38,20 @@ public abstract class LocalSearch extends SearchHeuristic {
   
   public LocalSearch(TTP1Instance ttp) {
     super(ttp);
+    // generate Delaunay triangulation
+    candidates = GraphHelper.delaunayKNN(ttp,10);
+    //candidates = GraphHelper.delaunay(ttp);
   }
   
-  public LocalSearch(TTP1Instance ttp, TTPSolution s0) {
-    super(ttp);
-    this.s0 = s0;
+
+  @Override
+  public void setTTP(TTP1Instance ttp) {
+    super.setTTP(ttp);
+    // generate Delaunay triangulation
+   candidates = GraphHelper.delaunay(ttp);
+//    candidates = GraphHelper.delaunayKNN(ttp,5);
   }
-  
-  
+
   /**
    * use first fit strategy
    */
@@ -270,7 +275,7 @@ public abstract class LocalSearch extends SearchHeuristic {
    * deal with the TSKP sub-problem
    * 2-opt heuristic with Delaunay candidate generator
    */
-  public TTPSolution ls2opt(TTPSolution sol) {
+  public TTPSolution fast2opt(TTPSolution sol) {
 
     // TTP data
     int nbCities = ttp.getNbCities();
@@ -300,9 +305,6 @@ public abstract class LocalSearch extends SearchHeuristic {
     int i, j, c1, c2, q;
     int nbIter = 0;
 
-    // Delaunay triangulation
-    ArrayList<Integer>[] candidates = ttp.delaunay();
-
     // current tour
     tour = sol.getTour();
 
@@ -328,6 +330,7 @@ public abstract class LocalSearch extends SearchHeuristic {
         int node1 = tour[i] - 1;
         for (int node2 : candidates[node1]) {
           j = sol.mapCI[node2];
+          //if (j<=i) continue;
 
           // calculate final time with partial delta
           ft = sol.ft;
@@ -391,6 +394,132 @@ public abstract class LocalSearch extends SearchHeuristic {
 
 
   /**
+   * 2-opt search
+   *
+   * deal with the TSKP sub-problem
+   * 2-opt heuristic without neighborhood reduction techniques
+   */
+  public TTPSolution slow2opt(TTPSolution sol) {
+
+    // TTP data
+    int nbCities = ttp.getNbCities();
+    int nbItems = ttp.getNbItems();
+    double maxSpeed = ttp.getMaxSpeed();
+    double minSpeed = ttp.getMinSpeed();
+    long capacity = ttp.getCapacity();
+    double C = (maxSpeed - minSpeed) / capacity;
+
+    // initial solution data
+    int[] tour;
+
+    // delta parameters
+    double deltaT;
+
+    // improvement indicator
+    boolean improved;
+
+    // best solution
+    ttp.objective(sol);
+    int iBest=0, jBest=0;
+    double ftBest = sol.ft;
+
+    // neighbor solution
+    double ft;
+    long wc;
+    int i, j, c1, c2, q;
+    int nbIter = 0;
+
+    // Delaunay triangulation
+    //ArrayList<Integer>[] candidates = ttp.delaunay();
+
+    // current tour
+    tour = sol.getTour();
+
+    // search params
+    double threshold = -0.1;
+    if (nbItems >= 100000) {
+      threshold = -10;
+    }
+    if (nbCities >= 50000) { // ex. pla85000 based instances
+      threshold = -1000;
+    }
+
+    // search
+    do {
+      improved = false;
+      nbIter++;
+
+      // cleanup and stop execution if interrupted
+      if (Thread.currentThread().isInterrupted()) break;
+
+      // fast 2-opt
+      for (i = 1; i < nbCities - 1; i++) {
+        for (j=i+1; j < nbCities; j++) {
+
+          // calculate final time with partial delta
+          ft = sol.ft;
+          wc = i - 2 < 0 ? 0 : sol.weightAcc[i - 2]; // fix index...
+          deltaT = 0;
+          for (q = i - 1; q <= j; q++) {
+
+            wc += TwoOptHelper.get2optValue(q, sol.weightRec, i, j);
+            c1 = TwoOptHelper.get2optValue(q, tour, i, j) - 1;
+            c2 = TwoOptHelper.get2optValue((q + 1) % nbCities, tour, i, j) - 1;
+
+            deltaT += -sol.timeRec[q] + ttp.distFor(c1,c2) / (maxSpeed - wc * C);
+          }
+
+          // retrieve neighbor's final time
+          ft = ft + deltaT;
+
+          // update best
+          if (ft - ftBest < threshold) { // soft condition
+            iBest = i;
+            jBest = j;
+            ftBest = ft;
+            improved = true;
+
+            if (firstfit) break;
+          }
+
+          //if (firstfit && improved) break;
+        } // END FOR j
+        if (firstfit && improved) break;
+      } // END FOR i
+
+
+      //===================================
+      // update if improvement
+      //===================================
+      if (improved) {
+
+        // apply 2-opt move
+        TwoOptHelper.do2opt(tour, iBest, jBest);
+
+        // evaluate & update vectors
+        ttp.objective(sol);
+      }
+
+      // debug msg
+      if (this.debug) {
+        Deb.echo(">> TSKP " + nbIter +
+          ": ob=" + String.format("%.0f", sol.ob) +
+          " | ft=" + String.format("%.0f", sol.ft));
+      }
+
+    } while (improved && nbIter<maxIterTSKP);
+
+
+    // in order to compute sol.timeAcc
+    // we need to use objective function
+    ttp.objective(sol);
+    return sol;
+  }
+
+
+  /**
+   * bit-flip search
+   *
    * deal with the KRP sub-problem
    * this function applies a simple bit-flip
    */
@@ -534,6 +663,8 @@ public abstract class LocalSearch extends SearchHeuristic {
 
 
   /**
+   * simulated annealing
+   *
    * deal with the KRP sub-problem
    * this function applies a simple bit-flip
    */
@@ -706,5 +837,7 @@ public abstract class LocalSearch extends SearchHeuristic {
 
     return sBest;
   }
+
+
 
 }

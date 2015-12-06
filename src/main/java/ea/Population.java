@@ -42,4 +42,15 @@ public class Population extends TTPHeuristic {
     }
     return fittest;
   }
+
+  // fittest solution's index
+  public int fittestIndex() {
+    int fittest_idx = 0;
+    for (int i=1; i< Evolution.TOURNAMENT_SIZE; i++) {
+      if (sol[i].ob > sol[fittest_idx].ob) {
+        fittest_idx = i;
+      }
+    }
+    return fittest_idx;
+  }
 }

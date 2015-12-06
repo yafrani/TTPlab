@@ -4,9 +4,11 @@ import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
+import utils.GraphHelper;
 import utils.TwoOptHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -22,9 +24,7 @@ public class CS2TS extends LocalSearch {
     super(ttp);
   }
 
-  public CS2TS(TTP1Instance ttp, TTPSolution s0) {
-    super(ttp, s0);
-  }
+
 
 
   @Override
@@ -76,7 +76,7 @@ public class CS2TS extends LocalSearch {
     int nbIter = 0, nbIter1, nbIter2;
 
     // Delaunay triangulation
-    ArrayList<Integer>[] candidates = ttp.delaunay();
+    HashSet<Integer>[] candidates = GraphHelper.delaunay(ttp);
 
     // tabu search params
     LinkedList<Integer> tabuList = new LinkedList<>();

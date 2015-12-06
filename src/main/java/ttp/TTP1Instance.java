@@ -1,12 +1,11 @@
 package ttp;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import utils.CityCoordinates;
+import utils.ConfigHelper;
 import utils.Deb;
 
 /**
@@ -43,21 +42,14 @@ public class TTP1Instance extends TTPInstance {
    * @param fileName
    */
   public TTP1Instance(String fileName) {
-    this(new File(fileName));
-  }
-  
-  /**
-   * reads the instance from a .ttp file
-   * 
-   * @param file
-   */
-  public TTP1Instance(File file) {
-    
-    this.ttpFile = file;
+
+    String ttpData = ConfigHelper.getProperty("ttpdata");
+
+    this.ttpFile = new File(ttpData+fileName);
     BufferedReader br = null;
     
     try {
-      br = new BufferedReader(new FileReader(file));
+      br = new BufferedReader(new FileReader(this.ttpFile));
       String line;
       
       while ((line = br.readLine()) != null) {

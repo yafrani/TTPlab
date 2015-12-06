@@ -25,9 +25,7 @@ public class Joint2optBF extends LocalSearch {
     super(ttp);
   }
   
-  public Joint2optBF(TTP1Instance ttp, TTPSolution s0) {
-    super(ttp, s0);
-  }
+
   
   
   @Override

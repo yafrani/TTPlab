@@ -23,10 +23,8 @@ public class Handoff2optBF extends LocalSearch {
   public Handoff2optBF(TTP1Instance ttp) {
     super(ttp);
   }
-  
-  public Handoff2optBF(TTP1Instance ttp, TTPSolution s0) {
-    super(ttp, s0);
-  }
+
+
   
   @Override
   public TTPSolution search() {

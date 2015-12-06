@@ -1,11 +1,10 @@
 package mantesting;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Properties;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -19,6 +18,7 @@ import oldsolver.JointN1BF;
 import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
+import utils.ConfigHelper;
 import utils.Deb;
 import utils.Log;
 import utils.RandGen;
@@ -86,7 +86,11 @@ public class TestAll {
     }
     else {
       // get TTP file names from folder
-      final File instFolderRef = new File("./TTP1_data/"+instFolder);
+      // get datasets folder path
+      Properties prop = new Properties();
+      InputStream input;
+      String ttpData = ConfigHelper.getProperty("ttpdata");
+      final File instFolderRef = new File(ttpData+instFolder);
       
       for (final File fileEntry : instFolderRef.listFiles()) {
         String fileName = fileEntry.getName();
@@ -121,7 +125,7 @@ public class TestAll {
       for (final String ttpi : instances) { // instances
         
         // TTP instance
-        TTP1Instance ttp = new TTP1Instance("./TTP1_data/"+ttpi);
+        TTP1Instance ttp = new TTP1Instance(ttpi);
         
         /* initial solution s0 */
         Constructive construct = new Constructive(ttp);
