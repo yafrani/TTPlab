@@ -1,10 +1,7 @@
 package solver;
 
 import com.sun.javafx.geom.Edge;
-import ea.EdgeRecombination;
-import ea.Initialization;
-import ea.Population;
-import ea.Selection;
+import ea.*;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -13,13 +10,13 @@ import utils.Quicksort;
 /**
  * Created by kyu on 10/25/15.
  */
-public class EvoTTP extends Evolution {
+public class EvoERSP extends Evolution {
 
-  public EvoTTP() {
+  public EvoERSP() {
     super();
   }
 
-  public EvoTTP(TTP1Instance ttp) {
+  public EvoERSP(TTP1Instance ttp) {
     super(ttp);
   }
 
@@ -42,9 +39,10 @@ public class EvoTTP extends Evolution {
 
     // use local search
     LocalSearch ls = new CS2SA(ttp);
+
     //ls.debug();
     // reduce LS time
-    ls.maxIterTSKP = 10;
+    ls.maxIterTSKP = 1;
     ls.maxIterKRP = 10;
     pop = new Population(Evolution.POP_SIZE);
     // use Lin-Kernighan to initialize the tours
@@ -52,9 +50,9 @@ public class EvoTTP extends Evolution {
       int[] rtour = init.randomTour();
       pop.sol[i] = new TTPSolution(
         init.tsp2opt(rtour),
-        construct.zerosPickingPlan()
+        construct.randomPickingPlan()
       );
-      pop.sol[i] = ls.insertAndEliminate(pop.sol[i]);
+      //pop.sol[i] = ls.insertAndEliminate(pop.sol[i]);
       ttp.objective(pop.sol[i]);
       //Deb.echo(">> "+i+" >> "+pop.sol[i].ob);
       // 2-opt heuristic on TSKP
@@ -68,20 +66,17 @@ public class EvoTTP extends Evolution {
     Deb.echo("Initialization done !");
     //===============================================
 
-    // number of iterations
-    int nbIter = 0;
-    // improvement tag
-    boolean improved;
 
     //===============================================
     // start EA search
     //===============================================
+    int nbIter = 0;
+    boolean improved;
     do {
       nbIter++;
       //improved = false;
 
-      // get & sort fitness
-      // use indices
+      // get & sort fitness, use indices
       Double[] fits = new Double[POP_SIZE];
       for (int i=0; i<POP_SIZE; i++) {
         fits[i] = pop.sol[i].ob;
@@ -95,36 +90,55 @@ public class EvoTTP extends Evolution {
 
       int j = POP_SIZE-1;
 
-      // Crossover & mutate some solutions
+      // Crossover & LS some selected solutions
       for (int i = 0; i < selectSize; i++) {
 
         // Select parents
         TTPSolution[] p = Selection.tournament(pop);
 
         // Crossover parents
-        TTPSolution c = EdgeRecombination.ERX(p[0], p[1]);
-        c.setTour(p[0].clone().getTour());
+        // ERX for tours
+        int[] ct = EdgeRecombination.ERX(p[0].getTour(), p[1].getTour());
+        // SPX for picking plans
+        int[] cpp = StrCrossover.SPX(p[0].getPickingPlan(), p[1].getPickingPlan());
+        // combine tour and picking plan
+        TTPSolution c = new TTPSolution(ct,cpp);
         ttp.objective(c);
 
         // Apply local search
+        ls.maxIterTSKP = 100;
+        ls.maxIterKRP = 100;
         c = ls.fast2opt(c);
-        // simple bit-flip on KRP
         c = ls.lsBitFlip(c);
 
-        // replace worst solutions
-        pop.sol[idx[j--]] = c;
 
+        // check if it is identical
+        boolean identical = true;
+        for (int k = 0; k < POP_SIZE; k++) {
+          // either tour or picking plan is identical
+          if (pop.sol[k].ob == c.ob) {
+            identical = false;
+            Deb.echo("IDENTICAL: " + c.ob);
+            break;
+          }
+        }
+
+
+        // replace worst solutions
+        if (identical)
+          pop.sol[idx[j--]] = c;
+
+
+        // TODO use mutation !!
+        // TODO or explore somehow...
         // mutate offspring depending
         // on some very small probability
 //        mutate2opt(c1);
-
-        // compute fitness
-
-//        newpop.tours[i] = c1;
-//        newpop.tours[i+1] = c2;
       }
 
       //for (int u=0; u<Evolution.POP_SIZE; u++) Deb.echo(">> "+u+" >> "+pop.sol[idx[u]].ob);
+
+
 
       // stop execution if interrupted
       if (Thread.currentThread().isInterrupted()) return null;
@@ -133,13 +147,11 @@ public class EvoTTP extends Evolution {
       if (this.debug) {
         Deb.echo("Best "+nbIter+":");
         Deb.echo(pop.fittest().ob);
-//        Deb.echo("ob-best: "+sol.ob);
-//        Deb.echo("wend   : "+sol.wend);
         Deb.echo("---");
       }
 
       // stop when no improvements
-    } while (nbIter<8);
+    } while (nbIter<28);
     //===============================================
 
     return null;

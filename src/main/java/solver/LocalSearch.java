@@ -385,6 +385,7 @@ public abstract class LocalSearch extends SearchHeuristic {
 
     } while (improved && nbIter<maxIterTSKP);
 
+    Deb.echo("==> 2-opt :" + nbIter + " iterations");
 
     // in order to compute sol.timeAcc
     // we need to use objective function
@@ -654,6 +655,7 @@ public abstract class LocalSearch extends SearchHeuristic {
 
     } while (improved && nbIter<maxIterTSKP);
 
+    Deb.echo("==> bitflip :" + nbIter + " iterations");
 
     // in order to recover all history vectors
     ttp.objective(sol);

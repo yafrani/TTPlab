@@ -45,7 +45,7 @@ public class TestEvo {
     Deb.echoz(p2.getTour());
     Deb.echo("OBJ: " + p2.ob);
 
-    TTPSolution c = EdgeRecombination.ERX(p1, p2);
+    TTPSolution c = new TTPSolution(EdgeRecombination.ERX(p1.getTour(), p2.getTour()),null);
     ttp.objective(c);
     Deb.echo("OBJ: " + c.ob);
     c.setTour(init.tsp2opt(c.getTour()));
@@ -78,49 +78,6 @@ public class TestEvo {
 
 
 
-  // testing PX
-  public static void main5() {
-
-//    final TTP1Instance ttp = new TTP1Instance("berlin52-ttp/berlin52_n51_bounded-strongly-corr_01.ttp");
-//    final TTP1Instance ttp = new TTP1Instance("u574-ttp/u574_n573_bounded-strongly-corr_01.ttp");
-//    final TTP1Instance ttp = new TTP1Instance("rl11849-ttp/rl11849_n11848_uncorr_07.ttp");
-    final TTP1Instance ttp = new TTP1Instance("a280-ttp/a280_n279_bounded-strongly-corr_01.ttp");
-
-    Deb.echo(ttp);
-    Deb.echo("------------------");
-    Constructive construct = new Constructive(ttp);
-    Initialization init = new Initialization(ttp);
-
-    Deb.echo("ok 1");
-    // parent 1
-    TTPSolution p1 = construct.generate("rz");
-    //p1.setTour(init.tsp2opt(p1.getTour()));
-    p1.setTour(init.qBoruvka());
-    ttp.objective(p1);
-    Deb.echo("ok 2");
-
-    // parent 2
-    TTPSolution p2 = construct.generate("rz");
-    p2.setTour(init.tsp2opt(p2.getTour()));
-    ttp.objective(p2);
-    Deb.echo("ok 3");
-
-    // resulting child
-    //Deb.echo(p1.getTour());
-    Deb.echo("OBJ: " + p1.ob);
-    //Deb.echo(p2.getTour());
-    Deb.echo("OBJ: " + p2.ob);
-    Deb.echo("ok 4");
-
-    TTPSolution c1 = EdgeRecombination.ERX(p1, p2);
-    Deb.echo("ok 5");
-    c1.setTour(init.tsp2opt(c1.getTour()));
-    ttp.objective(c1);
-    Deb.echo("OBJ: " + c1.ob);
-    Deb.echo("ok 6");
-    //PartitionCrossover.PX(p1, p2);
-
-  }
 
 
 
@@ -161,7 +118,7 @@ public class TestEvo {
         long exTime;
         startTime = System.currentTimeMillis();
 
-        TTPSolution c1 = EdgeRecombination.ERX(p1, p2);
+        int[] ct1 = EdgeRecombination.ERX(p1.getTour(), p2.getPickingPlan());
 
         stopTime = System.currentTimeMillis();
         exTime = stopTime - startTime;
@@ -174,7 +131,6 @@ public class TestEvo {
 
 
   public static void main(String[] args) {
-    //test_runtime_of_ERX_on_large_TTP();
-    main5();
+    test_runtime_of_ERX_on_large_TTP();
   }
 }

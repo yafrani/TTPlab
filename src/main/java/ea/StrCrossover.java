@@ -15,7 +15,7 @@ public class StrCrossover {
       c[i] = s1[i];
     }
     for (int i=cp;i<s1.length; i++) {
-      c[i] = s1[i];
+      c[i] = s2[i];
     }
 
     return c;

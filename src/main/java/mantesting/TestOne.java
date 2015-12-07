@@ -37,7 +37,7 @@ public class TestOne {
 //    algo.setTTP(ttp);
 //    algo.firstfit();
 //    algo.debug();
-    final Evolution evalgo = new EvoTTP(ttp);
+    final Evolution evalgo = new EvoERSP(ttp);
     evalgo.debug();
 
     /* execute */

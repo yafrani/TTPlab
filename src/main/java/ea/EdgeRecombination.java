@@ -35,12 +35,14 @@ public class EdgeRecombination {
     }
   }
 
-  // partition crossover
-  public static TTPSolution ERX(TTPSolution p1, TTPSolution p2) {
+
+  // Edge Recombination Crossover
+  // applied to tour independently of the picking plan
+  public static int[] ERX(int[] pt1, int[] pt2) {
 
     //TTPSolution c1 = p1.clone(), c2 = p2.clone();
-    int[] pt1 = p1.getTour();
-    int[] pt2 = p2.getTour();
+//    int[] pt1 = p1.getTour();
+//    int[] pt2 = p2.getTour();
     int nbCities = pt1.length;
 
     //------------------------
@@ -150,7 +152,7 @@ public class EdgeRecombination {
 //    Deb.echo("OK? "+ts.size()+" / "+(ts.size()==nbCities));
     //==================================
 
-    return new TTPSolution(ct1, p1.getPickingPlan());
+    return ct1;
   }
 
 
