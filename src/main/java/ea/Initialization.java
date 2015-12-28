@@ -18,8 +18,10 @@ import java.util.*;
 public class Initialization extends TTPHeuristic {
 
   protected HashSet<Integer>[] candidates;
-  public Initialization() {
 
+  public Initialization() {
+    // generate Delaunay triangulation
+    candidates = GraphHelper.delaunayKNN(ttp, 5);
   }
 
   public Initialization(TTP1Instance ttp) {
@@ -97,7 +99,6 @@ public class Initialization extends TTPHeuristic {
     }
     return tour;
   }
-
 
 
   /**
@@ -179,12 +180,11 @@ public class Initialization extends TTPHeuristic {
   }
 
 
-
   /**
-   * Quick boruvka tour
-   * + 1 kick using CLK
+   * random tour
+   * + 1 kick using LK
    */
-  public int[] qBoruvka() {
+  public int[] rlinkern() {
 
     int nbCities = ttp.getNbCities();
     int[] tour = new int[nbCities];
@@ -194,7 +194,7 @@ public class Initialization extends TTPHeuristic {
     try {
 
       // execute linkern program
-      String[] cmd = {"./bins/linkern/qboruvka.sh", fileName};
+      String[] cmd = {"./bins/linkern/rlinkern.sh", fileName};
       Runtime runtime = Runtime.getRuntime();
       Process proc = runtime.exec(cmd);
 
@@ -218,7 +218,6 @@ public class Initialization extends TTPHeuristic {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-
 
     return tour;
   }

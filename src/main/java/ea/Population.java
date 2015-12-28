@@ -31,11 +31,10 @@ public class Population extends TTPHeuristic {
   }
 
 
-
   // fittest solution
   public TTPSolution fittest() {
     TTPSolution fittest = sol[0];
-    for (int i=1; i< Evolution.TOURNAMENT_SIZE; i++) {
+    for (int i=1; i< sol.length; i++) {
       if (sol[i].ob > fittest.ob) {
         fittest = sol[i];
       }
@@ -43,14 +42,16 @@ public class Population extends TTPHeuristic {
     return fittest;
   }
 
+
   // fittest solution's index
   public int fittestIndex() {
     int fittest_idx = 0;
-    for (int i=1; i< Evolution.TOURNAMENT_SIZE; i++) {
+    for (int i=1; i< sol.length; i++) {
       if (sol[i].ob > sol[fittest_idx].ob) {
         fittest_idx = i;
       }
     }
     return fittest_idx;
   }
+
 }

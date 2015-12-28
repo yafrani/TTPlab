@@ -39,8 +39,9 @@ public abstract class LocalSearch extends SearchHeuristic {
   public LocalSearch(TTP1Instance ttp) {
     super(ttp);
     // generate Delaunay triangulation
-    candidates = GraphHelper.delaunayKNN(ttp,10);
-    //candidates = GraphHelper.delaunay(ttp);
+//    candidates = GraphHelper.delaunayKNN(ttp,10);
+    candidates = GraphHelper.delaunay(ttp);
+    Deb.echo("delaunay OK");
   }
   
 
@@ -48,8 +49,8 @@ public abstract class LocalSearch extends SearchHeuristic {
   public void setTTP(TTP1Instance ttp) {
     super.setTTP(ttp);
     // generate Delaunay triangulation
-   candidates = GraphHelper.delaunay(ttp);
 //    candidates = GraphHelper.delaunayKNN(ttp,5);
+   candidates = GraphHelper.delaunay(ttp);
   }
 
   /**
@@ -653,7 +654,7 @@ public abstract class LocalSearch extends SearchHeuristic {
         }
       }
 
-    } while (improved && nbIter<maxIterTSKP);
+    } while (improved && nbIter<maxIterKRP);
 
     Deb.echo("==> bitflip :" + nbIter + " iterations");
 

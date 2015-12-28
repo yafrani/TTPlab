@@ -15,8 +15,6 @@ public class PartitionCrossover {
 
   /**
    * Neighbors list element
-   *
-   * Created by kyu on 10/25/15.
    */
   public static class Neighbors {
 
@@ -49,118 +47,6 @@ public class PartitionCrossover {
             " %3d"+(R2c?"*":" ")+" ",
           L1,R1,L2,R2);
     }
-  }
-
-
-  /**
-   * 2-opt search
-   *
-   * deal with the TSKP sub-problem
-   * 2-opt heuristic with Delaunay candidate generator
-   */
-  public static TTPSolution ls2opt1(TTPSolution sol, TTP1Instance ttp) {
-
-    // TTP data
-    int nbCities = ttp.getNbCities();
-    double maxSpeed = ttp.getMaxSpeed();
-    double minSpeed = ttp.getMinSpeed();
-    long capacity = ttp.getCapacity();
-    double C = (maxSpeed - minSpeed) / capacity;
-
-    // initial solution data
-    int[] tour;
-
-    // delta parameters
-    double deltaT;
-
-    // improvement indicator
-    boolean improved;
-
-    // best solution
-    ttp.objective(sol);
-    int iBest=0, jBest=0;
-    double ftBest = sol.ft;
-
-    // neighbor solution
-    double ft;
-    long wc;
-    int i, j, c1, c2, q;
-    int nbIter = 0;
-
-    // Delaunay triangulation
-    HashSet<Integer>[] candidates = GraphHelper.delaunay(ttp);
-
-    // current tour
-    tour = sol.getTour();
-
-
-
-
-    // search
-    do {
-    improved = false;
-    nbIter++;
-
-    // cleanup and stop execution if interrupted
-
-    // fast 2-opt
-    for (i = 1; i < nbCities - 1; i++) {
-      int node1 = tour[i] - 1;
-      for (int node2 : candidates[node1]) {
-        j = sol.mapCI[node2];
-
-        // calculate final time with partial delta
-        ft = sol.ft;
-        wc = i - 2 < 0 ? 0 : sol.weightAcc[i - 2]; // fix index...
-        deltaT = 0;
-        for (q = i - 1; q <= j; q++) {
-
-          wc += TwoOptHelper.get2optValue(q, sol.weightRec, i, j);
-          c1 = TwoOptHelper.get2optValue(q, tour, i, j) - 1;
-          c2 = TwoOptHelper.get2optValue((q + 1) % nbCities, tour, i, j) - 1;
-
-          deltaT += -sol.timeRec[q] + ttp.distFor(c1,c2) / (maxSpeed - wc * C);
-        }
-
-        // retrieve neighbor's final time
-        ft = ft + deltaT;
-
-        // update best
-        if (ft < ftBest) { // soft condition
-          iBest = i;
-          jBest = j;
-          ftBest = ft;
-          improved = true;
-
-        }
-
-      } // END FOR j
-    } // END FOR i
-
-
-    //===================================
-    // update if improvement
-    //===================================
-    if (improved) {
-
-      // apply 2-opt move
-      TwoOptHelper.do2opt(tour, iBest, jBest);
-
-      // evaluate & update vectors
-      ttp.objective(sol);
-    }
-
-    // debug msg
-    Deb.echo(">> TSKP " + nbIter +
-      ": ob=" + String.format("%.0f", sol.ob) +
-      " | ft=" + String.format("%.0f", sol.ft));
-    } while (improved);
-
-
-    // in order to compute sol.timeAcc
-    // we need to use objective function
-    ttp.objective(sol);
-    return sol;
   }
 
 

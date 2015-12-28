@@ -7,14 +7,14 @@ repositories {
     mavenCentral()
 }
 
-//jar {
-//    baseName = 'ttp-solver'
-//    version =  '0.1.0'
-//}
-//
-//task wrapper(type: Wrapper) {
-//    gradleVersion = '2.0'
-//}
+jar {
+    baseName = 'ttp-solver'
+    version =  '0.1.0'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
 
 jar {
     manifest {
