@@ -7,15 +7,15 @@ import utils.Deb;
 import utils.Quicksort;
 
 /**
- * Created by kyu on 10/25/15.
+ * Created by kyu on 12/29/15.
  */
-public class EvoMPUX extends Evolution {
+public class EvoMPUXv2 extends Evolution {
 
-  public EvoMPUX() {
+  public EvoMPUXv2() {
     super();
   }
 
-  public EvoMPUX(TTP1Instance ttp) {
+  public EvoMPUXv2(TTP1Instance ttp) {
     super(ttp);
   }
 
@@ -40,15 +40,12 @@ public class EvoMPUX extends Evolution {
 
     // population
     pop = new Population(Evolution.POP_SIZE);
-    Population offspring = new Population(selectSize);
+    Population offpop = new Population(selectSize);
+    int offpopSize;
 
     // use local search
     LocalSearch ls = new CS2SA(ttp);
-    ls.firstfit();
 
-    // reduce LS time
-    ls.maxIterTSKP = 30;
-    ls.maxIterKRP = 30;
 
     // initialize one using LK
     pop.sol[0] = new TTPSolution(
@@ -67,20 +64,29 @@ public class EvoMPUX extends Evolution {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-
-      Deb.echo("> "+i+", tour initialized !");
+      Deb.echo("> " + i + ", tour initialized !");
     }
+
+    // reduce LS time
+    ls.maxIterTSKP = 10;
+    ls.maxIterKRP = 400;
+    ls.firstfit();
 
     // apply LS for all
     for (int i=0; i<POP_SIZE; i++) {
+      Deb.echo("  MAX: "+ls.maxIterKRP);
       // 2-opt heuristic on TSKP
       pop.sol[i] = ls.fast2opt(pop.sol[i]);
       // initialize pp
       pop.sol[i] = ls.insertAndEliminate(pop.sol[i]);
+
       // simple bit-flip on KRP
-      // todo cancel this ?
-      //pop.sol[i] = ls.lsBitFlip(pop.sol[i]);
-      Deb.echo("> "+i+", pick plan initialized !");
+      // cancel this ?
+      pop.sol[i] = ls.lsBitFlip(pop.sol[i]);
+      Deb.echo("> "+i+", pick plan initialized ! >> "+pop.sol[i].ob);
+
+      ls.maxIterKRP -= 80;
+      if (ls.maxIterKRP < 10) ls.maxIterKRP = 10;
     }
 
     Deb.echo("Initialization done !");
@@ -93,9 +99,10 @@ public class EvoMPUX extends Evolution {
     int nbGen = 0;
     int nbIdleSteps = 0;
     // max iteration in LS
-    // todo depends on problem size (#items and #cities) ??
-    ls.maxIterTSKP = 50;
+    // todo depends on problem size (#items and #cities) !! #must_try
+    ls.maxIterTSKP = 10;
     ls.maxIterKRP = 10;
+    //ls.bestfit();
     do {
       nbGen++;
       nbIdleSteps++;
@@ -109,30 +116,50 @@ public class EvoMPUX extends Evolution {
       qs.sort();
       int[] idx = qs.getIndices();
 
+//      Deb.echo("B: "+pop.sol[0].ob);
+//      pop.sol[0] = ls.fast2opt(pop.sol[0]);
+//      pop.sol[0] = ls.lsBitFlip(pop.sol[0]);
+//      Deb.echo("A: "+pop.sol[0].ob);
+
       // DEBUG PRINT
       for (int u=0; u<Evolution.POP_SIZE; u++) Deb.echo(">> "+u+" >> "+pop.sol[idx[u]].ob);
-//      if (true)return null;
+
 
       int j = POP_SIZE-1;
+      offpopSize = 0;
 
-      // Crossover & LS some selected solutions
+      // Crossover, mutate, and LS some selected solutions
       for (int i = 0; i < selectSize; i++) {
 
-        // Select parents
+        /* Select parents */
         TTPSolution[] p = Selection.tournament(pop);
 
-        // Crossover parents
+        /* Crossover parents */
         TTPSolution c = MPUX.crossover(p[0], p[1], ttp);
         ttp.objective(c);
 
-        // Apply local search
+        // TODO use mutation !!?
+        // mutate offspring depending
+        // on some very small probability
+        double mp = Math.random();
+        if (mp < MUTATION_RATE) {
+          Deb.echo("APPLY MUTATION");
+          int[] x = Mutation.doubleBridge(c.getTour());
+          c.setTour(x);
+          ttp.objective(c);
+        }
+
+        /* Apply local search */
         double lsp = Math.random();
         if (lsp < LS_RATE) {
+          Deb.echo("APPLY LS");
           c = ls.fast2opt(c);
           c = ls.lsBitFlip(c);
         }
 
-        // check if it is identical
+
+        /* add to offspring population */
+        // check if already in offpop
         boolean identical = false;
         for (int k = 0; k < POP_SIZE; k++) {
           // either tour or picking plan is identical
@@ -142,11 +169,10 @@ public class EvoMPUX extends Evolution {
           }
         }
 
-        // if not identical solutions
+        // if not existent
         if (!identical) {
-          //..?
-          // replace worst solutions
-          pop.sol[idx[j--]] = c;
+          // add to offspring population
+          offpop.sol[offpopSize++] = c;
         }
         // use mutation to eliminate premature convergence
         else {
@@ -156,7 +182,7 @@ public class EvoMPUX extends Evolution {
             int[] x = Mutation.doubleBridge(p[0].getTour());
             p[0].setTour(x);
             ttp.objective(p[0]);
-            // apply LS
+            // apply LS?
 //            p[0] = ls.fast2opt(p[0]);
 //            p[0] = ls.lsBitFlip(p[0]);
           }
@@ -165,16 +191,35 @@ public class EvoMPUX extends Evolution {
             int[] x = Mutation.doubleBridge(p[1].getTour());
             p[1].setTour(x);
             ttp.objective(p[1]);
-            // apply LS
+            // apply LS?
 //            p[1] = ls.fast2opt(p[1]);
 //            p[1] = ls.lsBitFlip(p[1]);
           }
         }
+      }
 
-        // TODO use mutation !!?
-        // TODO or explore somehow...
-        // mutate offspring depending
-        // on some very small probability
+      // Add offspring to population
+      for (int i=0; i<offpopSize; i++) {
+        TTPSolution c = offpop.sol[i];
+//        // check if it is identical
+//        boolean identical = false;
+//        for (int k = 0; k < POP_SIZE; k++) {
+//          // either tour or picking plan is identical
+//          if (pop.sol[k].ob == c.ob) {
+//            identical = true;
+//            break;
+//          }
+//        }
+//        // if not identical solutions
+//        if (!identical) {
+          // replace worst solutions
+        pop.sol[idx[j--]] = c;
+//        }
+//        // use mutation to eliminate premature convergence
+//        else {
+//          Deb.echo("XXX-IDENTICAL: " + c.ob);
+//        }
+
       }
 
       TTPSolution fittest = pop.fittest();

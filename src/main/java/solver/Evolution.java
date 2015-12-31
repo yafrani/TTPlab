@@ -17,17 +17,17 @@ public abstract class Evolution extends SearchHeuristic {
     super(ttp);
   }
 
-  public static final int MAX_GEN = 10000;
+  public static final int MAX_GEN = 100000; // basically doesn't matter much...
   public static final int MAX_IDLE_STEPS = 5000;
 
   // GA params
   public static final double MUTATION_RATE = .1;
-  public static final double SELECTION_RATE = .75;
-  public static final int POP_SIZE = 20;
+  public static final double SELECTION_RATE = .75; // .50 | .80 | .85 | .60
+  public static final int POP_SIZE = 20; // 30, 40, ..
   public static final int TOURNAMENT_SIZE = 5;
 
   // MA params
-  public static final double LS_RATE = .2;
+  public static final double LS_RATE = .2; // .1
 
   Population pop;
 

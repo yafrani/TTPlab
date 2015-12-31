@@ -11,7 +11,6 @@ import ttp.TTPSolution;
  */
 public abstract class SearchHeuristic extends TTPHeuristic {
 
-  protected int maxIterCS = Integer.MAX_VALUE;
   protected int maxIterTSKP = Integer.MAX_VALUE;
   protected int maxIterKRP = Integer.MAX_VALUE;
 

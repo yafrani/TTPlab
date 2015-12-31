@@ -45,7 +45,8 @@ public class CS2B extends LocalSearch {
     // improvement tag
     boolean improved;
 
-
+    maxIterTSKP=40;
+    maxIterKRP=40;
     // start cosolver search
     do {
       nbIter++;

@@ -43,7 +43,7 @@ public class TTPPaperTests {
   static final String[] instFolders = {
 //    // small
 //    "eil76-ttp",
-    "kroA100-ttp",
+//    "kroA100-ttp",
 //    "ch130-ttp",
 //    "u159-ttp",
 //    "a280-ttp",
@@ -54,24 +54,24 @@ public class TTPPaperTests {
 //    "rl1304-ttp",
 //    "fl1577-ttp",
 //    "d2103-ttp",
-//    "pcb3038-ttp",
-//    "fnl4461-ttp",
-//    "pla7397-ttp",
-//    // large
-//    "rl11849-ttp",
-//    "usa13509-ttp",
-//    "brd14051-ttp",
-//    "d15112-ttp",
-//    "d18512-ttp",
-//    "pla33810-ttp",
+    "pcb3038-ttp",
+    "fnl4461-ttp",
+    "pla7397-ttp",
+    // large
+    "rl11849-ttp",
+    "usa13509-ttp",
+    "brd14051-ttp",
+    "d15112-ttp",
+    "d18512-ttp",
+    "pla33810-ttp",
 //    "pla85900-ttp",
   };
 
 
   static final String[] KPTypes = {
 //    "uncorr",
-//    "uncorr-similar-weights",
-    "bounded-strongly-corr",
+    "uncorr-similar-weights",
+//    "bounded-strongly-corr",
   };
   
   
@@ -102,7 +102,9 @@ public class TTPPaperTests {
     
     
     /* algorithm settings */
-    final LocalSearch algo = new CS2SA();
+//    final LocalSearch algo = new CS2SA();
+    final Evolution algo = new EvoMPUX();
+
     //algo.firstfit();
 //    algo.noDebug();
     algo.noLog();
@@ -152,7 +154,7 @@ public class TTPPaperTests {
               ttp.objective(s0);
               
               /* algorithm setting */
-              algo.setS0(s0);
+              //algo.setS0(s0);
               algo.setTTP(ttp);
 
               

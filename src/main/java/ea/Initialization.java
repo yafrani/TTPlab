@@ -191,10 +191,21 @@ public class Initialization extends TTPHeuristic {
 
     String fileName = ttp.getName().replaceAll("-.+", "");
 
-    try {
+    // number of LK kicks
+    int nbKicks = 1;
+    if (nbCities>100)
+      nbKicks = 10;
+    if (nbCities>1000)
+      nbKicks = 50;
+    if (nbCities>10000)
+      nbKicks = 100;
+    // ...
 
+    Deb.echo("nb LK kicks: "+nbKicks);
+
+    try {
       // execute linkern program
-      String[] cmd = {"./bins/linkern/rlinkern.sh", fileName};
+      String[] cmd = {"./bins/linkern/rlinkern.sh", fileName, ""+nbKicks};
       Runtime runtime = Runtime.getRuntime();
       Process proc = runtime.exec(cmd);
 
