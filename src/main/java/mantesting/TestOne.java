@@ -18,6 +18,7 @@ public class TestOne {
 
     String[] inst = {
 //      "my-ttp/sample10.ttp",
+//      "bier127-ttp/bier127_n1260_bounded-strongly-corr_01.ttp",
 
       //===========================================
       // ITEM FACTOR = 1
@@ -63,7 +64,7 @@ public class TestOne {
 //      "rl11849-ttp/rl11849_n59240_uncorr-similar-weights_05.ttp",
 //      "usa13509-ttp/usa13509_n67540_uncorr-similar-weights_05.ttp",
 //      "brd14051-ttp/brd14051_n70250_uncorr-similar-weights_05.ttp",
-      "d15112-ttp/d15112_n75555_uncorr-similar-weights_05.ttp",
+//      "d15112-ttp/d15112_n75555_uncorr-similar-weights_05.ttp",
 //      "d18512-ttp/d18512_n92555_uncorr-similar-weights_05.ttp",
 //      "pla33810-ttp/pla33810_n169045_uncorr-similar-weights_05.ttp",
 
@@ -80,17 +81,16 @@ public class TestOne {
 //      "dsj1000-ttp/dsj1000_n9990_uncorr_10.ttp",
 //      "rl1304-ttp/rl1304_n13030_uncorr_10.ttp",
 //      "fl1577-ttp/fl1577_n15760_uncorr_10.ttp",
-      "d2103-ttp/d2103_n21020_uncorr_10.ttp",
-      "pcb3038-ttp/pcb3038_n30370_uncorr_10.ttp",
-      "fnl4461-ttp/fnl4461_n44600_uncorr_10.ttp",
-      "pla7397-ttp/pla7397_n73960_uncorr_10.ttp",
-      "rl11849-ttp/rl11849_n118480_uncorr_10.ttp",
-      "usa13509-ttp/usa13509_n135080_uncorr_10.ttp",
-      "brd14051-ttp/brd14051_n140500_uncorr_10.ttp",
-      "d15112-ttp/d15112_n151110_uncorr_10.ttp",
-      "d18512-ttp/d18512_n185110_uncorr_10.ttp",
+//      "d2103-ttp/d2103_n21020_uncorr_10.ttp",
+//      "pcb3038-ttp/pcb3038_n30370_uncorr_10.ttp",
+//      "fnl4461-ttp/fnl4461_n44600_uncorr_10.ttp",
+//      "pla7397-ttp/pla7397_n73960_uncorr_10.ttp",
+//      "rl11849-ttp/rl11849_n118480_uncorr_10.ttp",
+//      "usa13509-ttp/usa13509_n135080_uncorr_10.ttp",
+//      "brd14051-ttp/brd14051_n140500_uncorr_10.ttp",
+//      "d15112-ttp/d15112_n151110_uncorr_10.ttp",
+//      "d18512-ttp/d18512_n185110_uncorr_10.ttp",
       "pla33810-ttp/pla33810_n338090_uncorr_10.ttp",
-
 
       // VL inst.
       "pla85900-ttp/pla85900_n85899_bounded-strongly-corr_01.ttp",
@@ -104,11 +104,7 @@ public class TestOne {
     Deb.echo("------------------");
 
     /* algorithm */
-//    final LocalSearch algo = new CS2B();
-//    algo.setTTP(ttp);
-//    algo.firstfit();
-//    algo.debug();
-    final SearchHeuristic evalgo = new CS2B(ttp);//EvoMPUXv2(ttp);
+    final SearchHeuristic evalgo = new EvoMPUXv2(ttp);
     evalgo.debug();
 
     /* execute */
@@ -120,7 +116,6 @@ public class TestOne {
         long exTime;
         startTime = System.currentTimeMillis();
         TTPSolution sx = evalgo.search();
-//        TTPSolution sx = algo.search();
         stopTime = System.currentTimeMillis();
         exTime = stopTime - startTime;
 

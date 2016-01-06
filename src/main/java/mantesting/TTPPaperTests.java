@@ -70,8 +70,8 @@ public class TTPPaperTests {
 
   static final String[] KPTypes = {
 //    "uncorr",
-    "uncorr-similar-weights",
-//    "bounded-strongly-corr",
+//    "uncorr-similar-weights",
+    "bounded-strongly-corr",
   };
   
   

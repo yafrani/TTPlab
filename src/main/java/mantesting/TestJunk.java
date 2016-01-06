@@ -13,6 +13,24 @@ import utils.TwoOptHelper;
 public class TestJunk {
 
 
+  public static void main(String[] s) {
+    double lsRate = .001;
+    int c=1;
+    do {
+      Deb.echo(c+": "+lsRate);
+      lsRate = lsRate/.95;
+      c++;
+    } while (lsRate<1);
+  }
+
+
+
+
+
+
+
+
+
   public static void mainxx(String[] args) {
 
     String inst = "berlin52-ttp/berlin52_n153_bounded-strongly-corr_10.ttp";
@@ -92,7 +110,7 @@ public class TestJunk {
 
 
 
-  public static void main(String[] args) {
+  public static void mainxxx(String[] args) {
     final TTP1Instance ttp = new TTP1Instance("berlin52-ttp/berlin52_n51_bounded-strongly-corr_01.ttp");
     Deb.echo(ttp);
     int[] A = ttp.getAvailability();

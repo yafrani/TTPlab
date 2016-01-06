@@ -1,6 +1,9 @@
 package ea;
 
 import solver.Evolution;
+import ttp.TTP1Instance;
+import ttp.TTPInstance;
+import ttp.TTPSolution;
 import utils.Deb;
 import utils.RandGen;
 
@@ -81,5 +84,23 @@ public class Mutation {
     return newsol;
   }
 
+
+  public static TTPSolution randomFlips(TTPSolution sol, double strength, TTP1Instance ttp) {
+    TTPSolution copy = sol.clone();
+    int[] pp = sol.getPickingPlan();
+    int[] A = ttp.getAvailability();
+    int nbBits = (int)strength * pp.length;
+    int r;
+    for (int i=0; i<nbBits; i++) {
+      r = RandGen.randInt(0,pp.length-1);
+      pp[r] = pp[r] != 0 ? 0 : A[r];
+    }
+    ttp.objective(sol);
+    if (sol.wend<0) {
+      Deb.echo("BIG PROBLEM ! STOP MUTATION, RECOVER SAVED COPY...");
+      sol = copy;
+    }
+    return sol;
+  }
 
 }

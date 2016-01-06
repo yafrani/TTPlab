@@ -45,8 +45,7 @@ public class CS2B extends LocalSearch {
     // improvement tag
     boolean improved;
 
-    maxIterTSKP=40;
-    maxIterKRP=40;
+
     // start cosolver search
     do {
       nbIter++;
@@ -70,7 +69,7 @@ public class CS2B extends LocalSearch {
       // debug msg
       if (this.debug) {
         Deb.echo("Best "+nbIter+":");
-        Deb.echo(sol);
+        //Deb.echo(sol);
         Deb.echo("ob-best: "+sol.ob);
         Deb.echo("wend   : "+sol.wend);
         Deb.echo("---");

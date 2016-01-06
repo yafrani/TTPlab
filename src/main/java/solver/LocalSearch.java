@@ -82,6 +82,119 @@ public abstract class LocalSearch extends SearchHeuristic {
    *
    * base on the item insertion heuristic in MATLS
    * described in "improving efficiency of heuristics..."
+   *
+   * uses only delta_1 and delta_2 approximations
+   * in order to limit the number of inserted items
+   */
+  public TTPSolution insertT2(TTPSolution sol) {
+
+    // TTP data
+    int nbCities = ttp.getNbCities();
+    int nbItems = ttp.getNbItems();
+    long[][] D = ttp.getDist();
+    int[] A = ttp.getAvailability();
+    double maxSpeed = ttp.getMaxSpeed();
+    double minSpeed = ttp.getMinSpeed();
+    long capacity = ttp.getCapacity();
+    double C = (maxSpeed - minSpeed) / capacity;
+    double R = ttp.getRent();
+
+    // initial solution data
+    int[] tour = sol.getTour();
+    int[] pickingPlan = sol.getPickingPlan();
+
+    // neighbor solution
+    int origBF;
+    int i, k, itr;
+
+    // distances of all tour cities (city -> end)
+    long[] L = new long[nbCities];
+    // current weight
+    long wCurr;
+    // time approximations
+    double t1, t2, t3, a, b1, b2;
+
+    // store `distance to end` of each tour city
+    L[nbCities - 1] = ttp.distFor(tour[nbCities - 1] - 1, 0);
+    for (i = nbCities - 2; i >= 0; i--) {
+      L[i] = L[i + 1] + ttp.distFor(tour[i + 1] - 1, tour[i] - 1);
+    }
+
+    // sort item according to score
+    Double[] scores = new Double[nbItems];
+    int[] insertedItems = new int[nbItems];
+
+    for (k = 0; k < nbItems; k++) {
+      // index where Bit-Flip happened
+      origBF = sol.mapCI[A[k] - 1];
+      // calculate time approximations
+      t1 = L[origBF] * (1 / (maxSpeed - C * ttp.weightOf(k)) - 1 / maxSpeed);
+      // affect score to item
+      scores[k] = (ttp.profitOf(k) - R * t1) / ttp.weightOf(k);
+      // empty the knapsack
+      pickingPlan[k] = 0;
+    }
+
+    // evaluate solution after emptying knapsack
+    ttp.objective(sol);
+
+    // sort items according to score
+    Quicksort<Double> qs = new Quicksort<>(scores);
+    qs.sort();
+    int[] sortedItems = qs.getIndices();
+
+    // loop & insert items
+    int nbInserts = 0;
+    wCurr = 0;
+    int v2 = 0, v3 = 0;
+    for (itr = 0; itr < nbItems; itr++) {
+
+      k = sortedItems[itr];
+
+      // check if new weight doesn't exceed knapsack capacity
+      if (wCurr + ttp.weightOf(k) > capacity) {
+        continue;
+      }
+
+      // index where Bit-Flip happened
+      origBF = sol.mapCI[A[k] - 1];
+
+      /* insert item if it has a potential gain */
+      // time approximations t2 (worst-case time)
+      t2 = L[origBF] * (1 / (maxSpeed - C * (wCurr + ttp.weightOf(k))) - 1 / (maxSpeed - C * wCurr));
+      if (ttp.profitOf(k) > R * t2) {
+        v2++;
+        pickingPlan[k] = A[k];
+        wCurr += ttp.weightOf(k);
+        insertedItems[nbInserts++] = k;
+      }
+    } // END FOR k
+
+    // evaluate solution & update vectors
+    ttp.objective(sol);
+
+    // debug msg
+    this.debug = true;
+    if (this.debug) {
+      Deb.echo(">> item insertion: best=" + sol.ob);
+      Deb.echo("   wend: " + sol.wend);
+
+      Deb.echo("==> nb t2: " + v2 + " | nb t3: " + v3);
+      Deb.echo("==> nb inserted: " + nbInserts + "/" + nbItems + "(" +
+        String.format("%.2f", (nbInserts * 100.0) / nbItems) + "%)");
+      Deb.echo("==> w_curr: " + wCurr);
+    }
+    this.debug = false;
+
+    return sol;
+  }
+
+
+  /**
+   * KP pre-processing
+   *
+   * base on the item insertion heuristic in MATLS
+   * described in "improving efficiency of heuristics..."
    */
   public TTPSolution insertAndEliminate(TTPSolution sol) {
 
@@ -159,7 +272,8 @@ public abstract class LocalSearch extends SearchHeuristic {
       /* insert item if it has a potential gain */
       // time approximations t2 (worst-case time)
       t2 = L[origBF] * (1/(maxSpeed-C*(wCurr+ttp.weightOf(k))) - 1/(maxSpeed-C*wCurr));
-      if (ttp.profitOf(k) > R*t2) {v2++;
+      if (ttp.profitOf(k) > R*t2) {
+        v2++;
         pickingPlan[k] = A[k];
         wCurr += ttp.weightOf(k);
         insertedItems[nbInserts++] = k;
@@ -195,8 +309,6 @@ public abstract class LocalSearch extends SearchHeuristic {
         String.format("%.2f", (nbInserts * 100.0) / nbItems)+"%)");
       Deb.echo("==> w_curr: "+wCurr);
     }
-
-
 
     if (nbItems > 100000 || nbCities > 50000) return sol;
 
@@ -709,6 +821,7 @@ public abstract class LocalSearch extends SearchHeuristic {
     double T = 100.0;
     double alpha = .95;
     double trialFactor;
+
     if (nbItems < 500)
       trialFactor = 1000;
     else if (nbItems < 1000)
