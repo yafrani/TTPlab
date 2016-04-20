@@ -40,12 +40,16 @@ public class CS2SA extends LocalSearch {
     );
     // pre-process the knapsack
     // insert and eliminate items
-    s0 = insertAndEliminate(s0);
+
+    if (ttp.getNbCities() < 30000) s0 = insertAndEliminate(s0);
+    else s0 = insertT2(s0);
+
+    ttp.objective(s0);
+    Deb.echo("STARTING SOL >> "+s0.ob);
     //===============================================
 
     // copy initial solution into improved solution
     TTPSolution sol = s0.clone();
-
 
     // best found
     double GBest = sol.ob;

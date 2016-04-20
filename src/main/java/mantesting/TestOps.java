@@ -2,7 +2,7 @@ package mantesting;
 
 import ea.ERX2;
 import ea.Initialization;
-import ea.MPUX;
+import ea.MPX2;
 import ea.Mutation;
 import solver.Constructive;
 import ttp.TTP1Instance;
@@ -17,6 +17,11 @@ import java.util.concurrent.Future;
  * Created by kyu on 11/3/15.
  */
 public class TestOps {
+
+
+
+
+
 
   final static TTP1Instance ttp = new TTP1Instance("my-ttp/sample10.ttp");
 //  final static TTP1Instance ttp = new TTP1Instance("berlin52-ttp/berlin52_n51_bounded-strongly-corr_01.ttp");
@@ -50,7 +55,7 @@ public class TestOps {
     Deb.echo(p2.getTour());
     Deb.echo(p2.getPickingPlan());
 
-    TTPSolution c = MPUX.crossover(p1, p2, ttp);
+    TTPSolution c = MPX2.crossover(p1, p2, ttp);
     Deb.echo(c.getTour());
     Deb.echo(c.getPickingPlan());
 
@@ -121,4 +126,23 @@ public class TestOps {
   public static void main(String[] args) {
     test_crossover();
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

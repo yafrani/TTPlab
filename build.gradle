@@ -8,8 +8,8 @@ repositories {
 }
 
 jar {
-    baseName = 'ttp-solver'
-    version =  '0.1.0'
+    baseName = 'ttplab'
+    version =  '1.1'
 }
 
 task wrapper(type: Wrapper) {
@@ -18,7 +18,7 @@ task wrapper(type: Wrapper) {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'mantesting.TestCLI'
+        attributes 'Main-Class': 'mantesting.CLI'
     }
 }
 

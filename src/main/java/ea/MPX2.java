@@ -11,7 +11,7 @@ import java.util.TreeSet;
 /**
  * Created by kyu on 12/24/15.
  */
-public class MPUX {
+public class MPX2 {
 
   // maximal preservative tour
   // uniform picking plan
@@ -32,6 +32,9 @@ public class MPUX {
     int[] ct1 = new int[nbCities];
     //int[] c2 = new Tour(nbCities);
 
+    /*==================================
+     * PART I: tour
+     *==================================*/
     // generate 2 crossover cut points
     Random gen = new Random();
     int pos1, pos2;
@@ -97,6 +100,14 @@ public class MPUX {
 //    //==================================
 
 
+//    // no pick plan crossover...
+//    TTPSolution sol1 = new TTPSolution(ct1, pp1.clone());
+//    if (true) return sol1;
+
+
+    /*==================================
+     * PART II: pick plan
+     *==================================*/
     // fill cpp1 with bits according to cities
     // j is item ID
     // i is city ID
@@ -146,4 +157,5 @@ public class MPUX {
 
     return sol;
   }
+
 }

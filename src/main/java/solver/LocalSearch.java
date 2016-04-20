@@ -41,7 +41,8 @@ public abstract class LocalSearch extends SearchHeuristic {
     // generate Delaunay triangulation
 //    candidates = GraphHelper.delaunayKNN(ttp,10);
     candidates = GraphHelper.delaunay(ttp);
-    Deb.echo("delaunay OK");
+
+    if (debug) Deb.echo("Delaunay triangulation: OK");
   }
   
 
@@ -174,7 +175,6 @@ public abstract class LocalSearch extends SearchHeuristic {
     ttp.objective(sol);
 
     // debug msg
-    this.debug = true;
     if (this.debug) {
       Deb.echo(">> item insertion: best=" + sol.ob);
       Deb.echo("   wend: " + sol.wend);
@@ -184,7 +184,6 @@ public abstract class LocalSearch extends SearchHeuristic {
         String.format("%.2f", (nbInserts * 100.0) / nbItems) + "%)");
       Deb.echo("==> w_curr: " + wCurr);
     }
-    this.debug = false;
 
     return sol;
   }
@@ -498,11 +497,12 @@ public abstract class LocalSearch extends SearchHeuristic {
 
     } while (improved && nbIter<maxIterTSKP);
 
-    Deb.echo("==> 2-opt :" + nbIter + " iterations");
+    if (debug) Deb.echo("==> 2-opt :" + nbIter + " iterations");
 
     // in order to compute sol.timeAcc
     // we need to use objective function
     ttp.objective(sol);
+
     return sol;
   }
 
@@ -768,7 +768,7 @@ public abstract class LocalSearch extends SearchHeuristic {
 
     } while (improved && nbIter<maxIterKRP);
 
-    Deb.echo("==> bitflip :" + nbIter + " iterations");
+    if (debug) Deb.echo("==> bitflip :" + nbIter + " iterations");
 
     // in order to recover all history vectors
     ttp.objective(sol);
@@ -842,7 +842,7 @@ public abstract class LocalSearch extends SearchHeuristic {
 
     long trials = Math.round(nbItems*trialFactor);
 
-    Deb.echo(">>>> TRIAL FACTOR: "+trialFactor);
+    if (debug) Deb.echo(">>>> TRIAL FACTOR: "+trialFactor);
 
     //===============================================
     // start simulated annealing process

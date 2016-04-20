@@ -31,6 +31,6 @@ public abstract class Evolution extends SearchHeuristic {
   // MA params
   public static final double LS_RATE = .2; // .1
 
-  Population pop;
+  protected Population pop;
 
 }

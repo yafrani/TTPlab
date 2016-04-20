@@ -1,6 +1,10 @@
-package solver;
+package oldsolver;
 
 import ea.*;
+import solver.CS2SA;
+import solver.Constructive;
+import solver.Evolution;
+import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -47,8 +51,8 @@ public class EvoMPUX extends Evolution {
     ls.firstfit();
 
     // reduce LS time
-    ls.maxIterTSKP = 30;
-    ls.maxIterKRP = 30;
+//    ls.maxIterTSKP = 30;
+//    ls.maxIterKRP = 30;
 
     // initialize one using LK
     pop.sol[0] = new TTPSolution(
@@ -94,8 +98,8 @@ public class EvoMPUX extends Evolution {
     int nbIdleSteps = 0;
     // max iteration in LS
     // todo depends on problem size (#items and #cities) ??
-    ls.maxIterTSKP = 50;
-    ls.maxIterKRP = 10;
+//    ls.setMmaxIterTSKP = 50;
+//    ls.maxIterKRP = 10;
     do {
       nbGen++;
       nbIdleSteps++;
@@ -122,7 +126,7 @@ public class EvoMPUX extends Evolution {
         TTPSolution[] p = Selection.tournament(pop);
 
         // Crossover parents
-        TTPSolution c = MPUX.crossover(p[0], p[1], ttp);
+        TTPSolution c = MPX2.crossover(p[0], p[1], ttp);
         ttp.objective(c);
 
         // Apply local search
@@ -203,8 +207,8 @@ public class EvoMPUX extends Evolution {
     //===============================================
     // apply LS for all
     //===============================================
-    ls.maxIterTSKP = 300;
-    ls.maxIterKRP = 300;
+//    ls.maxIterTSKP = 300;
+//    ls.maxIterKRP = 300;
     for (int i=0; i<POP_SIZE; i++) {
 
       // 2-opt heuristic on TSKP

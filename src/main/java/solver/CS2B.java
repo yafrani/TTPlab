@@ -31,12 +31,11 @@ public class CS2B extends LocalSearch {
     TTPSolution s0 = construct.generate("lz");
     // pre-process the knapsack
     // insert and eliminate items
-    s0 = insertAndEliminate(s0);
+    s0 = insertT2(s0);
     //==============================================
 
     // copy initial solution into improved solution
     TTPSolution sol = s0.clone();
-    Deb.echo("init done");
 
     // best found
     double GBest = sol.ob;

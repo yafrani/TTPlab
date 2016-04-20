@@ -183,6 +183,7 @@ public class Constructive extends TTPHeuristic {
   
   /**
    * use Lin-Kernighan TSP tour
+   * uses hardcoded tours
    */
   public int[] linkernTour() {
     int nbCities = ttp.getNbCities();

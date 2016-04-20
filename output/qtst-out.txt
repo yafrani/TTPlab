@@ -1,0 +1,4 @@
+null
+dsj1000_n999_bounded-strongly-corr_01.ttp 144219 4.304
+dsj1000_n999_bounded-strongly-corr_01.ttp 144219 4.495
+dsj1000_n999_bounded-strongly-corr_01.ttp 144219 4.029

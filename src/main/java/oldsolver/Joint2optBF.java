@@ -1,5 +1,6 @@
 package oldsolver;
 
+import solver.Constructive;
 import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
@@ -30,10 +31,12 @@ public class Joint2optBF extends LocalSearch {
   
   @Override
   public TTPSolution search() {
-    
+//    Constructive construct = new Constructive(ttp);
+//    s0 = construct.generate("lg");
+
     // calculate initial objective value
     ttp.objective(s0);
-    
+    Deb.echo(s0.ob);
     // copy initial solution into improved solution
     TTPSolution sol = s0.clone();//, sBest = s0.clone();
     

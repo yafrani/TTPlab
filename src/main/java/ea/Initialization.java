@@ -198,12 +198,12 @@ public class Initialization extends TTPHeuristic {
     if (nbCities>1000)
       nbKicks = 80;
     if (nbCities>10000)
-      nbKicks = 300;
+      nbKicks = 500;
     if (nbCities>30000)
-      nbKicks = 1400;
+      nbKicks = 800;
     // ...
 
-    Deb.echo("nb LK kicks: "+nbKicks);
+    //Deb.echo("nb LK kicks: "+nbKicks);
 
     try {
       // execute linkern program

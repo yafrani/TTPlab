@@ -7,13 +7,21 @@ import utils.Deb;
 import utils.Quicksort;
 import utils.TwoOptHelper;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
- * junk testing
+ * Created by kyu on 1/26/16.
  */
 public class TestJunk {
 
-
   public static void main(String[] s) {
+    Deb.echo(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+  }
+
+
+
+  public static void mainww(String[] s) {
     double lsRate = .001;
     int c=1;
     do {
@@ -22,14 +30,6 @@ public class TestJunk {
       c++;
     } while (lsRate<1);
   }
-
-
-
-
-
-
-
-
 
   public static void mainxx(String[] args) {
 
@@ -106,10 +106,6 @@ public class TestJunk {
   }
 
 
-
-
-
-
   public static void mainxxx(String[] args) {
     final TTP1Instance ttp = new TTP1Instance("berlin52-ttp/berlin52_n51_bounded-strongly-corr_01.ttp");
     Deb.echo(ttp);
@@ -174,7 +170,7 @@ public class TestJunk {
     //Deb.echol("z   :"); Deb.echo(z,"%4d");
     Deb.echol("x   :"); Deb.echo(x,"%4d");
     Deb.echol("wacc:"); Deb.echo(s0.weightAcc,"%4d");
-    Deb.echol("tacc:"); Deb.echo(s0.timeAcc,"%4.0f");
+    Deb.echol("tacc:"); Deb.echo(s0.timeAcc, "%4.0f");
 
     //Deb.echol("wr:"); Deb.echo(s0.weightRec,"%4d");
     //Deb.echo("ob = "+s0.ob);

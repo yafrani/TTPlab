@@ -12,6 +12,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import oldsolver.EvoMPUX;
+import oldsolver.Joint2optBF;
+import oldsolver.JointN1BF;
 import solver.*;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
@@ -36,11 +39,27 @@ public class TTPPaperTests {
   /**
    * initial picking plan generation
    */
-  static final char ppAlgo = 'z';
+  static final char ppAlgo = 'g';
   
   
   
   static final String[] instFolders = {
+//    "eil51-ttp",
+//    "berlin52-ttp",
+//    "eil76-ttp",
+    "kroA100-ttp",
+//    "pr124-ttp",
+//    "ch150-ttp",
+//    "u159-ttp",
+//    "kroA200-ttp",
+//    "ts225-ttp",
+//    "a280-ttp",
+//    "lin318-ttp",
+//    "u574-ttp",
+//    "u724-ttp",
+//    "dsj1000-ttp",
+//    "rl1304-ttp",
+
 //    // small
 //    "eil76-ttp",
 //    "kroA100-ttp",
@@ -54,36 +73,38 @@ public class TTPPaperTests {
 //    "rl1304-ttp",
 //    "fl1577-ttp",
 //    "d2103-ttp",
-    "pcb3038-ttp",
-    "fnl4461-ttp",
-    "pla7397-ttp",
-    // large
-    "rl11849-ttp",
-    "usa13509-ttp",
-    "brd14051-ttp",
-    "d15112-ttp",
-    "d18512-ttp",
-    "pla33810-ttp",
+//    "pcb3038-ttp",
+//    "fnl4461-ttp",
+//    "pla7397-ttp",
+//    // large
+//    "rl11849-ttp",
+//    "usa13509-ttp",
+//    "brd14051-ttp",
+//    "d15112-ttp",
+//    "d18512-ttp",
+//    "pla33810-ttp",
 //    "pla85900-ttp",
   };
 
 
   static final String[] KPTypes = {
-//    "uncorr",
+    "uncorr",
 //    "uncorr-similar-weights",
-    "bounded-strongly-corr",
+//    "bounded-strongly-corr",
   };
   
   
   static final int[] knapsackCategories = {
-    1,
+//    1,
 //    5,
+    6,
 //    10,
   };
   
   
   static final int[] itemFactor = {
     1,
+//    3,
 //    5,
 //    10,
   };
@@ -103,9 +124,9 @@ public class TTPPaperTests {
     
     /* algorithm settings */
 //    final LocalSearch algo = new CS2SA();
-    final Evolution algo = new EvoMPUX();
+    final LocalSearch algo = new JointN1BF();
 
-    //algo.firstfit();
+//    algo.firstfit();
 //    algo.noDebug();
     algo.noLog();
     
@@ -154,10 +175,10 @@ public class TTPPaperTests {
               ttp.objective(s0);
               
               /* algorithm setting */
-              //algo.setS0(s0);
+              algo.setS0(s0);
               algo.setTTP(ttp);
 
-              
+
               /*---------------------------------*
                * execute: interruption sensitive *
                *---------------------------------*/
