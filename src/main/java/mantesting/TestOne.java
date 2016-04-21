@@ -107,7 +107,7 @@ public class TestOne {
 
     /* algorithm */
     //final SearchHeuristic evalgo = new CS2SA(ttp);
-    final SearchHeuristic evalgo  = new Joint2optBF(ttp);
+    final SearchHeuristic evalgo  = new MA2B(ttp);
     evalgo.debug();
 
     /* execute */

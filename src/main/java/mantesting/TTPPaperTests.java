@@ -46,8 +46,8 @@ public class TTPPaperTests {
   static final String[] instFolders = {
 //    "eil51-ttp",
 //    "berlin52-ttp",
-//    "eil76-ttp",
-    "kroA100-ttp",
+    "eil76-ttp",
+//    "kroA100-ttp",
 //    "pr124-ttp",
 //    "ch150-ttp",
 //    "u159-ttp",
@@ -59,6 +59,8 @@ public class TTPPaperTests {
 //    "u724-ttp",
 //    "dsj1000-ttp",
 //    "rl1304-ttp",
+
+
 
 //    // small
 //    "eil76-ttp",
@@ -124,9 +126,9 @@ public class TTPPaperTests {
     
     /* algorithm settings */
 //    final LocalSearch algo = new CS2SA();
-    final LocalSearch algo = new JointN1BF();
+    final LocalSearch algo = new Joint2optBF();
 
-//    algo.firstfit();
+    algo.firstfit();
 //    algo.noDebug();
     algo.noLog();
     
