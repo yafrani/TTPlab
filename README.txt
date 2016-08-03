@@ -1,15 +1,19 @@
-# Environment
+=================================
+ Environment
+=================================
 
-## Prerequisites
+Prerequisites:
 - java 1.7+
 - any linux OS
 
-## Additional tools
+Additional tools:
 - Intellij IDEA 14+
 - Gradle 2+
 
 
-# Algorithms/References
+=================================
+ Algorithms/References
+=================================
 
 - cs2b  : CoSolver-based with 2-OPT and Bit-flip [2]
 - cs2sa : CoSolver-based with 2-OPT and Simulated Annealing [1]
@@ -19,8 +23,9 @@
 
 [2] Yafrani, Mohamed El, and Belaïd Ahiod. "Cosolver2B: An Efficient Local Search Heuristic for the Travelling Thief Problem." arXiv preprint arXiv:1603.07051 (2016).
 
-
-# Important notes
+=================================
+ Important notes
+=================================
 
 1. make sure all the files in bins directory are executable:
    chmod +x bins -R
