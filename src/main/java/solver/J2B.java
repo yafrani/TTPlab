@@ -1,4 +1,4 @@
-package oldsolver;
+package solver;
 
 import ea.Initialization;
 import solver.Constructive;

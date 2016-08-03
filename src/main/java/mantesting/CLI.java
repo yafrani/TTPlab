@@ -13,8 +13,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import oldsolver.J2B;
-import oldsolver.JNB;
+import solver.J2B;
+import solver.JNB;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;

@@ -1,4 +1,4 @@
-package oldsolver;
+package solver;
 
 import solver.Constructive;
 import solver.LocalSearch;
