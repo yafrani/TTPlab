@@ -1,5 +1,6 @@
 package oldsolver;
 
+import ea.Initialization;
 import solver.Constructive;
 import solver.LocalSearch;
 import ttp.TTP1Instance;
@@ -15,14 +16,14 @@ import utils.TwoOptHelper;
  * @author kyu
  *
  */
-public class Joint2optBF extends LocalSearch {
+public class J2B extends LocalSearch {
   
   
-  public Joint2optBF() {
+  public J2B() {
     super();
   }
   
-  public Joint2optBF(TTP1Instance ttp) {
+  public J2B(TTP1Instance ttp) {
     super(ttp);
   }
   
@@ -31,12 +32,26 @@ public class Joint2optBF extends LocalSearch {
   
   @Override
   public TTPSolution search() {
-//    Constructive construct = new Constructive(ttp);
-//    s0 = construct.generate("lg");
+
+    //===============================================
+    // generate initial solution
+    //===============================================
+    Constructive construct = new Constructive(ttp);
+
+//    s0 = new TTPSolution(
+//      init.rlinkern(),
+//      construct.zerosPickingPlan()
+//    );
+    s0 = construct.generate("lg");
+//    s0 = insertAndEliminate(s0);
+
+    //ttp.objective(s0);
+    //Deb.echo("STARTING SOL >> "+s0.ob);
+    //===============================================
 
     // calculate initial objective value
     ttp.objective(s0);
-    Deb.echo(s0.ob);
+//    Deb.echo(s0.ob);
     // copy initial solution into improved solution
     TTPSolution sol = s0.clone();//, sBest = s0.clone();
     

@@ -12,9 +12,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import oldsolver.EvoMPUX;
-import oldsolver.Joint2optBF;
-import oldsolver.JointN1BF;
+import oldsolver.J2B;
 import solver.*;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
@@ -46,10 +44,10 @@ public class TTPPaperTests {
   static final String[] instFolders = {
 //    "eil51-ttp",
 //    "berlin52-ttp",
-    "eil76-ttp",
+//    "eil76-ttp",
 //    "kroA100-ttp",
 //    "pr124-ttp",
-//    "ch150-ttp",
+    "ch150-ttp",
 //    "u159-ttp",
 //    "kroA200-ttp",
 //    "ts225-ttp",
@@ -91,8 +89,8 @@ public class TTPPaperTests {
 
   static final String[] KPTypes = {
     "uncorr",
-//    "uncorr-similar-weights",
-//    "bounded-strongly-corr",
+    "uncorr-similar-weights",
+    "bounded-strongly-corr",
   };
   
   
@@ -100,7 +98,7 @@ public class TTPPaperTests {
 //    1,
 //    5,
     6,
-//    10,
+    10,
   };
   
   
@@ -108,7 +106,7 @@ public class TTPPaperTests {
     1,
 //    3,
 //    5,
-//    10,
+    10,
   };
   
   
@@ -126,9 +124,9 @@ public class TTPPaperTests {
     
     /* algorithm settings */
 //    final LocalSearch algo = new CS2SA();
-    final LocalSearch algo = new Joint2optBF();
+    final LocalSearch algo = new J2B();
 
-    algo.firstfit();
+//    algo.firstfit();
 //    algo.noDebug();
     algo.noLog();
     
@@ -166,7 +164,7 @@ public class TTPPaperTests {
                 Deb.echo(">> skipped");
                 continue;
               }
-              //if (true) continue;
+              if (true) continue;
               
               // TTP instance
               TTP1Instance ttp = new TTP1Instance(ttpi);

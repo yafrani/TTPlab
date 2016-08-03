@@ -1,12 +1,9 @@
 package ttp;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Properties;
 
 import utils.CityCoordinates;
 import utils.ConfigHelper;
-import utils.Deb;
 
 /**
  * TTP1 instance
@@ -26,7 +23,7 @@ public class TTP1Instance extends TTPInstance {
   protected double rent;
 
 
-  
+
   /**
    * instance to string
    */

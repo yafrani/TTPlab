@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import solver.Constructive;
-import oldsolver.JointN1BF;
+import oldsolver.JNB;
 import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
@@ -103,7 +103,7 @@ public class TestAll {
     
     
     /* algorithm settings */
-    final LocalSearch algo = new JointN1BF();
+    final LocalSearch algo = new JNB();
     algo.firstfit();
     algo.noDebug();
     algo.noLog();

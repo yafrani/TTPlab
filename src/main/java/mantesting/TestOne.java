@@ -7,7 +7,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import oldsolver.Joint2optBF;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -106,8 +105,8 @@ public class TestOne {
     Deb.echo("------------------");
 
     /* algorithm */
-    //final SearchHeuristic evalgo = new CS2SA(ttp);
-    final SearchHeuristic evalgo  = new MA2B(ttp);
+    final SearchHeuristic evalgo = new CS2SA(ttp);
+//    final SearchHeuristic evalgo  = new MA2B(ttp);
     evalgo.debug();
 
     /* execute */

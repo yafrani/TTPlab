@@ -13,6 +13,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import oldsolver.J2B;
+import oldsolver.JNB;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -62,6 +64,13 @@ public class CLI {
       case "ma2b":
         algo = new MA2B(ttp);
         break;
+      case "j2b":
+        algo = new J2B(ttp);
+        break;
+      case "jnb":
+        algo = new JNB(ttp);
+        break;
+
       default:
         algo = new CS2SA(ttp);
     }

@@ -1,5 +1,6 @@
 package oldsolver;
 
+import solver.Constructive;
 import solver.LocalSearch;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
@@ -13,14 +14,14 @@ import utils.SwapHelper;
  * @author kyu
  *
  */
-public class JointN1BF extends LocalSearch {
+public class JNB extends LocalSearch {
   
   
-  public JointN1BF() {
+  public JNB() {
     super();
   }
   
-  public JointN1BF(TTP1Instance ttp) {
+  public JNB(TTP1Instance ttp) {
     super(ttp);
   }
   
@@ -28,7 +29,13 @@ public class JointN1BF extends LocalSearch {
   
   @Override
   public TTPSolution search() {
-    
+
+    //===============================================
+    // generate initial solution
+    //===============================================
+    Constructive construct = new Constructive(ttp);
+    s0 = construct.generate("lr");
+
     // calculate initial objective value
     ttp.objective(s0);
     
