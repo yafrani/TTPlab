@@ -3,7 +3,7 @@
 This project is a java implementation of heuristic algorithms to solve
 the [Travelling Thief Problem](http://cs.adelaide.edu.au/~optlog/research/combinatorial.php) [3].
 
-If you are more interested in comparing your algorithm with our, 
+If you are more interested in comparing your algorithm with ours, 
 the jar executable version with python scripts is also available at 
 [this link](https://github.com/yafrani/ttplab-jar).
 
@@ -49,8 +49,8 @@ For additional information, please send an email to *m dot elyafrani at gmail do
 
 # References
 
-[1] El Yafrani, Mohamed, and Belaïd Ahiod. "Population-based vs. Single-solution Heuristics for the Travelling Thief Problem." Proceedings of the 2016 on Genetic and Evolutionary Computation Conference. ACM, 2016.
+[1] El Yafrani, Mohamed, and Belaïd Ahiod. "Population-based vs. Single-solution Heuristics for the Travelling Thief Problem." Genetic and Evolutionary Computation Conference (GECCO), ACM, 2016.
 
-[2] Yafrani, Mohamed El, and Belaïd Ahiod. "Cosolver2B: An Efficient Local Search Heuristic for the Travelling Thief Problem." arXiv preprint arXiv:1603.07051 (2016).
+[2] El Yafrani, Mohamed, and Belaïd Ahiod. "Cosolver2B: An Efficient Local Search Heuristic for the Travelling Thief Problem." IEEE/ACS International Conference of Computer Systems and Applications (AICCSA), IEEE, 2015.
 
 [3] Bonyadi, Mohammad Reza, Zbigniew Michalewicz, and Luigi Barone. "The travelling thief problem: the first step in the transition from theoretical problems to realistic problems." 2013 IEEE Congress on Evolutionary Computation. IEEE, 2013.
