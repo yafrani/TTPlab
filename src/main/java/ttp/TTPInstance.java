@@ -140,7 +140,7 @@ public abstract class TTPInstance {
   // used to simulate the distance matrix
   public long distFor(int i, int j) {
     if (dist==null) {
-      return Math.round(this.coordinates[i].distanceEuclid(this.coordinates[j]));
+      return (long)Math.ceil(this.coordinates[i].distanceEuclid(this.coordinates[j]));
     }
     return dist[i][j];
   }

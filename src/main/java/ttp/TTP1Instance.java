@@ -130,8 +130,7 @@ public class TTP1Instance extends TTPInstance {
             this.setDist(new long[this.nbCities][this.nbCities]);
             for (int i = 0; i < nbCities; i++) {
               for (int j = 0; j < nbCities; j++) {
-                getDist()[i][j] = Math.round(this.coordinates[i].distanceEuclid(this.coordinates[j]));
-                //System.out.println(this.coord[i] + "&" + this.coord[j] + "->" + dist[i][j]);
+                getDist()[i][j] = (long)Math.ceil(this.coordinates[i].distanceEuclid(this.coordinates[j]));
               }
             }
           }
