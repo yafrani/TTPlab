@@ -74,6 +74,24 @@ public class TwoOptHelper {
 
 
 
+  /**
+   * do random 2opt arcs exchange
+   */
+  public static void doRand2opt(int[] tour) {
+
+    int i, j, n = tour.length;
+
+    i = RandGen.randInt(1, n-11);
+    j = i + RandGen.randInt(2,10);
+
+    int tmp, N = (j-i+1)/2;
+    for (int k=i; k<i+N; k++) {
+      tmp = tour[k];
+      tour[k] = tour[j-k+i];
+      tour[j-k+i] = tmp;
+    }
+  }
+
 
   public static void doRandExchange(int[] tour) {
     int pos1,pos2,pos3,

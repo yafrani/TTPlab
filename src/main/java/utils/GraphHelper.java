@@ -20,7 +20,9 @@ public class GraphHelper {
 
     try {
       // write coordinates
-      String fileNameCoord = "bins/delaunay/" + ttp.getName() + ".coord";
+      String[] tspBase = ttp.getName().split("_",2);
+      String name = tspBase[0];
+      String fileNameCoord = "bins/delaunay/" + name + ".coord";
       File fileCoord = new File(fileNameCoord);
       PrintWriter coordWriter = new PrintWriter(fileCoord);
       coordWriter.println(ttp.getNbCities());

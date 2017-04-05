@@ -16,6 +16,9 @@ import utils.Log;
 public abstract class TTPInstance {
   
   protected String name;
+  protected String directory;
+  protected String tspName;
+
   protected String knapsackDataType;
   protected int nbCities;
   protected int nbItems;
@@ -92,7 +95,13 @@ public abstract class TTPInstance {
   public void setDist(long[][] dist) {
     this.dist = dist;
   }
-  
+
+  public String getTspName() {
+    return tspName;
+  }
+  public String getDirectory() {
+    return directory;
+  }
   public String getName() {
     return name;
   }
@@ -140,6 +149,7 @@ public abstract class TTPInstance {
   // used to simulate the distance matrix
   public long distFor(int i, int j) {
     if (dist==null) {
+//      return Math.round(this.coordinates[i].distanceEuclid(this.coordinates[j]));
       return (long)Math.ceil(this.coordinates[i].distanceEuclid(this.coordinates[j]));
     }
     return dist[i][j];

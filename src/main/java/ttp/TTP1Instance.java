@@ -4,6 +4,7 @@ import java.io.*;
 
 import utils.CityCoordinates;
 import utils.ConfigHelper;
+import utils.Deb;
 
 /**
  * TTP1 instance
@@ -39,6 +40,12 @@ public class TTP1Instance extends TTPInstance {
    * @param fileName
    */
   public TTP1Instance(String fileName) {
+    //this.name = fileName;
+    String[] sp = fileName.split("/", 2);
+    this.directory = sp[0];
+    this.name = sp[1];
+    String[] sp2 = directory.split("-", 2);
+    this.tspName = sp2[0];
 
     String ttpData = ConfigHelper.getProperty("ttpdata");
 
@@ -55,7 +62,7 @@ public class TTP1Instance extends TTPInstance {
         if (line.startsWith("PROBLEM NAME")) {
           line = line.substring(line.indexOf(":")+1);
           line = line.replaceAll("\\s+","");
-          this.name = line;
+          //this.name = line;
         }
         
         // KP data type
@@ -108,7 +115,7 @@ public class TTP1Instance extends TTPInstance {
           this.rent = Double.parseDouble(line);
         }
         
-        // edge weight
+      // edge weight
         if (line.startsWith("EDGE_WEIGHT_TYPE")) {
           line = line.substring(line.indexOf(":")+1);
           line = line.replaceAll("\\s+","");
@@ -130,7 +137,9 @@ public class TTP1Instance extends TTPInstance {
             this.setDist(new long[this.nbCities][this.nbCities]);
             for (int i = 0; i < nbCities; i++) {
               for (int j = 0; j < nbCities; j++) {
+//                getDist()[i][j] = Math.round(this.coordinates[i].distanceEuclid(this.coordinates[j]));
                 getDist()[i][j] = (long)Math.ceil(this.coordinates[i].distanceEuclid(this.coordinates[j]));
+                //System.out.println(this.coord[i] + "&" + this.coord[j] + "->" + dist[i][j]);
               }
             }
           }

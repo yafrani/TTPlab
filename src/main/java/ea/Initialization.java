@@ -2,9 +2,10 @@ package ea;
 
 import solver.TTPHeuristic;
 import ttp.TTP1Instance;
+import ttp.TTPSolution;
+import utils.ConfigHelper;
 import utils.Deb;
 import utils.GraphHelper;
-import utils.RandGen;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -189,7 +190,7 @@ public class Initialization extends TTPHeuristic {
     int nbCities = ttp.getNbCities();
     int[] tour = new int[nbCities];
 
-    String fileName = ttp.getName().replaceAll("-.+", "");
+    String fileName = ttp.getTspName().replaceAll("-.+", "");
 
     // number of LK kicks
     int nbKicks = 1;
@@ -204,6 +205,7 @@ public class Initialization extends TTPHeuristic {
     // ...
 
     //Deb.echo("nb LK kicks: "+nbKicks);
+    //if (Thread.currentThread().isInterrupted()) return null;
 
     try {
       // execute linkern program
@@ -235,4 +237,58 @@ public class Initialization extends TTPHeuristic {
     return tour;
   }
 
+
+
+
+
+
+
+
+  /**
+   * Markus' code for linkern + PackIterative
+   */
+//  public TTPSolution lkPackIterative() {
+//
+//    // feed the input solution to approx jar
+//    String dataDir = ConfigHelper.getProperty("ttpdata");
+//    String instDir = ttp.getDirectory();
+//    String instName = ttp.getName();
+//    //Deb.echo(fileName+"::"+instFolder);
+//
+//    // setup and run algorithm
+//    int maxRuntime = 100000; // in ms
+//    M_TTPInstance instance = new M_TTPInstance(new File(dataDir+"/"+instDir+"/"+instName));
+//    M_TTPSolution newSolution = new M_TTPSolution(new int[instance.numberOfNodes+1], new int[instance.numberOfItems]);
+//    instance.evaluate(newSolution, false);
+//    // execute and get solution
+//    newSolution = M_Optimisation.HT(instance, maxRuntime, true);
+//    int[] newTour = newSolution.normalTour();
+//    int[] newPP = newSolution.normalPP(instance);
+////        Deb.echo(newTour);
+////        Deb.echo(newPP);
+//
+//    // read output solution
+//    TTPSolution sf = new TTPSolution(newTour, newPP);
+//    return sf;
+////    problem.evaluate(sf);
+////    setWend(sf.wend);
+////    setOb(sf.ob);
+//
+////    // convert to BitSet
+////    BitSet bitSet = new BitSet(newPP.length);
+////
+////    for (int i = 0; i < newPP.length; i++) {
+////      bitSet.set(i, newPP[i]!=0);
+////    }
+////
+////    // init tour
+////    setVariableValue(0, 1);
+////    for (int i = 1; i < this.getNbCities() - 1; i++) {
+////      setVariableValue(i, newTour[i]);
+////    }
+////    setVariableValue(this.getNbCities() - 1, 1);
+////
+////    // start with empty bit-set
+////    setVariableValue(getNbCities(), bitSet);
+//  }
 }

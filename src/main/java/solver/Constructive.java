@@ -189,7 +189,7 @@ public class Constructive extends TTPHeuristic {
     int nbCities = ttp.getNbCities();
     int[] tour = new int[nbCities];
     
-    String fileName = ttp.getName().replaceAll("-.+", "");
+    String fileName = ttp.getTspName();
     String dirName = ConfigHelper.getProperty("lktours");
     fileName += ".linkern.tour";
     //Deb.echo(dirName + "/" + fileName);
@@ -268,6 +268,51 @@ public class Constructive extends TTPHeuristic {
     return tour;
   }
 
+
+
+  /**
+   * Boruvka initialization procedure
+   */
+  public int[] qburuvkaTour() {
+    int nbCities = ttp.getNbCities();
+    int[] tour = new int[nbCities];
+
+    String name = ttp.getName().replaceAll("-.+", "");
+    String fileName = ConfigHelper.getProperty("tspdata") + name + ".tsp";
+    Deb.echo(fileName);
+    try {
+      // execute linkern program
+      String[] cmd = {"./bins/kdtree/kdtree",
+        "-j",
+        "-o", "./bins/kdtree/out.tour",
+        fileName};
+      Runtime runtime = Runtime.getRuntime();
+      Process proc = runtime.exec(cmd);
+
+      proc.waitFor();
+
+      // read output tour
+      File tourFile = new File("./bins/kdtree/out.tour");
+      BufferedReader br = new BufferedReader(new FileReader(tourFile));
+      String line;
+      br.readLine(); // skip first line
+      int i = 0;
+      while ((line = br.readLine()) != null) {
+        String[] parts = line.split("\\s+");
+        for (String str:parts)
+          tour[i++] = 1 + Integer.parseInt(str);
+      }
+      tourFile.delete();
+      br.close();
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    return tour;
+  }
 
 
 
@@ -509,9 +554,9 @@ public class Constructive extends TTPHeuristic {
   
   
   //testing ...
-  public static void mainx(String[] args) {
+  public static void main(String[] args) {
     Constructive x = new Constructive(new TTP1Instance("eil51-ttp/eil51_n50_bounded-strongly-corr_01.ttp"));
-    int[] t = x.linkernTour();
+    int[] t = x.qburuvkaTour();
     Deb.echo(t);
   }
 }

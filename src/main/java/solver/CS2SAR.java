@@ -1,5 +1,6 @@
 package solver;
 
+import ea.Initialization;
 import ttp.TTP1Instance;
 import ttp.TTPSolution;
 import utils.Deb;
@@ -15,7 +16,7 @@ import utils.RandGen;
  *
  * Created by kyu on 4/7/15.
  */
-public class CS2SA extends LocalSearch {
+public class CS2SAR extends LocalSearch {
 
   public double T_abs;       // absolute temperature
   public double T0;           // initial temperature
@@ -23,13 +24,13 @@ public class CS2SA extends LocalSearch {
   public double trialFactor; // number of trials (per temperature)
 
 
-  public CS2SA() {
+  public CS2SAR() {
     super();
     // use default config
     SAConfig();
   }
 
-  public CS2SA(TTP1Instance ttp) {
+  public CS2SAR(TTP1Instance ttp) {
     super(ttp);
     // use default config
     SAConfig();
@@ -43,12 +44,10 @@ public class CS2SA extends LocalSearch {
     int nbItems = ttp.getNbItems();
 
     T_abs = 1;
-//    T0 = 100.0;
-//    alpha = 0.95;
-    alpha=0.9578;
-    T0=98;
+    T0 = 100.0;
+    alpha = 0.95;
 
-    trialFactor = generateTFLinFit(nbItems);
+    trialFactor = generateTFLinFitALT(nbItems);
   }
 
 
@@ -207,18 +206,21 @@ public class CS2SA extends LocalSearch {
     return sBest;
   }
 
+
   @Override
   public TTPSolution search() {
 
     //===============================================
     // generate initial solution
     //===============================================
+    Constructive construct = new Constructive(ttp);
+    Initialization init = new Initialization(ttp);
     if (s0==null) {
-      Constructive construct = new Constructive(ttp);
       // use Lin-Kernighan to initialize the tour
       s0 = new TTPSolution(
-        construct.linkernTour(),
+        init.rlinkern(),
         construct.zerosPickingPlan()
+//        construct.randomPickingPlan()
       );
 
       // pre-process the knapsack
@@ -226,8 +228,10 @@ public class CS2SA extends LocalSearch {
       if (ttp.getNbCities() < 30000) s0 = insertAndEliminate(s0);
       else s0 = insertT2(s0);
 
-//      Initialization init = new Initialization(ttp);
-//      s0 = init.lkPackIterative();
+      // boosting
+      if (ttp.getNbCities() < 200) {
+        s0 = lsBitFlip(s0);
+      }
     }
     ttp.objective(s0);
     if (this.debug) {
@@ -238,35 +242,49 @@ public class CS2SA extends LocalSearch {
     // copy initial solution into improved solution
     TTPSolution sol = s0.clone();
 
-    // best found
-    double GBest = sol.ob;
+    // best found solution
+    TTPSolution sBest = sol.clone();
+
     // number of iterations
     int nbIter = 0;
     // improvement tag
-    boolean improved;
+    int idleSteps = 0;
 
     //===============================================
     // start cosolver search
     //===============================================
     do {
       nbIter++;
-      improved = false;
 
       // 2-opt heuristic on TSKP
       sol = fast2opt(sol);
-      //if (true) break;
 
       // simple bit-flip on KRP
       sol = simulatedAnnealing(sol);
 
-      // update best if improvement
-      if (sol.ob > GBest) {
-        GBest = sol.ob;
-        improved = true;
+      // tag idle step
+      if (sol.ob > sBest.ob) {
+        idleSteps = 0;
+        sBest = sol.clone();
+      }
+      else {
+        idleSteps++;
       }
 
-      // stop execution if interrupted
-      if (Thread.currentThread().isInterrupted()) return sol;
+      // restart if no improvement
+      if (idleSteps>0 && !Thread.currentThread().isInterrupted()) {
+        if (debug) {
+          Deb.echo("===> RESTART");
+        }
+        idleSteps++;
+        // restart
+        sol = new TTPSolution(
+          init.rlinkern(),
+          construct.randomPickingPlan()
+        );
+      }
+
+      ttp.objective(sol);
 
       // debug msg
       if (this.debug) {
@@ -276,26 +294,20 @@ public class CS2SA extends LocalSearch {
         Deb.echo("---");
       }
 
-      // stop when no improvements
-    } while (improved);
+      // stop when time expires
+    } while (!Thread.currentThread().isInterrupted());
     //===============================================
 
-    return sol;
+    return sBest;
   }
 
 
 
-  public static double generateTFLinFitx(int xi) {
+  public static double generateTFLinFitALT(int xi) {
+//    function yi = nit_linear(xi)
     int i=-1;
-//    int[] x = new int[]{         50,    204,  609,  1147,  8034, 38875, 105318,  253568, 338090};
-    int[] x = new int[]{         1,   75,    375,  790,  2102, 15111, 70250, 140500,  338090};
-    double[] y = new double[]{57872,  13896,  700,   350,    16,     1,   0.16,  0.0493,   0.03};
-
-//    int[] x = new int[]{         1,   75,    375,  790,  2102, 15111, 70250, 140500,  338090};
-//    double[] y = new double[]{
-//      57872, 13896, 350, 16, 1, .16, .0493, .03
-//    };
-
+    int[] x = new int[]{50, 204, 609, 1147, 8034, 38875, 105318, 253568, 338090};
+    double[] y = new double[]{1000, 500,  100,   50,    10,     1,   0.04,  0.03, 0.03};
     int n=y.length;
     for (int k=0; k<n-1; k++) {
       if (x[k] <= xi && xi < x[k + 1]) {
@@ -303,6 +315,8 @@ public class CS2SA extends LocalSearch {
         break;
       }
     }
+
+    // handle special cases
     if (xi <= x[0]) {
       return 57872.0;
     }
@@ -310,78 +324,13 @@ public class CS2SA extends LocalSearch {
       return 0.03;
     }
 
+    // create linear interpolation
     double m = ( y[i]-y[i+1] ) / ( x[i]-x[i+1] );
     double b = y[i]-m*x[i];
 
     double yi = m*xi + b;
 
     return yi;
-  }
-
-  public static double generateTFLinFit(int xi) {
-    int i=-1;
-//    int[] z = new int[]{ 1,  75, 375, 790, 2102, 15111, 70250, 140500, 338090};
-
-//    int[] x = new int[]{         1,   75,    375,  790,  2102, 15111, 70250, 140500,  338090};
-//    double[] y = new double[]{57872,  13896,  700,   350,    16,     1,   0.16,  0.0493,   0.03};
-
-    int[] x = new int[]{ 1, 130, 496, 991, 3038, 18512, 75556, 169046, 338090};
-    double[] y = new double[]{57872,  13896,  700,   350,    16,     1,   0.16,  0.0493,   0.03};
-
-
-    int n=y.length;
-    for (int k=0; k<n-1; k++) {
-      if (x[k] <= xi && xi < x[k + 1]) {
-        i = k;
-        break;
-      }
-    }
-    if (xi <= x[0]) {
-      return 57872.0;
-    }
-    if (xi >= x[n-1]) {
-      return 0.03;
-    }
-
-    double m = ( y[i]-y[i+1] ) / ( x[i]-x[i+1] );
-    double b = y[i]-m*x[i];
-
-    double yi = m*xi + b;
-
-    return yi;
-  }
-
-  public static double generateTFExpFit(int X) {
-    double a =   1.614e+05;
-    double b =   -0.006915;
-    double c =       145.4;
-    double d =  -5.191e-05;
-
-    double A = a * Math.exp(b * X) + c * Math.exp(d * X);
-
-    return A;
-  }
-
-  public static double generateTFManualFit(int X) {
-    int nbItems = X;
-    double trialFactor;
-    if (nbItems < 500)
-      trialFactor = 1000;// reduce... (time)
-
-    else if (nbItems < 1000)
-      trialFactor = 100;
-    else if (nbItems < 5000)
-      trialFactor = 50;
-
-    else if (nbItems < 20000)
-      trialFactor = 10; //was 5... retest others
-    else if (nbItems < 100000)
-      trialFactor = 1;
-    else if (nbItems < 200000)
-      trialFactor = .04;
-    else
-      trialFactor = .03;
-    return trialFactor;
   }
 
 }

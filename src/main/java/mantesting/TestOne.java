@@ -18,17 +18,15 @@ public class TestOne {
 
     String[] inst = {
 //      "my-ttp/sample10.ttp",
-//      "bier127-ttp/bier127_n1260_bounded-strongly-corr_01.ttp",
-//      "a280-ttp/a280_n2790_uncorr-similar-weights_10.ttp",
 
       //===========================================
       // ITEM FACTOR = 1
       //===========================================
-//      "eil76-ttp/eil76_n75_bounded-strongly-corr_01.ttp",
-//      "kroA100-ttp/kroA100_n99_bounded-strongly-corr_01.ttp",
+//      "eil76-ttp/eil76_n75_uncorr_01.ttp",
+      "kroA100-ttp/kroA100_n99_uncorr_01.ttp",
 //      "ch130-ttp/ch130_n129_bounded-strongly-corr_01.ttp",
 //      "u159-ttp/u159_n158_bounded-strongly-corr_01.ttp",
-      "a280-ttp/a280_n279_bounded-strongly-corr_01.ttp",
+//      "a280-ttp/a280_n279_bounded-strongly-corr_01.ttp",
 //      "u574-ttp/u574_n573_bounded-strongly-corr_01.ttp",
 //      "u724-ttp/u724_n723_bounded-strongly-corr_01.ttp",
 //      "dsj1000-ttp/dsj1000_n999_bounded-strongly-corr_01.ttp",
@@ -79,7 +77,7 @@ public class TestOne {
 //      "a280-ttp/a280_n2790_uncorr_10.ttp",
 //      "u574-ttp/u574_n5730_uncorr_10.ttp",
 //      "u724-ttp/u724_n7230_uncorr_10.ttp",
-//      "dsj1000-ttp/dsj1000_n9990_uncorr_10.ttp",
+      "dsj1000-ttp/dsj1000_n9990_uncorr_10.ttp",
 //      "rl1304-ttp/rl1304_n13030_uncorr_10.ttp",
 //      "fl1577-ttp/fl1577_n15760_uncorr_10.ttp",
 //      "d2103-ttp/d2103_n21020_uncorr_10.ttp",
@@ -93,10 +91,6 @@ public class TestOne {
 //      "d18512-ttp/d18512_n185110_uncorr_10.ttp",
 //      "pla33810-ttp/pla33810_n338090_uncorr_10.ttp",
 
-      // VL inst.
-      "pla85900-ttp/pla85900_n85899_bounded-strongly-corr_01.ttp",
-      "pla85900-ttp/pla85900_n429495_uncorr-similar-weights_05.ttp",
-      "pla85900-ttp/pla85900_n858990_uncorr_10.ttp",
     };
 
     /* instance information */
@@ -104,26 +98,28 @@ public class TestOne {
     Deb.echo(ttp);
     Deb.echo("------------------");
 
+
     /* algorithm */
-    final SearchHeuristic evalgo = new CS2SA(ttp);
 //    final SearchHeuristic evalgo  = new MA2B(ttp);
+//    final SearchHeuristic evalgo = new CS2B(ttp);
+//    final SearchHeuristic evalgo = new HybridMASA(ttp);
+    final SearchHeuristic evalgo = new CS2SA(ttp);
+
     evalgo.debug();
 
     /* execute */
     ExecutorService executor = Executors.newFixedThreadPool(4);
-    Future<?> future = executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        long startTime, stopTime;
-        long exTime;
-        startTime = System.currentTimeMillis();
-        TTPSolution sx = evalgo.search();
-        stopTime = System.currentTimeMillis();
-        exTime = stopTime - startTime;
+    Future<?> future = executor.submit(() -> {
+      long startTime, stopTime;
+      long exTime;
+      startTime = System.currentTimeMillis();
+      TTPSolution sx = evalgo.search();
+      stopTime = System.currentTimeMillis();
+      exTime = stopTime - startTime;
 
-        Deb.echo("objective   : " + sx.ob);
-        Deb.echo("Duration    : " + (exTime/1000.0) + " sec");
-      }
+      Deb.echo("objective   : " + sx.ob);
+      Deb.echo("Duration    : " + (exTime/1000.0) + " sec");
+      sx.printStats();
     });
 
     executor.shutdown();  // reject all further submissions

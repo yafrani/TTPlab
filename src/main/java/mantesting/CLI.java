@@ -25,7 +25,7 @@ public class CLI {
   public static void main(String[] args) {
 
     if (args.length < 2) {
-      args = new String[]{"d18512_n185110_uncorr_10.ttp", "cs2sa"};
+      args = new String[]{"eil76_n75_bounded-strongly-corr_01.ttp", "cs2sa"};
     }
 
     String[] spl = args[0].split("_",2);
@@ -50,29 +50,46 @@ public class CLI {
 
     // TTP instance
     final TTP1Instance ttp = new TTP1Instance(spl[0]+"-ttp/"+inst);
-
+    int nbItems = ttp.getNbItems();
 
     /* algorithm to run */
     final SearchHeuristic algo;
     switch (algoName) {
+
       case "cs2b":
         algo = new CS2B(ttp);
-        break;
+      break;
+
       case "cs2sa":
         algo = new CS2SA(ttp);
-        break;
+
+        // tuned using irace package
+//        ((CS2SA)algo).trialFactor = CS2SA.generateTFLinFit(nbItems);
+//        ((CS2SA)algo).alpha = .9484;
+//        ((CS2SA)algo).T0 = 3587;
+//        Deb.echo(((CS2SA)algo).trialFactor + " // ");
+      break;
+
+      case "cs2sar":
+        algo = new CS2SAR(ttp);
+      break;
+
+
       case "ma2b":
         algo = new MA2B(ttp);
-        break;
+      break;
+
       case "j2b":
         algo = new J2B(ttp);
-        break;
+      break;
+
       case "jnb":
         algo = new JNB(ttp);
-        break;
+      break;
 
       default:
         algo = new CS2SA(ttp);
+      break;
     }
 
 
