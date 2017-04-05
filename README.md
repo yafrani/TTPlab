@@ -41,6 +41,9 @@ the jar executable version with python scripts is also available at
 
 4. database paths can be modified in the "config.properties"
 
+5. there was a metric issue in the older version of the code (before Nov 14, 2016), 
+   please download the current version for comparison purposes
+
 
 # Contact information
 
