@@ -36,12 +36,12 @@ the jar executable version with python scripts is also available at
    http://cs.adelaide.edu.au/~optlog/CEC2014COMP_InstancesNew/
 
 3. the linkern binary file in the bins/linkern/ folder is a modified one.
-   The code source have been slightly hacked in order to improve the randomness of
+   The source codes have been slightly hacked in order to improve the randomness of
    the generated initial tours
 
 4. database paths can be modified in the "config.properties"
 
-5. there was a metric issue in the older version of the code (before Nov 14, 2016), 
+5. there was a metric issue in the TTP objective function in the older version of the code (before Nov 14, 2016), 
    please download the current version for comparison purposes
 
 
